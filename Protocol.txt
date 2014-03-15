@@ -1,0 +1,8 @@
+15.03.2014
+----------
+-Ersterstellung Dokumentation
+-Github Repo erstellen
+-Einlesen Buch Kapitel 15 (Semaphore, Shared Memory…)
+-Erstellen Debian VM
+-SSH Key-gen for Github (Mac and Debian)
+

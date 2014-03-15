@@ -1,5 +1,0 @@
-15.03.2014
-----------
--Erstellen GitRepo
--Erstellen Dokumentation
--Einlesen in shared Memory, Semaphore
