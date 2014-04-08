@@ -3,6 +3,7 @@
 CFLAGS=-Wall -g -O2 -std=gnu99 -I./include -L./lib
 
 LIBS=-lpthread -litsky
+LRT=-lrt
 
 all: Server
 
@@ -42,7 +43,7 @@ lib/sort_common.o: lib/sort_common.c
 
 
 Server: Server.c lib/libitsky.a include/itskylib.h
-	gcc $(CFLAGS) Server.c $(LIBS) -o Server
+	gcc $(CFLAGS) Server.c $(LIBS) -o Server    $(LRT)
 
 
 
