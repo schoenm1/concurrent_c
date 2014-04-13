@@ -15,6 +15,7 @@
 
  ---------------------------------------------------------------*/
 
+#include "Log-Level.h"
 #include <arpa/inet.h>  /* for sockaddr_in, inet_addr() and inet_ntoa() */
 #include <errno.h>
 #include <netinet/in.h>
@@ -27,103 +28,176 @@
 #include <unistd.h>     /* for close() */
 
 #include <itskylib.h>
-#include "Log-Level.h"
 
 #define RCVBUFSIZE 128   /* Size of receive buffer */
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
 #define SERVERPORT_ARG "-p";
+#define LOGLEVEL_ARG "-l";
+#define SERVERNAME "Server";
+int _MAX_LENGTH_ARG = 5; // defines the maximum Length of arguments. e.g. "-l"
 
-unsigned short squareServPort;     /* Server port */
+/* all global variables for Arguments */
+char _logLevel_arg[10] = LOGLEVEL_ARG
+;
+char _serverPort_arg[10] = SERVERPORT_ARG
+;
 
 
 
+/* global vars for TCP-Server */
+int servSock; /* Socket descriptor for server */
+int clntSock; /* Socket descriptor for client */
+struct sockaddr_in squareServAddr; /* Local address */
+struct sockaddr_in squareClntAddr; /* Client address */
+unsigned short ServerPort; /* Server port */
+unsigned int clntAddrLen; /* Length of client address data structure */
 
 struct validArgs {
 	int isSet;
-	char arg[];
-
+	char arg[10];
+//char value[10];
 };
 
 struct validArgs validArguments[5];
 
-void initValidArguments(int argc, char *argv[]) {
-	int i;
-	int retcode;
-	char _logLevel[10] = LOGLEVEL_ARG;
-	char _serverPort[10] =SERVERPORT_ARG;
-	int counter_validArgs = 0;
+#include "valid-args.h"
 
-	/* Parse all Arguments (except arg[0]. This is File itself) */
-	for (i = 1; i < argc; i++) {
-		printf("Argument No. %i\t", i);
-		printf("Value = %s\n", argv[i]);
+void setValidArguments() {
+	/* init LOGLEVEL */
+	validArguments[0].isSet = 0;
+	char _logLevel[5] = LOGLEVEL_ARG;
+	strncpy(validArguments[0].arg, _logLevel,strlen(_logLevel));
 
-		/* if "-l" is Arg, then set Log-Level */
-		if (strcmp(argv[i], _logLevel) == 0) {
-			printf("Treffer fuer Loglevel\n\n");
-			int _mylogLevel = (int) atoi(argv[i + 1]);
-			printf("Loglevel = %i\n", _mylogLevel);
-			retcode = setLogLevel(_mylogLevel);
-			handle_error(retcode, "LogLevel could not be set\n", PROCESS_EXIT);
-			i++;
-		}
-
-
-		/* parse for Server-Port */
-		if (strcmp(argv[i], _logLevel) == 0) {
-//hier fehlt noch die Zuweisung des Portes
-
-			i++;
-		}
-
-
-
-
-	}
-}
-void usage(const char *argv0, const char *msg) {
-	if (msg != NULL && strlen(msg) > 0) {
-		printf("%s\n\n", msg);
-	}
-	printf("Usage MUST\n==============\n");
-	printf("%s -p <Server Port>\n", argv0);
-	printf("Usage OPTIONAL\n====================\n");
-	printf("-l <int Loglevel> {0=EMERGENCY, 1=ALERT, INFORMATIONAL}\n");
-	exit(1);
+	/* init Server-Port */
+	validArguments[1].isSet = 0;
+	char _serverPort[5] = SERVERPORT_ARG;
+	strncpy(validArguments[1].arg, _serverPort,strlen(_serverPort));
 }
 
-void validatingArgs(int argc, char *argv[]) {
-	int i;
-
-	for (i = 0; i < argc; i++) {
-
-		//if (strcmp(thread_data_array[count2].filename, valid_file[count])
-
-
-	}
-
-}
+setTCPServer();
 
 int main(int argc, char *argv[]) {
-
-	initValidArguments(argc, argv);
-	//initValidArgs();
-
-	/*char valid_inputs[100][255];
-
-	 printf("\nValidating now the arguments and set the configuration of the Server...\n");
-	 printf("Loglevel = %i",(int) argv[2]);
-
-
-
-	 */
-
-	//setLogLevel(myint);
-
-
 	int retcode;
-	if (is_help_requested(argc, argv)) {
-		usage(argv[0], "");
+
+	printf("\nServer started. Is now initializing the setup...\n");
+	/* set up default Log-Level */
+	retcode = setLogLevel(4);
+	handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
+	printf("... Done\n");
+
+#ifdef LOGLEVEL_EMERGENCY
+	printf("afasjfaisofh uidashfuiasdhuifahui ofh uiasdh fuiasdh uifohauiofh asuioh fuioasio\n");
+#endif
+
+	printf("Setting up the valid arguments...");
+
+	setValidArguments(); //setting up all valid arguments
+	printf("... Done\n");
+
+	/* if no arguments is chosen, output the usage of the Server */
+	if (argc == 1) {
+		usage();
+	} else {
+		printf("Verify valid arguments ...\n");
+		initValidArguments(argc, argv);
 	}
 
+	if (validArguments[1].isSet == 0){
+		printf("There was no argument for the Server-Port. It will no be set to default = 7000\n");
+		ServerPort = 7000;
+		validArguments[1].isSet = 1;
+
+	}
+
+
+	retcode = setTCPServer();
+	handle_error(retcode, "TCP Server settings could not be established!\n", PROCESS_EXIT);
+	ServerListen();
+
+
 }
+
+int setTCPServer() {
+	int retcode;
+	printf("Set up TCP-Server settings ...\n");
+	//printf("LOGLEVEL_DEBUG = %i",LOGLEVEL_DEBUG);
+
+	/* Create socket for incoming connections */
+	servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	handle_error(servSock, "socket() failed", PROCESS_EXIT);
+
+	/* Construct local address structure */
+	memset(&squareServAddr, 0, sizeof(squareServAddr)); /* Zero out structure */
+	squareServAddr.sin_family = AF_INET; /* Internet address family */
+	squareServAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
+	squareServAddr.sin_port = htons(ServerPort); /* Local port */
+
+	/* Bind to the local address */
+	retcode = bind(servSock, (struct sockaddr *) &squareServAddr,
+			sizeof(squareServAddr));
+	handle_error(retcode, "bind() failed", PROCESS_EXIT);
+
+	/* Mark the socket so it will listen for incoming connections */
+	retcode = listen(servSock, MAXPENDING);
+	handle_error(retcode, "listen() failed", PROCESS_EXIT);
+
+return 1;
+}
+
+
+void ServerListen(){
+printf("Server is now going to Listening Mode for Clients.\n");
+printf("Client can connect to Server on Port %i\n",ServerPort);
+	while (TRUE) { /* Run forever */
+	    /* Set the size of the in-out parameter */
+	    clntAddrLen = sizeof(squareClntAddr);
+
+	    /* Wait for a client to connect */
+	    clntSock = accept(servSock, (struct sockaddr *) &squareClntAddr, &clntAddrLen);
+	    handle_error(clntSock, "accept() failed", PROCESS_EXIT);
+
+	    /* clntSock is connected to a client! */
+
+	    printf("Handling client %s\n", inet_ntoa(squareClntAddr.sin_addr));
+	    handle_tcp_client(clntSock);
+	  }
+	  /* NOT REACHED: */
+	  exit(0);
+}
+
+
+void handle_tcp_client(int clntSocket) {
+  char squareBuffer[RCVBUFSIZE];      /* Buffer for square string */
+  int recvMsgSize;                    /* Size of received message */
+
+  while (TRUE) {
+    /* Receive message from client */
+    recvMsgSize = recv(clntSocket, squareBuffer, RCVBUFSIZE - 1, 0);
+    handle_error(recvMsgSize, "recv() failed", PROCESS_EXIT);
+
+    if (recvMsgSize == 0) {
+      /* zero indicates end of transmission */
+      break;
+    }
+    squareBuffer[recvMsgSize] = '\000';
+    /* Send received string and receive again until end of transmission */
+    /* Square message and send it back to client */
+    int x = atoi(squareBuffer);
+    int y = x*x;
+    sprintf(squareBuffer, "%12d", y);
+    int sendMsgSize = strlen(squareBuffer);
+    ssize_t sentSize = send(clntSocket, squareBuffer, sendMsgSize, 0);
+    if (sentSize != recvMsgSize) {
+      die_with_error("send() failed");
+    }
+    /* See if there is more data to receive in the next round...*/
+  }
+
+  close(clntSocket);    /* Close client socket */
+}
+
+
+
+
+
+
