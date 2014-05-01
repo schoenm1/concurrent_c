@@ -8,7 +8,7 @@ LRT=-lrt
 all: Server
 
 clean:
-	rm -f lib/libitsky.a  lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o Server
+	rm -f lib/libitsky.a  lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o Server Client
 
 # external Libraries by Karl Brodowsky 
 
@@ -45,6 +45,8 @@ lib/sort_common.o: lib/sort_common.c
 Server: Server.c lib/libitsky.a include/itskylib.h
 	gcc $(CFLAGS) Server.c $(LIBS) -o Server    $(LRT)
 
+Client: Client.c lib/libitsky.a include/itskylib.h
+	gcc $(CFLAGS) Client.c $(LIBS) -o Client    $(LRT)
 
 
 lib/libitsky.a: lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o

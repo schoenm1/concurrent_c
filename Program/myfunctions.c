@@ -1,0 +1,44 @@
+/*
+  power recursive
+  return x^y
+*/
+int power(int x,int y){
+    if (y==0) return 1;
+    if (y==1) return x;
+    return( x*power(x,y-1) );
+}
+
+
+void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr){
+struct shm_ctr_struct *myshm_ctr = shm_ctr;
+int i = 1;
+int loop = TRUE;
+printf("\nWill now output all shm-blocks...\n");
+printf("===============================================================================\n");
+while (TRUE){
+printf("Block No %i:\t Block-Size = %i\t Filename = %s\t isLast = %i\n",i, myshm_ctr->shm_size, myshm_ctr->filename, myshm_ctr->isLast);
+sleep(1);
+if (myshm_ctr->isLast == TRUE){
+	break;
+	//loop = FALSE;
+}
+else{
+myshm_ctr = myshm_ctr->next;
+i++;
+}
+}
+printf("===============================================================================\n");
+
+}
+
+
+
+void print_single_shm_blocks(struct shm_ctr_struct *shm_ctr){
+	printf("===============================================================================\n");
+	printf("Address: %x\t Block-Size = %i\t Filename = %s\n",shm_ctr->filedata, shm_ctr->shm_size, shm_ctr->filename);
+
+
+	printf("===============================================================================\n");
+}
+
+

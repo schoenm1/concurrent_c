@@ -35,10 +35,11 @@ void initValidArguments(int argc, char *argv[]) {
 			int _mylogLevel = (int) atoi(argv[i + 1]);
 			//printf("********* arg = %i",validArguments[0].isSet);
 			if (validArguments[0].isSet == 0) {
-
+/*
 				retcode = setLogLevel(_mylogLevel);
 				handle_error(retcode, "LogLevel could not be set.\n",
 						PROCESS_EXIT);
+	*/
 				validArguments[0].isSet = 1;
 				printf("... Done\n");
 			} else {
