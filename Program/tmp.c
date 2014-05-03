@@ -1,245 +1,109 @@
+/* (C) IT Sky Consulting GmbH 2014
+ * http://www.it-sky-consulting.com/
+ * Author: Karl Brodowsky
+ * Date: 2014-02-27
+ * License: GPL v2 (See https://de.wikipedia.org/wiki/GNU_General_Public_License )
+ *
+ * This file is inspired by http://cs.baylor.edu/~donahoo/practical/CSockets/code/HandleTCPClient.c
+ */
 
-#include<stdio.h>
-#include<conio.h>
+#include <arpa/inet.h>  /* for sockaddr_in and inet_addr() */
+#include <errno.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <stdio.h>
+#include <stdio.h>      /* for printf() and fprintf() and ... */
+#include <stdlib.h>     /* for atoi() and exit() and ... */
+#include <string.h>     /* for memset() and ... */
+#include <sys/socket.h> /* for socket(), connect(), send(), and recv() */
+#include <sys/types.h>
+#include <unistd.h>     /* for close() */
 
+#include <itskylib.h>
 
-int tree[2050],i,j,k;
-void
-segmentalloc(int,int),makedivided(int),makefree(int),printing(int,int);
-int place(int),power(int,int);
-main()
-{
-	int totsize,cho,req;
-	clrscr();
-	for(i=0;i<80;i++) printf("%c",5);
-	printf("B U D D Y   S Y S T E M  R E Q U I R E M E N T S");
-	for(i=0;i<80;i++) printf("%c",5);
-	printf("	*  Enter the Size of the memory  :  ");
-	scanf("%d",&totsize);
-	clrscr();
-	while(1)
-	{
-		for(i=0;i<80;i++) printf("%c",5);
-		printf("
-			     B U D D Y   S Y S T E M
+#define RCVBUFSIZE 32   /* Size of receive buffer */
 
-");
-		for(i=0;i<80;i++) printf("%c",5);
-		printf("
-	*  1)   Locate the process into the Memory");
-		printf("	*  2)   Remove the process from Memory");
-		printf("	*  3)   Tree structure for Memory allocation Map");
-		printf("	*  4)   Exit");
-		for(i=0;i<80;i++) printf("%c",5);
-		printf("
-
-	*  Enter your choice  :  ");
-		scanf("%d",&cho);
-		switch(cho)
-		{
-			case 1:
-				clrscr();
-				printf("
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				printf("
-");
-				printf("			M E M O R Y   A L L O C A T I O N 
-
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				printf("
-
-	*  Enter the Process size  : ");
-				scanf("%d",&req);
-				segmentalloc(totsize,req);
-				break;
-			case 2:
-				clrscr();
-				printf("
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				printf("
-");
-				printf("			M E M O R Y   D E A L L O C A T I O N 
-
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				printf("
-
-	*  Enter the process size  :  ");
-				scanf("%d",&req);
-				makefree(req);
-				break;
-			case 3:
-				clrscr();
-				printf("
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				printf("
-			M E M O R Y   A L L O C A T I O N   M A
-    P
-
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				printf("
-
-");
-				printing(totsize,0);
-				printf("
-
-");
-				for(i=0;i<80;i++) printf("%c",5);
-				getch();
-				clrscr();
-				break;
-			default:
-				return;
-		}
-	}
+void usage(const char *argv0, const char *msg) {
+  if (msg != NULL && strlen(msg) > 0) {
+    printf("%s\n\n", msg);
+  }
+  printf("Usage\n\n");
+  printf("%s <Server IP> <number> [<Port>]\n", argv0);
+  exit(1);
 }
 
-void segmentalloc(int totsize,int request)
-{
-	int flevel=0,size;
-	size=totsize;
-	if(request>totsize)
-	{
-		printf("
-	%c  R E S U L T  :
-",2);
-		printf("
-	*  The system don't have enough free memory
-");
-		printf("
-	*  Suggession  :  Go for VIRTUAL MEMORY
+int main(int argc, char *argv[]) {
 
-");
-		getch();
-		return;
-	}
-	while(1)
-	{
-		if(request<size && request>(size/2))
-			break;
-		else
-		{
-			size/=2;
-			flevel++;
-		}
-	}
-	for(i=power(2,flevel)-1;i<=(power(2,flevel+1)-2);i++)
-		if(tree[i]==0 && place(i))
-		{
-			tree[i]=request;
-			makedivided(i);
-			printf("
+  int retcode;
 
-	 Result    :     Successful Allocation
+  if (is_help_requested(argc, argv)) {
+    usage(argv[0], "");
+  }
 
-");
-			break;
-		}
-	if(i==power(2,flevel+1)-1)
-	{
-		printf("	%c    Result  :  ");
-		printf("
-	*  The system don't have enough free memory
+  int sock;                        /* Socket descriptor */
+  struct sockaddr_in server_address; /* Square server address */
+  unsigned short server_port;     /* Square server port */
+  char *server_ip;                    /* Server IP address (dotted quad) */
+  char input_string[13];              /* String to send to square server */
+  char square_buffer[RCVBUFSIZE];     /* Buffer for square string */
+  unsigned int input_string_len;      /* Length of string to square */
+  int bytes_received, total_bytes_received;   /* Bytes read in single recv()
+                                      and total bytes read */
 
-");
-		printf("
-	*  Suggession  :  Go for VIRTUAL Memory Mode
+  if (argc < 3 || argc > 4) {    /* Test for correct number of arguments */
+    usage(argv[0], "wrong number of arguments");
+  }
 
-");
-	}
-}
+  server_ip = argv[1];             /* First arg: server IP address (dotted quad) */
+  int x = atoi(argv[2]);         /* Second arg: string to square */
+  sprintf(input_string, "%12d", x); /* make sure no non-numeric characters are around */
 
-void makedivided(int node)
-{
-	while(node!=0)
-	{
-		node=node%2==0?(node-1)/2:node/2;
-		tree[node]=1;
-	}
-}
+  if (argc == 4) {
+    server_port = atoi(argv[3]); /* Use given port, if any */
+  } else {
+    server_port = 7000;  /* 7000 is a free port */
+  }
 
-int place(int node)
-{
-	while(node!=0)
-	{
-		node=node%2==0?(node-1)/2:node/2;
-		if(tree[node]>1)
-			return 0;
-	}
-	return 1;
-}
+  /* Create a reliable, stream socket using TCP */
+  sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  handle_error(sock, "socket() failed", PROCESS_EXIT);
 
-void makefree(int request)
-{
-	int node=0;
-	while(1)
-	{
-		if(tree[node]==request)
-			break;
-		else
-			node++;
-	}
-	tree[node]=0;
-	while(node!=0)
-	{
-		if(tree[node%2==0?node-1:node+1]==0 && tree[node]==0)
-		{
-			tree[node%2==0?(node-1)/2:node/2]=0;
-			node=node%2==0?(node-1)/2:node/2;
-		}
-		else break;
-	}
-}
+  /* Construct the server address structure */
+  memset(&server_address, 0, sizeof(server_address));     /* Zero out structure */
+  server_address.sin_family      = AF_INET;             /* Internet address family */
+  server_address.sin_addr.s_addr = inet_addr(server_ip);   /* Server IP address */
+  server_address.sin_port        = htons(server_port); /* Server port: htons host to network byte order */
 
-int power(int x,int y)
-{
-	int z,ans;
-	if(y==0) return 1;
-	ans=x;
-	for(z=1;z<y;z++)
-		ans*=x;
-	return ans;
-}
+  /* Establish the connection to the square server */
+  retcode = connect(sock, (struct sockaddr *) &server_address, sizeof(server_address));
+  handle_error(retcode, "connect() failed", PROCESS_EXIT);
 
-void printing(int totsize,int node)
-{
-	int permission=0,llimit,ulimit,tab;
-	if(node==0)
-		permission=1;
-	else if(node%2==0)
-		permission=tree[(node-1)/2]==1?1:0;
-	else
-		permission=tree[node/2]==1?1:0;
-	if(permission)
-	{
-		llimit=ulimit=tab=0;
-		while(1)
-		{
-			if(node>=llimit && node<=ulimit)
-				break;
-			else
-			{
-				tab++;
-				printf("       ");
-				llimit=ulimit+1;
-				ulimit=2*ulimit+2;
-			}
-		}
-		printf(" %d ",totsize/power(2,tab));
-		if(tree[node]>1)
-			printf("---> Allocated %d
-",tree[node]);
-		else if(tree[node]==1)
-			printf("---> Divided
-");
-		else printf("---> Free
-");
-		printing(totsize,2*node+1);
-		printing(totsize,2*node+2);
-	}
+  input_string_len = strlen(input_string);          /* Determine input length */
+
+  /* Send the string to the server */
+  int count = send(sock, input_string, input_string_len, 0);
+  if (count != input_string_len) {
+    die_with_error("send() sent a different number of bytes than expected");
+  }
+
+  /* Receive the same string containing the square back from the server */
+  total_bytes_received = 0;
+  printf("Received: ");                /* Setup to print the squared string */
+  char *ptr = square_buffer;
+  while (total_bytes_received < input_string_len) {
+      /* Receive up to the buffer size (minus 1 to leave space for
+         a null terminator) bytes from the sender */
+    bytes_received = recv(sock, ptr, RCVBUFSIZE - 1 - total_bytes_received, 0);
+    if (bytes_received <= 0) {
+      die_with_error("recv() failed or connection closed prematurely");
+    }
+    total_bytes_received += bytes_received;   /* Keep tally of total bytes */
+    ptr += bytes_received;
+    square_buffer[bytes_received] = '\0';  /* Terminate the string! */
+  }
+  int y = atoi(square_buffer);
+  printf("x=%d y=x*x=%d\n", x, y);    /* Print the result and a final linefeed */
+
+  close(sock);
+  exit(0);
 }

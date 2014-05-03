@@ -50,7 +50,6 @@ int retrcode = FALSE;
 		struct shm_ctr_struct *nextshm;
 		nextshm = malloc(sizeof(struct shm_ctr_struct));
 
-
 		struct shm_ctr_struct *tmpnext = shm_ctr->next;
 
 		/* new setting for this place */

@@ -5,7 +5,7 @@ CFLAGS=-Wall -g -O2 -std=gnu99 -I./include -L./lib
 LIBS=-lpthread -litsky
 LRT=-lrt
 
-all: Server
+all: Server Client
 
 clean:
 	rm -f lib/libitsky.a  lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o Server Client

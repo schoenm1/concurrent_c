@@ -1,3 +1,83 @@
+enum LOGLEVELS {
+	LOG_EMERGENCY,
+	LOG_ALERT,
+	LOG_CRITICAL,
+	LOG_ERROR,
+	LOG_WARNING,
+	LOG_NOTICE,
+	LOG_INFORMATIONAL,
+	LOG_DEBUG
+} LOG_LEVEL;
+
+
+
+char * getLogLevel(int log_level, char *lvl) {
+//	char *lvl = malloc(sizeof(char) * 24);
+
+	switch (log_level) {
+
+	case LOG_EMERGENCY:
+		lvl = "LOG_EMERGENCY";
+		break;
+	case LOG_ALERT:
+		lvl = "LOG_ALERT";
+		break;
+	case LOG_CRITICAL:
+		lvl = "LOG_CRITICAL";
+		break;
+	case LOG_ERROR:
+		lvl = "LOG_ERROR";
+		break;
+	case LOG_WARNING:
+		lvl = "LOG_WARNING";
+		break;
+	case LOG_NOTICE:
+		lvl = "LOG_NOTICE";
+		break;
+	case LOG_INFORMATIONAL:
+		lvl = "LOG_INFORMATIONAL";
+		break;
+	case LOG_DEBUG:
+		lvl = "LOG_DEBUG";
+		break;
+	}
+	//printf("**************** - LOGLEVEL = %s - ********************************\n",lvl);
+	//char *bla = "hoi du";
+	return lvl;
+}
+
+/* LOG_TRACE(log level, format, args ) */
+void LOG_TRACE(int lvl, char *msg, ...) {
+//LOGLEVEL MY_LOGLEVEL;
+char *L_LEVEL = malloc(sizeof(char) * 24);
+	printf("<<<<<<<<<       %s %s:\t", __DATE__, __TIME__);
+	L_LEVEL = getLogLevel(lvl, L_LEVEL);
+	//L_LEVEL = giveback();
+	//getLogLevel(4);
+	//char *bla = "hoidu";
+	//bla = nextaddress(bla);
+	printf("%s\t\n", L_LEVEL);
+	printf("%s\n", msg);
+
+}
+
+
+
+
+
+
+void setValidServerArguments() {
+	/* init LOGLEVEL */
+	validArguments[0].isSet = 0;
+	char _logLevel[5] = LOGLEVEL_ARG;
+	strncpy(validArguments[0].arg, _logLevel, strlen(_logLevel));
+
+	/* init Server-Port */
+	validArguments[1].isSet = 0;
+	char _serverPort[5] = SERVERPORT_ARG;
+	strncpy(validArguments[1].arg, _serverPort, strlen(_serverPort));
+}
+
 int setServerPort(int myserverPort) {
 	int _myServerPort = myserverPort;
 	if (_myServerPort <= 1024 || _myServerPort > 65535) {
@@ -17,7 +97,7 @@ int setServerPort(int myserverPort) {
 	return -1;
 }
 
-void initValidArguments(int argc, char *argv[]) {
+void initValidServerArguments(int argc, char *argv[]) {
 	int i;
 	int retcode;
 	int counter_validArgs = 0;
@@ -35,11 +115,9 @@ void initValidArguments(int argc, char *argv[]) {
 			int _mylogLevel = (int) atoi(argv[i + 1]);
 			//printf("********* arg = %i",validArguments[0].isSet);
 			if (validArguments[0].isSet == 0) {
-/*
 				retcode = setLogLevel(_mylogLevel);
 				handle_error(retcode, "LogLevel could not be set.\n",
 						PROCESS_EXIT);
-	*/
 				validArguments[0].isSet = 1;
 				printf("... Done\n");
 			} else {
