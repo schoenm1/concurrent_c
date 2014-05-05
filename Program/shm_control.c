@@ -13,10 +13,10 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 		int filesize) {
 	int retrcode = FALSE;
 
-	printf("Size of shm Place is %i\n", shm_ctr->shm_size);
+	printf("Size of shm Place is %i. IsFree = %i\n", shm_ctr->shm_size, shm_ctr->isfree);
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize))
-			&& (shm_ctr->isfree = TRUE)) {
+			&& (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
 		retrcode = shm_ctr;
 		printf("Found a good place.\n");
@@ -39,7 +39,9 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 
 	return retrcode;
 }
-/* Will devide the shm control into pieces. a place for a file is bigger than the file length, but less than 2 times the file length */
+/* Will devide the shm control into pieces. a place for a file
+ is bigger than the file length, but less than 2 times the file length */
+
 int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	printf("Now in devide(). I want to devide until I reach Block size of %i\n",
 			untilSize);
@@ -47,7 +49,7 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	/* check if place can be devided */
 	printf("Shm_ctl ist free = %i\n",shm_ctr->isfree);
 
-	if (shm_ctr->isfree) {
+	if (shm_ctr->isfree == TRUE) {
 
 		/* new setting for devided, next place */
 		struct shm_ctr_struct *nextshm;
@@ -65,7 +67,9 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 		nextshm->shm_size = newsize; // setting size
 		nextshm->isfree = TRUE; //setting isFree
 		nextshm->next = tmpnext; //setting next
-		nextshm->filename = "NULL";
+nextshm->filename = malloc(sizeof(char) * 128);
+nextshm->filename = "NULL";
+
 
 		/* check if this was last one */
 		if (shm_ctr->isLast == TRUE) {

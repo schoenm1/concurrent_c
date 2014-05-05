@@ -46,7 +46,7 @@ int shm_id;
 #include "handleFiles.c"
 #define BUFSIZE 128   /* Size of receive buffer */
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
-#define MAXRECWORDS 32/* Maximum of words receiving from the client */
+#define MAXRECWORDS 30000/* Maximum of words receiving from the client */
 #define SERVERPORT_ARG "-p";
 #define LOGLEVEL_ARG "-l";
 #define SERVERNAME "Server";
@@ -127,7 +127,7 @@ int initshm(char *shm_start) {
 	shm_ctr->filedata = shm_start;
 	printf("... Done\n");
 	printf("Shared Memory ID = %i\n", shm_id);
-	printf("Filename is: %c\n", shm_ctr->filedata);
+	printf("Filename is: %c\n", shm_ctr->filename);
 	printf("Shared Memory Start location = %p\n", &(shm_ctr->filedata));
 	return TRUE;
 }
@@ -174,11 +174,10 @@ int main(int argc, char *argv[]) {
 // if address of founded place + size of place < than
 	//	if ((&(place->filedata) + place->shm_size)< (&(shm_ctr->filedata) + TOT_SHM_SIZE)) {
 	printf("Address of place = %x\n", place);
-	if (!place == 0){
+	if (!place == 0) {
 		printf("Inside of checking if return of place is valid...\n");
-			place->isfree = FALSE;
-			place->filename = testfilename;
-
+		place->isfree = FALSE;
+		place->filename = testfilename;
 
 	}
 //#ifdef DEBUG
@@ -298,7 +297,7 @@ void runClientCommand(char *recMessage[], char *command) {
 		char *filecontent = malloc(sizeof(char) * MAX_FILE_LENGTH);
 		filecontent = getFileContent(recMessage);
 		//filesize = strlen(filecontent);
-		char *filename = recMessage[2];
+	  	char *filename = recMessage[2];
 		printf("Filesize = %i \t Content = %s\n", strlen(filecontent),
 				filecontent);
 		char *returnvalue;
@@ -307,7 +306,7 @@ void runClientCommand(char *recMessage[], char *command) {
 
 }
 
-void breakCharArrayInWords(char *recMessage[], char *squareBuffer[]) {
+void breakCharArrayInWords(char *recMessage[], char *recBuffer[]) {
 	printf("## Now in breakCharArrayinWords ##\n");
 
 	/* break now the received Message into a string array where the sign " " breaks words */
@@ -316,23 +315,25 @@ void breakCharArrayInWords(char *recMessage[], char *squareBuffer[]) {
 	int count = 0;
 
 	/* get the first token */
-	token = strtok(squareBuffer, breaksign);
+	token = strtok(recBuffer, breaksign);
 	printf("%i: Token = %s and Size of token = %i\n", count, token,
 			strlen(token));
-	printf("recMessage[count]= %s\n", recMessage[count]);
+	//printf("recMessage[count]= %s\n", recMessage[count]);
 	//memset(recMessage[count], '\0', sizeof( recMessage[count] ));
 	//clear String
 	//char *tmp = token;
 	//printf("%i: string = %s and Size of string = %i\n", count, tmp, strlen(tmp));
-
+	//recMessage[count] = malloc(sizeof(char) * 1024);
 	recMessage[count] = token;
-	printf("recMessage[count]= %s\n", recMessage[count]);
+	printf("recMessage[%i]= %s\n", count, recMessage[count]);
 	count++;
 
 	/* walk through other tokens */
 	while (token != NULL) {
 		token = strtok(NULL, breaksign);
+	//	recMessage[count] = malloc(sizeof(char) * 1024);
 		recMessage[count] = token;
+		printf("recMessage[count]= %s\n", recMessage[count]);
 		count++;
 	}
 }
@@ -344,17 +345,20 @@ void sendMessage() {
 void handle_tcp_client(int clntSocket) {
 	int retrcode;
 	//char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
-	char recBuffer[BUFSIZE]; /* Buffer for square string */
+	char recBuffer[MAXRECWORDS]; /* Buffer for  string */
 	int recvMsgSize; /* Size of received message */
 
-	memset(recBuffer, '\0', sizeof( recBuffer ));
 	//reset recBuffer
 
 	while (TRUE) {
+		//	char recBuffer[BUFSIZE];
+		memset(recBuffer, '\0', sizeof( recBuffer ));
+		printf("\nbefore Handling Client...\n\n");
+		print_all_shm_blocks(shm_ctr);
 		char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
 
 		/* reset Buffer for next transmission */
-				memset(recBuffer, '\0', sizeof( recBuffer ));
+		//memset(recBuffer, '\0', sizeof( recBuffer ));
 
 		/* Receive message from client */
 		printf("Waiting for reveicing message from Client.\n");
@@ -363,14 +367,17 @@ void handle_tcp_client(int clntSocket) {
 		printf("Received message from Client %s: %s\n",
 				inet_ntoa(squareClntAddr.sin_addr), recBuffer);
 		printf("Received Message Size = %i\n", recvMsgSize);
+		printf("rec Buffer = %s\n", recBuffer);
 
+		printf("\nbefore break Array into Words...\n\n");
+	 	print_all_shm_blocks(shm_ctr);
 		breakCharArrayInWords(recMessage, recBuffer);
 
 #ifdef DEBUG
 		if (LOGLEVEL >= LOG_NOTICE) {
 			LOG_TRACE(LOG_NOTICE,
 					"Checking now if expected length of message is the effective length. If yes, transmission was ok.\n");
-			char *tmp;
+			//char *tmp;
 			LOG_TRACE(LOG_NOTICE, "Size should be: %s\t Size is: %i\n",
 					recMessage[0], recvMsgSize);
 			/*printf("Size should be: %s\t Size is: %i\n", recMessage[0],
@@ -430,6 +437,7 @@ void handle_tcp_client(int clntSocket) {
 		 die_with_error("send() failed");
 		 }*/
 		/* See if there is more data to receive in the next round...*/
+		//free(recBuffer);
 	}
 
 	close(clntSocket); /* Close client socket */

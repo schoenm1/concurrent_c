@@ -7,19 +7,14 @@ int power(int x, int y) {
 	return (x * power(x, y - 1));
 }
 
-
-
-void copystr(char *dest,char *src)
-       {
-                while(*src!='\0')
-                *dest++=*src++;
-                *dest='\0';
-                return;
-       }
-
-
-
-
+void copy_string(char *target, char *source) {
+	while (*source) {
+		*target = *source;
+		source++;
+		target++;
+	}
+	*target = '\0';
+}
 
 /* will output all existing shared memory blocks which exists at the moment */
 void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
@@ -29,8 +24,10 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	printf(
 			"===============================================================================\n");
 	while (TRUE) {
-		printf("Block No %i:\t Block-Size = %i\t isFree = %i Filename = %s\t isLast = %i\n",
-				i, myshm_ctr->shm_size, myshm_ctr->isfree, myshm_ctr->filename,  myshm_ctr->isLast);
+		printf(
+				"Block No %i:\t Block-Address = %x\t\t    Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
+				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
+				myshm_ctr->filename, &(myshm_ctr->filename), myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {
 			break;
 		} else {

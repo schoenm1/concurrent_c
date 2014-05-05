@@ -48,6 +48,8 @@ char * getValidServerCommand(char *command){
 	if(strcmp(command,"DELETE") == 0)	return TRUE;
 	if(strcmp(command,"READ") == 0)	return TRUE;
 	if(strcmp(command,"UPDATE") == 0)	return TRUE;
+	if(strcmp(command,"LIST") == 0)	return TRUE;
+
 
 printf("no match found...\n");
 return FALSE;

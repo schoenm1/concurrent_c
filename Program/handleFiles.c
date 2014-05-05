@@ -32,8 +32,6 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
 	printf("Checked a good address is:  %x\n", place);
 
-
-
 	if (place == FALSE) {
 		printf(
 				"0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...\n");
@@ -46,11 +44,36 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 		}
 		place = find_shm_place(shm_ctr, filesize);
 	}
-	place->isfree = FALSE;
-	place->filename = filename;
 
-	print_all_shm_blocks(shm_ctr);
-	return "File successfully created";
+	if (place != FALSE) {
+		//copystr(place->filename, filename);
+		//memcpy(place->filename, filename, sizeof(*(place->filename)));
+
+		//print_all_shm_blocks(shm_ctr);
+//char *tmp = malloc (sizeof(char) * 128);
+		printf("\n*********** BEFORE SETTING FILENAME *********************\n");
+
+		printf("Value of place->Filename = %s, Value of filename = %s\n",
+				place->filename, filename);
+		printf("Address of place->Filename = %x, Address of filename = %x\n\n",
+				(place->filename), filename);
+
+		place->isfree = FALSE;
+		place->filename = strdup(filename);
+
+		//print_all_shm_blocks(shm_ctr);
+
+
+		printf("Value of place->Filename = %s, Value of filename = %s\n",
+				place->filename, filename);
+		printf("Address of place->Filename = %x, Address of filename = %x\n",
+				(place->filename), filename);
+		//print_all_shm_blocks(shm_ctr);
+
+		//	free(tmpfilename);
+		return "File successfully created";
+	}
+	return -1;
 }
 
 /* will check if the file currenctly exists in shm */
@@ -59,8 +82,9 @@ int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retrcode = FALSE;
 	printf("Searching for Filename = %s\n", filename);
 
-	printf("Kontrolle: neuer Filename = %s\t in SHM Block = %s\n", filename,
-			shm_ctr->filename);
+	printf(
+			"Kontrolle: neuer Filename = %s\t in SHM Block mit Addresse %x= %s\t is Free = %i\n",
+			filename, shm_ctr, shm_ctr->filename, shm_ctr->isfree);
 	/* if stringcompare = True return True */
 	if (strcmp((shm_ctr->filename), filename) == 0) {
 		printf("File already exists. Return TRUE\n");
@@ -68,9 +92,9 @@ int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
 	}
 
 	/* if at end of shm_ctr, return false */
-	if (shm_ctr->isLast){
-	printf("At the end of SHM-Block. No correct file name found.\n");
-	return FALSE;
+	if (shm_ctr->isLast) {
+		printf("At the end of SHM-Block. No correct file name found.\n");
+		return FALSE;
 	}
 	/* else go to next shm_ctr */
 	shm_ctr = shm_ctr->next;
