@@ -1,6 +1,6 @@
 /*
  * File: 		Main.c
- * Author: 		Micha Sch≈°nenberger
+ * Author: 		Micha Schönenberger
  * Modul:		Concurrent Programming in C
  *
  * Created:     07.04.2014
@@ -46,7 +46,7 @@ int shm_id;
 #include "handleFiles.c"
 #define BUFSIZE 128   /* Size of receive buffer */
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
-#define MAXRECWORDS 32/* Maximum of words receiving from the client */
+#define MAXRECWORDS 32000/* Maximum of words receiving from the client */
 #define SERVERPORT_ARG "-p";
 #define LOGLEVEL_ARG "-l";
 #define SERVERNAME "Server";
@@ -151,16 +151,16 @@ int main(int argc, char *argv[]) {
 			PROCESS_EXIT);
 
 	/* Testfile for testing memory control */
-	printf("\n");
+/*	printf("\n");
 	int filesize = 1056;
 	printf("Want to write filename with size=%i to shm\n", filesize);
 	char * testfilename = "Test.txt";
 	printf("Adress of shm Place to check is %x\n", shm_ctr);
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
 	printf("Checked a good address is:  %x\n", place);
-
+*/
 	/*if there is no good place found, devide shm blocks */
-	if (place == FALSE) {
+	/*if (place == FALSE) {
 		printf(
 				"0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...\n");
 		int block_size_needed = round_up_int(filesize);
@@ -174,13 +174,12 @@ int main(int argc, char *argv[]) {
 // if address of founded place + size of place < than
 	//	if ((&(place->filedata) + place->shm_size)< (&(shm_ctr->filedata) + TOT_SHM_SIZE)) {
 	printf("Address of place = %x\n", place);
-	if (!place == 0){
+	if (!place == 0) {
 		printf("Inside of checking if return of place is valid...\n");
-			place->isfree = FALSE;
-			place->filename = testfilename;
+		place->isfree = FALSE;
+		place->filename = testfilename;
 
-
-	}
+	}*/
 //#ifdef DEBUG
 	//if (LOGLEVEL >= LOG_INFORMATIONAL) {
 	//LOG_TRACE(LOG_INFORMATIONAL, "Will now output all existing shared memory blocks\n");
@@ -280,7 +279,7 @@ void ServerListen() {
 #ifdef DEBUG
 		if (LOGLEVEL >= LOG_WARNING) {
 			LOG_TRACE(LOG_WARNING, "Test Log Warning\n");
-			printf("Handling Client %s\n", inet_ntoa(squareClntAddr.sin_addr));
+ 			printf("Handling Client %s\n", inet_ntoa(squareClntAddr.sin_addr));
 		}
 #endif
 
@@ -301,6 +300,7 @@ void runClientCommand(char *recMessage[], char *command) {
 		char *filename = recMessage[2];
 		printf("Filesize = %i \t Content = %s\n", strlen(filecontent),
 				filecontent);
+		//print_all_shm_blocks(shm_ctr);
 		char *returnvalue;
 		writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
 	}
@@ -343,40 +343,38 @@ void sendMessage() {
 
 void handle_tcp_client(int clntSocket) {
 	int retrcode;
-	//char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
+
 	char recBuffer[BUFSIZE]; /* Buffer for square string */
 	int recvMsgSize; /* Size of received message */
 
-	memset(recBuffer, '\0', sizeof( recBuffer ));
-	//reset recBuffer
-
 	while (TRUE) {
 		char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
-
 		/* reset Buffer for next transmission */
-				memset(recBuffer, '\0', sizeof( recBuffer ));
-
+		memset(recBuffer, '\0', sizeof( recBuffer ));
+		//memset(recMessage, '\0', sizeof( recMessage));
+		//recMessage = "\0";
 		/* Receive message from client */
+
+		printf("\n\nbefore runClientCommand\n");
+				print_all_shm_blocks(shm_ctr);
 		printf("Waiting for reveicing message from Client.\n");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
 		handle_error(recvMsgSize, "recv() failed", PROCESS_EXIT);
 		printf("Received message from Client %s: %s\n",
 				inet_ntoa(squareClntAddr.sin_addr), recBuffer);
-		printf("Received Message Size = %i\n", recvMsgSize);
-
+		printf("Received Message Size = %i\t Message = %s\n", recvMsgSize,
+				recBuffer);
+		/*printf("Before break Array into Words .... \n\n");
+		print_all_shm_blocks(shm_ctr);*/
 		breakCharArrayInWords(recMessage, recBuffer);
 
-#ifdef DEBUG
-		if (LOGLEVEL >= LOG_NOTICE) {
-			LOG_TRACE(LOG_NOTICE,
-					"Checking now if expected length of message is the effective length. If yes, transmission was ok.\n");
-			char *tmp;
-			LOG_TRACE(LOG_NOTICE, "Size should be: %s\t Size is: %i\n",
-					recMessage[0], recvMsgSize);
-			/*printf("Size should be: %s\t Size is: %i\n", recMessage[0],
-			 recvMsgSize);
-			 */}
-#endif
+//#ifdef DEBUG
+		//if (LOGLEVEL >= LOG_NOTICE) {LOG_TRACE(LOG_NOTICE,"Checking now if expected length of message is the effective length. If yes, transmission was ok.\n");
+	//	char *tmp;
+//			LOG_TRACE(LOG_NOTICE, "Size should be: %s\t Size is: %i\n",recMessage[0], recvMsgSize);
+		//printf("Size should be: %s\t Size is: %i\n", recMessage[0],recvMsgSize);
+		// }
+//#endif
 		/* check is effective message is equal to expected message size */
 		int effLength = (int) atoi(recMessage[0]);
 		if (effLength == recvMsgSize) {
@@ -400,13 +398,15 @@ void handle_tcp_client(int clntSocket) {
 
 			/* if command is valid */
 			if (retrcode) {
+				print_all_shm_blocks(shm_ctr);
 				runClientCommand(recMessage, recMessage[1]);
-
+printf("\n\nafter runClientCommand\n");
+				print_all_shm_blocks(shm_ctr);
 			}
 
 		}
 
-		if (recvMsgSize < 3) {
+/*		if (recvMsgSize < 3) {
 
 			char msg[BUFSIZE] =
 					"Wrong number of arguments. Please write [CREATE|DELETE] <filename>";
@@ -417,7 +417,7 @@ void handle_tcp_client(int clntSocket) {
 					0);
 
 			break;
-		}
+		}*/
 
 		recBuffer[recvMsgSize] = '\000'; // set End Termination at the end of the Buffer
 
@@ -434,3 +434,4 @@ void handle_tcp_client(int clntSocket) {
 
 	close(clntSocket); /* Close client socket */
 }
+

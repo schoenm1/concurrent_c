@@ -10,6 +10,7 @@
 char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 		char *filecontent, int filesize) {
 	printf("Now in Function writeNewFile()\n");
+	print_all_shm_blocks(shm_ctr);
 	int retcode;
 	//int totfilesize = filesize + 1; //because termination \0
 	char *returnchar = malloc(sizeof(char) * 64);
@@ -30,9 +31,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 	//char * testfilename = "Test.txt";
 	printf("Address of shm Place to check is %x\n", shm_ctr);
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
-	printf("Checked a good address is:  %x\n", place);
-
-
+	//printf("Checked a good address is:  %x\n", place);
 
 	if (place == FALSE) {
 		printf(
@@ -47,7 +46,9 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 		place = find_shm_place(shm_ctr, filesize);
 	}
 	place->isfree = FALSE;
-	place->filename = filename;
+	//copystr(place->filename, filename);
+	place->filename = "123test";
+	//strcpy(place->filename, filename);
 
 	print_all_shm_blocks(shm_ctr);
 	return "File successfully created";
@@ -55,10 +56,11 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 
 /* will check if the file currenctly exists in shm */
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
-	printf("Now in Function checkifexists()\n");
+	printf(
+			"\n============================================================\nNow in Function checkifexists()\n");
 	int retrcode = FALSE;
-	printf("Searching for Filename = %s\n", filename);
-
+	//printf("Searching for Filename = %s\n", filename);
+//print_all_shm_blocks(shm_ctr);
 	printf("Kontrolle: neuer Filename = %s\t in SHM Block = %s\n", filename,
 			shm_ctr->filename);
 	/* if stringcompare = True return True */
@@ -68,12 +70,13 @@ int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
 	}
 
 	/* if at end of shm_ctr, return false */
-	if (shm_ctr->isLast){
-	printf("At the end of SHM-Block. No correct file name found.\n");
-	return FALSE;
+	if (shm_ctr->isLast) {
+		printf("At the end of SHM-Block. No correct file name found.\n");
+		return FALSE;
 	}
 	/* else go to next shm_ctr */
 	shm_ctr = shm_ctr->next;
 	retrcode = checkifexists(shm_ctr, filename);
 	return retrcode;
 }
+
