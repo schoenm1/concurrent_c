@@ -94,16 +94,20 @@ char * getLogLevel(int log_level, char *lvl) {
 /* LOG_TRACE(log level, format, args ) */
 void LOG_TRACE(int lvl, char *msg, ...) {
 //LOGLEVEL MY_LOGLEVEL;
-	char *L_LEVEL = malloc(sizeof(char) * 24);
-	printf("<<<<<<<<<       %s %s:\t", __DATE__, __TIME__);
-	L_LEVEL = getLogLevel(lvl, L_LEVEL);
-	//L_LEVEL = giveback();
-	//getLogLevel(4);
-	//char *bla = "hoidu";
-	//bla = nextaddress(bla);
-	printf("%s\t\n", L_LEVEL);
-	printf("%s\n", msg);
+char buf[1024];
+char *buff = (char *) malloc(sizeof(char) *1024);
 
+	//char *L_LEVEL = malloc(sizeof(char) * 24);
+	char * L_LEVEL = getLogLevel(lvl, L_LEVEL);
+	printf("# %s %s:\t", __DATE__, __TIME__);
+
+va_list va;
+va_start(va,msg);
+vsprintf(buf,msg,va);
+sprintf(buff,"%s\t%s\n",L_LEVEL,buf);
+printf("%s",buff);
+free(buff);
+va_end(va);
 }
 
 void setValidServerArguments() {

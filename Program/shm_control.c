@@ -43,11 +43,10 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
  is bigger than the file length, but less than 2 times the file length */
 
 int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
-	printf("Now in devide(). I want to devide until I reach Block size of %i\n",
-			untilSize);
+	//printf("Now in devide(). I want to devide until I reach Block size of %i\n",untilSize);
 	int retrcode = FALSE;
 	/* check if place can be devided */
-	printf("Shm_ctl ist free = %i\n",shm_ctr->isfree);
+//	printf("Shm_ctl ist free = %i\n",shm_ctr->isfree);
 
 	if (shm_ctr->isfree == TRUE) {
 

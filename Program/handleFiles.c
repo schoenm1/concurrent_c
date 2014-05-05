@@ -51,19 +51,19 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 
 		//print_all_shm_blocks(shm_ctr);
 //char *tmp = malloc (sizeof(char) * 128);
-		printf("\n*********** BEFORE SETTING FILENAME *********************\n");
+	/*	printf("\n*********** BEFORE SETTING FILENAME *********************\n");
 
 		printf("Value of place->Filename = %s, Value of filename = %s\n",
 				place->filename, filename);
 		printf("Address of place->Filename = %x, Address of filename = %x\n\n",
 				(place->filename), filename);
-
+*/
 		place->isfree = FALSE;
 		place->filename = strdup(filename);
 
 		//print_all_shm_blocks(shm_ctr);
 
-
+/*
 		printf("Value of place->Filename = %s, Value of filename = %s\n",
 				place->filename, filename);
 		printf("Address of place->Filename = %x, Address of filename = %x\n",
@@ -71,7 +71,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 		//print_all_shm_blocks(shm_ctr);
 
 		//	free(tmpfilename);
-		return "File successfully created";
+		return "File successfully created";*/
 	}
 	return -1;
 }

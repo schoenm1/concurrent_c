@@ -25,7 +25,7 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			"===============================================================================\n");
 	while (TRUE) {
 		printf(
-				"Block No %i:\t Block-Address = %x\t\t    Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
+				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
 				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
 				myshm_ctr->filename, &(myshm_ctr->filename), myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {
@@ -38,6 +38,63 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	printf(
 			"===============================================================================\n");
 
+}
+
+/* make from multiple arguments one string */
+char * getSingleString(char *msg, ...) {
+	char buf[1024];
+	char *buff = (char *) malloc(sizeof(char) * 65536);
+	char *retMsg = (char *) malloc(sizeof(char) * 65536);
+printf("now in getSingelString...\n");
+
+va_list va;
+va_start(va,msg);
+vsprintf(buf,msg,va);
+sprintf(buff,"%s",buf);
+retMsg = strdup(buff);
+//printf("retMsg = %s\n",retMsg);
+free(buff);
+va_end(va);
+//printf("BUFF = %s\n",buff);
+printf("at end of getSingle String\n");
+return retMsg;
+}
+
+char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
+	struct shm_ctr_struct *myshm_ctr = shm_ctr;
+	//char *all_shm_blocks;
+	char * one = " ";
+//	char * two = "ich will nach Hause";
+	char * all_shm_blocks = (char *) malloc(8192);
+	strcpy(all_shm_blocks, one);
+	//strcat(all_shm_blocks, two);
+	//char * three = "ich will nach Hause";
+
+	int i = 1;
+
+	while (TRUE) {
+		char * myblock = (char *) malloc(sizeof(malloc) * 128);
+		printf("in TRUE of myblock....\n");
+		myblock = getSingleString("Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
+				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
+				myshm_ctr->filename, &(myshm_ctr->filename),
+				myshm_ctr->isLast);
+		strcat(all_shm_blocks, myblock);
+		printf("Myblock = %s\n",myblock);
+
+		free(myblock);
+		if (myshm_ctr->isLast == TRUE) {
+			break;
+		} else {
+			myshm_ctr = myshm_ctr->next;
+			i++;
+		}
+
+
+		printf("at end of get_all_shm_blocks:\n%s\n\n\n",all_shm_blocks);
+	}
+
+	return all_shm_blocks;
 }
 
 void print_single_shm_blocks(struct shm_ctr_struct *shm_ctr) {

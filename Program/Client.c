@@ -29,7 +29,7 @@
 
 #include <itskylib.h>
 
-#define BUFSIZE 1024   /* Size of receive buffer */
+#define BUFSIZE 65535   /* Size of receive buffer */
 
 unsigned short int send_length;
 
@@ -114,10 +114,9 @@ int main(int argc, char *argv[]) {
 		memset(square_buffer, 0, strlen(square_buffer));
 
 		char intlen[10];
+		/* 8 for int +1 for space, +1 for \0 */
 		sprintf(intlen, "%9d", strlen(tmpsquare_buffer)+8+1 +1);
-		//8 for int +1 for space, +1 for \0
-		printf("Eingegebene Laenge (inkl. '0')= %s\t %i\n", intlen,
-				strlen(tmpsquare_buffer));
+		printf("Eingegebene Laenge (inkl. '0')= %s\t %i\n", intlen,strlen(tmpsquare_buffer));
 
 		/* the message to send is: <length of following message><message> e.g. 5abcd (the '0' char will be added to <length of msg> */
 		strcat(square_buffer, intlen);
@@ -140,7 +139,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			buff[num] = '\0';
-			printf("> Message Received From Server -  %s\n", square_buffer);
+			printf("> Message Received From Server\n%s", square_buffer);
 		}
 	}
 	close(sock);

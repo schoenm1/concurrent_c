@@ -19,6 +19,7 @@
 #define TOT_SHM_SIZE 65536
 #define MIM_SHM_BLOCK_SIZE 4
 #define MAX_FILE_LENGTH 32000
+#define MAX_WORD_SIZE 256
 #include <arpa/inet.h>  /* for sockaddr_in, inet_addr() and inet_ntoa() */
 #include <errno.h>
 #include<math.h>
@@ -30,6 +31,7 @@
 #include <sys/socket.h> /* for socket(), bind(), recv, send(), and connect() */
 #include <sys/types.h>
 #include <unistd.h>     /* for close() */
+#include <stdarg.h>
 
 #include <itskylib.h>
 #include "my.h" // global structs
@@ -68,7 +70,7 @@ unsigned short ServerPort; /* Server port */
 unsigned int clntAddrLen; /* Length of client address data structure */
 
 struct shm_ctr_struct *shm_ctr;
-char *default_Filename = "NULL";
+//char *default_Filename = "NULL";
 
 struct validArgs {
 	int isSet;
@@ -150,6 +152,11 @@ int main(int argc, char *argv[]) {
 	handle_error(retcode, "Could not create Shared Memory Control Set...\n",
 			PROCESS_EXIT);
 
+	printf("Setting up the valid arguments...");
+
+	setValidServerArguments(); //setting up all valid arguments
+	 printf("... Done\n");
+
 	/* Testfile for testing memory control */
 	printf("\n");
 	int filesize = 1056;
@@ -180,19 +187,14 @@ int main(int argc, char *argv[]) {
 		place->filename = testfilename;
 
 	}
-//#ifdef DEBUG
-	//if (LOGLEVEL >= LOG_INFORMATIONAL) {
-	//LOG_TRACE(LOG_INFORMATIONAL, "Will now output all existing shared memory blocks\n");
-	print_all_shm_blocks(shm_ctr);
-	//}
-//#endif
+#ifdef DEBUG
+	if (LOGLEVEL >= LOG_INFORMATIONAL) {
+		LOG_TRACE(LOG_INFORMATIONAL, "Will now output all existing shared memory blocks\n");
+		print_all_shm_blocks(shm_ctr);
+		//}
+#endif
 
 	/* ====================================================================================== */
-
-	printf("Setting up the valid arguments...");
-
-	setValidServerArguments(); //setting up all valid arguments
-	printf("... Done\n");
 
 	/* if no arguments is chosen, output the usage of the Server */
 	if (argc == 1) {
@@ -286,22 +288,37 @@ void ServerListen() {
 		handle_tcp_client(clntSock);
 	}
 	/* NOT REACHED: */
-	exit(0);
+	 exit(0);
 }
 
-void runClientCommand(char *recMessage[], char *command) {
+void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 
+	/* CREATE command */
 	if (strcmp(command, "CREATE") == 0) {
-		printf("Will no try to create a new file...\n");
+ 		printf("Will no try to create a new file...\n");
 		//int strlen(filecontent);
-		char *filecontent = malloc(sizeof(char) * MAX_FILE_LENGTH);
-		filecontent = getFileContent(recMessage);
+	  	char *filecontent = malloc(sizeof(char) * MAX_FILE_LENGTH);
+		filecontent = strdup(getFileContent(recMessage));
 		//filesize = strlen(filecontent);
 	  	char *filename = recMessage[2];
 		printf("Filesize = %i \t Content = %s\n", strlen(filecontent),
 				filecontent);
-		char *returnvalue;
+ 		char *returnvalue;
 		writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
+	}
+//printf("recMessage [] = \"%s\" \tSize = %i\n", recMessage[2], strlen(recMessage[2]));
+
+
+
+
+	/* LIST Shared Memory command */
+	if (strcmp(command, "LIST") == 0 && strcmp(recMessage[2], "shm\n") == 0) {
+		print_all_shm_blocks(shm_ctr);
+char *sendtoClient = get_all_shm_blocks(shm_ctr);
+printf("SendtoClient = %s\n", sendtoClient);
+ssize_t sentSize = send(clntSocket, sendtoClient, strlen(sendtoClient),
+					0);
+free(sendtoClient);
 	}
 
 }
@@ -331,34 +348,36 @@ void breakCharArrayInWords(char *recMessage[], char *recBuffer[]) {
 	/* walk through other tokens */
 	while (token != NULL) {
 		token = strtok(NULL, breaksign);
-	//	recMessage[count] = malloc(sizeof(char) * 1024);
+		recMessage[count] = malloc(sizeof(char) * MAX_WORD_SIZE);
 		recMessage[count] = token;
-		printf("recMessage[count]= %s\n", recMessage[count]);
+		printf("in while: recMessage[%i]= %s\n", count, recMessage[count]);
 		count++;
 	}
 }
 
-void sendMessage() {
+void sendMessage(int clntSocket, char *message) {
+
+
+
+
+
 
 }
 
 void handle_tcp_client(int clntSocket) {
-	int retrcode;
+	int retcode;
 	//char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
 	char recBuffer[MAXRECWORDS]; /* Buffer for  string */
 	int recvMsgSize; /* Size of received message */
 
-	//reset recBuffer
-
 	while (TRUE) {
-		//	char recBuffer[BUFSIZE];
 		memset(recBuffer, '\0', sizeof( recBuffer ));
-		printf("\nbefore Handling Client...\n\n");
-		print_all_shm_blocks(shm_ctr);
+		//printf("\nbefore Handling Client...\n\n");
+		//	print_all_shm_blocks(shm_ctr);
 		char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
 
 		/* reset Buffer for next transmission */
-		//memset(recBuffer, '\0', sizeof( recBuffer ));
+
 
 		/* Receive message from client */
 		printf("Waiting for reveicing message from Client.\n");
@@ -367,19 +386,18 @@ void handle_tcp_client(int clntSocket) {
 		printf("Received message from Client %s: %s\n",
 				inet_ntoa(squareClntAddr.sin_addr), recBuffer);
 		printf("Received Message Size = %i\n", recvMsgSize);
-		printf("rec Buffer = %s\n", recBuffer);
+  		printf("rec Buffer = %s\n", recBuffer);
 
 		printf("\nbefore break Array into Words...\n\n");
-	 	print_all_shm_blocks(shm_ctr);
+		//print_all_shm_blocks(shm_ctr);
 		breakCharArrayInWords(recMessage, recBuffer);
 
-#ifdef DEBUG
+#ifdef  DEBUG
 		if (LOGLEVEL >= LOG_NOTICE) {
 			LOG_TRACE(LOG_NOTICE,
 					"Checking now if expected length of message is the effective length. If yes, transmission was ok.\n");
 			//char *tmp;
-			LOG_TRACE(LOG_NOTICE, "Size should be: %s\t Size is: %i\n",
-					recMessage[0], recvMsgSize);
+				LOG_TRACE(LOG_NOTICE, "Size should be: %s\t Size is: %i\n", recMessage[0], recvMsgSize);
 			/*printf("Size should be: %s\t Size is: %i\n", recMessage[0],
 			 recvMsgSize);
 			 */}
@@ -393,21 +411,20 @@ void handle_tcp_client(int clntSocket) {
 			}
 #endif
 
-			retrcode = getValidServerCommand(recMessage[1]);
+			retcode = getValidServerCommand(recMessage[1]);
 			/* check if 1st word of message is a valid command */
 #ifdef DEBUG
 			if (LOGLEVEL >= LOG_NOTICE) {
-				printf("Command is \"%s\" and has a length of %i\n",
-						recMessage[1], strlen(recMessage[1]));
-				if (retrcode) {
+				printf("Command is \"%s\" and has a length of %i\n",recMessage[1], strlen(recMessage[1]));
+				if (retcode) {
 					printf("It is a valid command: %s\n", recMessage[1]);
 				};
 			}
 #endif
 
 			/* if command is valid */
-			if (retrcode) {
-				runClientCommand(recMessage, recMessage[1]);
+			if (retcode) {
+				runClientCommand(recMessage, recMessage[1], clntSocket);
 
 			}
 
@@ -428,15 +445,8 @@ void handle_tcp_client(int clntSocket) {
 
 		recBuffer[recvMsgSize] = '\000'; // set End Termination at the end of the Buffer
 
-		//int x = 5;
-		//	int y = x * x;
-		//sprintf(recBuffer, "%12d", y);
 		int sendMsgSize = strlen(recBuffer);
 		ssize_t sentSize = send(clntSocket, recBuffer, sendMsgSize, 0);
-		/*if (sentSize != recvMsgSize) {
-		 die_with_error("send() failed");
-		 }*/
-		/* See if there is more data to receive in the next round...*/
 		//free(recBuffer);
 	}
 
