@@ -7,6 +7,7 @@ int power(int x, int y) {
 	return (x * power(x, y - 1));
 }
 
+/* will output all existing shared memory blocks which exists at the moment */
 void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
 	int i = 1;

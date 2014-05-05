@@ -39,10 +39,11 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 
 	return retrcode;
 }
-
+/* Will devide the shm control into pieces. a place for a file is bigger than the file length, but less than 2 times the file length */
 int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
-	printf("Now in devide(). I want to devide until I reach Block size of %i\n", untilSize);
-int retrcode = FALSE;
+	printf("Now in devide(). I want to devide until I reach Block size of %i\n",
+			untilSize);
+	int retrcode = FALSE;
 	/* check if place can be devided */
 	if (shm_ctr->isfree) {
 
@@ -71,15 +72,16 @@ int retrcode = FALSE;
 			nextshm->next = nextshm;
 		}
 
-		if (newsize == untilSize){
+		if (newsize == untilSize) {
 			printf("After deviding I have a good block size.\n");
 			retrcode = TRUE;
 			return retrcode;
-		}
-		else {
+		} else {
 			print_single_shm_blocks(shm_ctr);
 			//print_single_shm_blocks(shm_ctr->next);
-			printf("Recursive call in deviding because block size is to big (at moment = %i) ... \n", newsize);
+			printf(
+					"Recursive call in deviding because block size is to big (at moment = %i) ... \n",
+					newsize);
 			retrcode = devide(shm_ctr, untilSize);
 		}
 
@@ -87,10 +89,6 @@ int retrcode = FALSE;
 
 	return retrcode;
 }
-
-
-
-
 
 int check_combine() {
 

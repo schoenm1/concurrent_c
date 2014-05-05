@@ -8,6 +8,50 @@ enum LOGLEVELS {
 	LOG_INFORMATIONAL,
 	LOG_DEBUG
 } LOG_LEVEL;
+/*
+enum SERVER_COMMANDS {
+	CREATE, UPDATE, DELETE, LIST, READ
+} SERVER_COMMANDS;
+*/
+
+
+char * getFileContent(char *recMessage[]){
+	printf("Now in funktion getFileContent()\n");
+int i;
+char * retchar = malloc (sizeof(char) * MAX_FILE_LENGTH);
+memset(retchar, '\0', sizeof(retchar)); //clear String
+strcat(retchar, recMessage[3]);
+
+//printf("Momentaner String = %s\n",retchar);
+
+
+for (i=4; i< sizeof(recMessage)-1; i++){
+//	printf("Setze nur fŸr i=%i Strings zusammen\n",i);
+	strcat(retchar, " ");
+	strcat(retchar, recMessage[i]);
+}
+printf("Message String = %s\n",retchar);
+return retchar;
+
+
+
+
+}
+
+
+
+
+char * getValidServerCommand(char *command){
+printf("command=\"%s\" size = %i\n",command,strlen(command));
+printf("command should  be=\"%s\" length = %i\n","CREATE",strlen("CREATE"));
+	if(strcmp(command,"CREATE") == 0)	return TRUE;
+	if(strcmp(command,"DELETE") == 0)	return TRUE;
+	if(strcmp(command,"READ") == 0)	return TRUE;
+	if(strcmp(command,"UPDATE") == 0)	return TRUE;
+
+printf("no match found...\n");
+return FALSE;
+}
 
 
 
@@ -42,14 +86,13 @@ char * getLogLevel(int log_level, char *lvl) {
 		break;
 	}
 	//printf("**************** - LOGLEVEL = %s - ********************************\n",lvl);
-	//char *bla = "hoi du";
 	return lvl;
 }
 
 /* LOG_TRACE(log level, format, args ) */
 void LOG_TRACE(int lvl, char *msg, ...) {
 //LOGLEVEL MY_LOGLEVEL;
-char *L_LEVEL = malloc(sizeof(char) * 24);
+	char *L_LEVEL = malloc(sizeof(char) * 24);
 	printf("<<<<<<<<<       %s %s:\t", __DATE__, __TIME__);
 	L_LEVEL = getLogLevel(lvl, L_LEVEL);
 	//L_LEVEL = giveback();
@@ -60,11 +103,6 @@ char *L_LEVEL = malloc(sizeof(char) * 24);
 	printf("%s\n", msg);
 
 }
-
-
-
-
-
 
 void setValidServerArguments() {
 	/* init LOGLEVEL */

@@ -42,11 +42,6 @@ void usage(const char *argv0, const char *msg) {
 	exit(1);
 }
 
-
-
-
-
-
 int main(int argc, char *argv[]) {
 
 	int retcode;
@@ -117,16 +112,18 @@ int main(int argc, char *argv[]) {
 		//clears the buffer
 
 		char intlen[10];
-		sprintf(intlen, "%9d", strlen(tmpsquare_buffer)+8+1 +1); //8 for int +1 for space, +1 for \0
+		sprintf(intlen, "%9d", strlen(tmpsquare_buffer)+8+1 +1);
+		//8 for int +1 for space, +1 for \0
 		printf("Eingegebene Laenge (inkl. '0')= %s\t %i\n", intlen,
 				strlen(tmpsquare_buffer));
 
 		/* the message to send is: <length of following message><message> e.g. 5abcd (the '0' char will be added to <length of msg> */
 		strcat(square_buffer, intlen);
 		strcat(square_buffer, " ");
-		printf("Size of square_buffer (just with len) = %i\n", strlen(square_buffer));
+		printf("Size of square_buffer (just with len) = %i\n",
+				strlen(square_buffer));
 		strcat(square_buffer, tmpsquare_buffer);
-printf("Size of square_buffer = %i\n", strlen(square_buffer));
+		printf("Size of square_buffer = %i\n", strlen(square_buffer));
 		if ((send(sock, square_buffer, strlen(square_buffer), 0)) == -1) {
 			fprintf(stderr, "Failure Sending Message\n");
 			close(sock);
@@ -146,32 +143,5 @@ printf("Size of square_buffer = %i\n", strlen(square_buffer));
 	}
 	close(sock);
 
-	/* Receive the same string containing the square back from the server */
-//  total_bytes_received = 0;
-//	char squareBuffer[RCVBUFSIZE]; /* Buffer for square string */
-	//printf("Received: ");                /* Setup to print the squared string */
-//  char *ptr = square_buffer;
-	// int sendMsgSize = RCVBUFSIZE;
-	// prinft("Please give a command...\n");
-//  int zahl;
-//  scanf("%i", &zahl);
-//	char squareBuffer[RCVBUFSIZE]; /* Buffer for square string */
-//  ssize_t sentSize = send(sock, squareBuffer, sendMsgSize, 0);
-	//while (total_bytes_received < input_string_len) {
-	/* Receive up to the buffer size (minus 1 to leave space for
-	 a null terminator) bytes from the sender */
-	// bytes_received = recv(sock, ptr, RCVBUFSIZE - 1 - total_bytes_received, 0);
-	//  if (bytes_received <= 0) {
-	//    die_with_error("recv() failed or connection closed prematurely");
-	//  }
-	//   total_bytes_received += bytes_received;   /* Keep tally of total bytes */
-	//   ptr += bytes_received;
-	//   square_buffer[bytes_received] = '\0';  /* Terminate the string! */
-	// }
-	//int y = atoi(square_buffer);
-	//printf("x=%d y=x*x=%d\n", x, y);    /* Print the result and a final linefeed */
-	// }
-	// close(sock);
-	// exit(0);
 }
 
