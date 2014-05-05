@@ -30,7 +30,7 @@ for (i=4; i< sizeof(recMessage)-1; i++){
 	strcat(retchar, " ");
 	strcat(retchar, recMessage[i]);
 }
-printf("Message String = %s\n",retchar);
+//printf("Message String = %s\n",retchar);
 return retchar;
 
 

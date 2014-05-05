@@ -151,16 +151,16 @@ int main(int argc, char *argv[]) {
 			PROCESS_EXIT);
 
 	/* Testfile for testing memory control */
-/*	printf("\n");
+	printf("\n");
 	int filesize = 1056;
 	printf("Want to write filename with size=%i to shm\n", filesize);
 	char * testfilename = "Test.txt";
 	printf("Adress of shm Place to check is %x\n", shm_ctr);
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
 	printf("Checked a good address is:  %x\n", place);
-*/
- /*if there is no good place found, devide shm blocks */
-	/*if (place == FALSE) {
+
+	/*if there is no good place found, devide shm blocks */
+	if (place == FALSE) {
 		printf(
 				"0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...\n");
 		int block_size_needed = round_up_int(filesize);
@@ -168,23 +168,24 @@ int main(int argc, char *argv[]) {
 		handle_error(retcode,
 				"Could not devide the shared memory for the needed size...\n",
 				PROCESS_EXIT);
-
+		place = find_shm_place(shm_ctr, filesize);
 	}
-	else {
-	*/
-/* if address of founded place + size of place < than
-		if ((&(place->filedata) + place->shm_size) < (&(shm_ctr->filedata) + TOT_SHM_SIZE)) {
-			printf("Inside of checking if return of place is valid...\n");
+
+// if address of founded place + size of place < than
+	//	if ((&(place->filedata) + place->shm_size)< (&(shm_ctr->filedata) + TOT_SHM_SIZE)) {
+	printf("Address of place = %x\n", place);
+	if (!place == 0){
+		printf("Inside of checking if return of place is valid...\n");
 			place->isfree = FALSE;
 			place->filename = testfilename;
-		}
+
 
 	}
 //#ifdef DEBUG
 	//if (LOGLEVEL >= LOG_INFORMATIONAL) {
-		//LOG_TRACE(LOG_INFORMATIONAL, "Will now output all existing shared memory blocks\n");
-		print_all_shm_blocks(shm_ctr);
-//	}
+	//LOG_TRACE(LOG_INFORMATIONAL, "Will now output all existing shared memory blocks\n");
+	print_all_shm_blocks(shm_ctr);
+	//}
 //#endif
 
 	/* ====================================================================================== */
@@ -278,8 +279,8 @@ void ServerListen() {
 		printf("Warning = %i\t Loglevel = %i\n", LOG_WARNING, LOGLEVEL);
 #ifdef DEBUG
 		if (LOGLEVEL >= LOG_WARNING) {
-	   		LOG_TRACE(LOG_WARNING, "Test Log Warning\n");
-		 	printf("Handling Client %s\n", inet_ntoa(squareClntAddr.sin_addr));
+			LOG_TRACE(LOG_WARNING, "Test Log Warning\n");
+			printf("Handling Client %s\n", inet_ntoa(squareClntAddr.sin_addr));
 		}
 #endif
 
@@ -291,14 +292,15 @@ void ServerListen() {
 
 void runClientCommand(char *recMessage[], char *command) {
 
-	if ( strcmp(command, "CREATE") == 0) {
+	if (strcmp(command, "CREATE") == 0) {
 		printf("Will no try to create a new file...\n");
 		//int strlen(filecontent);
 		char *filecontent = malloc(sizeof(char) * MAX_FILE_LENGTH);
 		filecontent = getFileContent(recMessage);
 		//filesize = strlen(filecontent);
 		char *filename = recMessage[2];
-		printf("Filesize = %i \t Content = %s\n",strlen(filecontent), filecontent);
+		printf("Filesize = %i \t Content = %s\n", strlen(filecontent),
+				filecontent);
 		char *returnvalue;
 		writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
 	}

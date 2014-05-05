@@ -45,6 +45,8 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 			untilSize);
 	int retrcode = FALSE;
 	/* check if place can be devided */
+	printf("Shm_ctl ist free = %i\n",shm_ctr->isfree);
+
 	if (shm_ctr->isfree) {
 
 		/* new setting for devided, next place */
@@ -84,6 +86,13 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 					newsize);
 			retrcode = devide(shm_ctr, untilSize);
 		}
+
+	}
+
+	/* if block is not free */
+	else{
+		shm_ctr = (shm_ctr->next)->next;
+		retrcode = devide(shm_ctr, untilSize);
 
 	}
 

@@ -16,7 +16,7 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			"===============================================================================\n");
 	while (TRUE) {
 		printf("Block No %i:\t Block-Size = %i\t Filename = %s\t isLast = %i\n",
-				i, myshm_ctr->shm_size, myshm_ctr->filename, myshm_ctr->isLast);
+				i, myshm_ctr->shm_size, myshm_ctr->filename,  myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {
 			break;
 		} else {

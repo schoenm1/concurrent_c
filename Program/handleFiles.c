@@ -17,11 +17,12 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 
 	/* check if file already exists */
 	retcode = checkifexists(shm_ctr, filename);
-	if (!retcode) {
+	printf("File exists = %i\n", retcode);
+
+	if (retcode == TRUE) {
 		printf("File already exists\n");
 		return "File already exists";
 	}
-
 	/* if file does not exists, create a new file */
 	printf("File with name %s does not exists. I will create it.\n", filename);
 
@@ -31,7 +32,8 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
 	printf("Checked a good address is:  %x\n", place);
 
-	/* If no place was found, return "not created" */
+
+
 	if (place == FALSE) {
 		printf(
 				"0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...\n");
@@ -42,12 +44,12 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 		if (!retcode) {
 			return "Could not devide the shm blocks. File can not be created!";
 		}
-
+		place = find_shm_place(shm_ctr, filesize);
 	}
-	print_all_shm_blocks(shm_ctr);
 	place->isfree = FALSE;
 	place->filename = filename;
 
+	print_all_shm_blocks(shm_ctr);
 	return "File successfully created";
 }
 
