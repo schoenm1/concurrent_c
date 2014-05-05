@@ -21,7 +21,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 
 	if (retcode == TRUE) {
 		printf("File already exists\n");
-		return "File already exists";
+		return "File already exists\n";
 	}
 	/* if file does not exists, create a new file */
 	printf("File with name %s does not exists. I will create it.\n", filename);
@@ -40,7 +40,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 		retcode = devide(shm_ctr, block_size_needed);
 		//	handle_error(retcode,"Could not devide the shared memory for the needed size...\n",PROCESS_EXIT);
 		if (!retcode) {
-			return "Could not devide the shm blocks. File can not be created!";
+			return "There was no place in the shared memory for creating the file!\n";
 		}
 		place = find_shm_place(shm_ctr, filesize);
 	}
@@ -60,7 +60,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 */
 		place->isfree = FALSE;
 		place->filename = strdup(filename);
-
+		return getSingleString("File \"%s\" successfully created.\n",(place->filename));
 		//print_all_shm_blocks(shm_ctr);
 
 /*
@@ -78,16 +78,17 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 
 /* will check if the file currenctly exists in shm */
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
-	printf("Now in Function checkifexists()\n");
+	//printf("Now in Function checkifexists()\n");
 	int retrcode = FALSE;
-	printf("Searching for Filename = %s\n", filename);
+	/*printf("Searching for Filename = %s\n", filename);
 
 	printf(
 			"Kontrolle: neuer Filename = %s\t in SHM Block mit Addresse %x= %s\t is Free = %i\n",
 			filename, shm_ctr, shm_ctr->filename, shm_ctr->isfree);
+			*/
 	/* if stringcompare = True return True */
 	if (strcmp((shm_ctr->filename), filename) == 0) {
-		printf("File already exists. Return TRUE\n");
+	//	printf("File already exists. Return TRUE\n");
 		return TRUE;
 	}
 

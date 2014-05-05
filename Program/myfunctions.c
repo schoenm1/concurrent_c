@@ -16,6 +16,11 @@ void copy_string(char *target, char *source) {
 	*target = '\0';
 }
 
+
+
+
+
+
 /* will output all existing shared memory blocks which exists at the moment */
 void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
@@ -45,7 +50,7 @@ char * getSingleString(char *msg, ...) {
 	char buf[1024];
 	char *buff = (char *) malloc(sizeof(char) * 65536);
 	char *retMsg = (char *) malloc(sizeof(char) * 65536);
-printf("now in getSingelString...\n");
+//printf("now in getSingelString...\n");
 
 va_list va;
 va_start(va,msg);
@@ -56,31 +61,28 @@ retMsg = strdup(buff);
 free(buff);
 va_end(va);
 //printf("BUFF = %s\n",buff);
-printf("at end of getSingle String\n");
+//printf("at end of getSingle String\n");
 return retMsg;
 }
 
 char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
 	//char *all_shm_blocks;
-	char * one = " ";
-//	char * two = "ich will nach Hause";
+	char * one = "======================================= ALL BLOCKS OF SHARED MEMORY =======================================\n";
 	char * all_shm_blocks = (char *) malloc(8192);
 	strcpy(all_shm_blocks, one);
-	//strcat(all_shm_blocks, two);
-	//char * three = "ich will nach Hause";
 
 	int i = 1;
 
 	while (TRUE) {
-		char * myblock = (char *) malloc(sizeof(malloc) * 128);
-		printf("in TRUE of myblock....\n");
+		char * myblock = (char *) malloc(sizeof(malloc) * 256);
+		//printf("in TRUE of myblock....\n");
 		myblock = getSingleString("Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
 				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
 				myshm_ctr->filename, &(myshm_ctr->filename),
 				myshm_ctr->isLast);
 		strcat(all_shm_blocks, myblock);
-		printf("Myblock = %s\n",myblock);
+		//printf("Myblock = %s\n",myblock);
 
 		free(myblock);
 		if (myshm_ctr->isLast == TRUE) {
@@ -90,9 +92,10 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			i++;
 		}
 
-
-		printf("at end of get_all_shm_blocks:\n%s\n\n\n",all_shm_blocks);
+		//printf("at end of get_all_shm_blocks:\n%s\n\n\n",all_shm_blocks);
 	}
+		char * last = "======================================= END OF SHARED MEMORY =======================================\n";
+		strcat(all_shm_blocks, last);
 
 	return all_shm_blocks;
 }

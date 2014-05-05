@@ -11,33 +11,34 @@
 
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 		int filesize) {
-	int retrcode = FALSE;
+
+	struct shm_ctr_struct *ret_struct = FALSE;
 
 	printf("Size of shm Place is %i. IsFree = %i\n", shm_ctr->shm_size, shm_ctr->isfree);
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize))
 			&& (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
-		retrcode = shm_ctr;
+		ret_struct = shm_ctr;
 		printf("Found a good place.\n");
 		printf("Address of good shm Place is %x\n", shm_ctr);
-		return retrcode;
+		printf("Address of good shm Place is %i\n", shm_ctr);
+		return ret_struct;
 	}
 
 	/* check if at end of Shared Memory. If yes, return FALSE */
-	struct shm_ctr *ab = shm_ctr->next;
-	if (shm_ctr == ab) {
-		printf(
-				"At the end of all shared memory places... No hit found to enter the filename.\n");
-		return retrcode;
+	//struct shm_ctr *ab = shm_ctr->next;
+	if (shm_ctr == (shm_ctr->next)) {
+		//printf("At the end of all shared memory places... No hit found to enter the filename.\n");
+		return ret_struct;
 	}
 
 	printf(
 			"Did not found a good place here. Will go to next possible place...\n");
 	struct shm_ctr_struct *nextone = shm_ctr->next;
-	retrcode = find_shm_place(nextone, filesize);
+	ret_struct = find_shm_place(nextone, filesize);
 
-	return retrcode;
+	return ret_struct;
 }
 /* Will devide the shm control into pieces. a place for a file
  is bigger than the file length, but less than 2 times the file length */
