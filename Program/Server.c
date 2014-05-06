@@ -313,7 +313,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...\n");
 		printf("#0 = In creating new file\n");
 		char * tmpchar = getFileContent(recMessage);
-		printf("rec Message = %s\n",recMessage);
+		printf("rec Message = %s\n", recMessage);
 
 		char *filecontent = strdup(getFileContent(recMessage));
 		printf("#1 = In creating new file\n");
@@ -361,7 +361,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		retcode = checkifexists(shm_ctr, recMessage[2]);
 
 		/* if file does not exist, send message to Client */
-		if (retcode) {
+		if (!retcode) {
 			sendtoClient = getSingleString(
 					"File with the name \"%s\" does not exist!\n",
 					recMessage[2]);
@@ -370,6 +370,24 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		}
 		/* else delete the file */
 		else {
+			retcode = deleteFile(shm_ctr, recMessage[2]);
+			printf("After deleting: SHM Block:\n");
+			print_all_shm_blocks(shm_ctr);
+			if (retcode) {
+				sendtoClient = getSingleString(
+						"File with name \"%s\" was successfully deleted.",
+						recMessage[2]);
+				send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+			}
+			printf("Will now try to combine free blocks...\n");
+			retcode = combine(shm_ctr);
+			/* repeat until there is no more deviding option */
+
+			print_all_shm_blocks(shm_ctr);
+			while (retcode) {
+				retcode = combine(shm_ctr);
+				print_all_shm_blocks(shm_ctr);
+			}
 
 		}
 
@@ -431,11 +449,6 @@ void handle_tcp_client(int clntSocket) {
 
 		//printf("\nbefore Handling Client...\n\n");
 		//	print_all_shm_blocks(shm_ctr);
-
-		int i;
-		for (i = 0; i < 1000; i++) {
-			printf("C = %c", recMessage[i]);
-		}
 
 		/* Receive message from client */
 		printf("Waiting for reveicing message from Client.\n");

@@ -14,16 +14,16 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 
 	struct shm_ctr_struct *ret_struct = FALSE;
 
-
-	LOG_TRACE(LOG_INFORMATIONAL, "Size of shm Place is %i. IsFree = %i\n", shm_ctr->shm_size, shm_ctr->isfree);
+	LOG_TRACE(LOG_INFORMATIONAL, "Size of shm Place is %i. IsFree = %i\n",
+			shm_ctr->shm_size, shm_ctr->isfree);
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize))
 			&& (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
 		ret_struct = shm_ctr;
-	//	printf("Found a good place.\n");
-	//	printf("Address of good shm Place is %p\n", shm_ctr);
-	//	printf("Address of good shm Place is %i\n", &shm_ctr);
+		//	printf("Found a good place.\n");
+		//	printf("Address of good shm Place is %p\n", shm_ctr);
+		//	printf("Address of good shm Place is %i\n", &shm_ctr);
 		return ret_struct;
 	}
 
@@ -48,7 +48,6 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	int retrcode = FALSE;
 	/* check if place can be devided */
 //	printf("Shm_ctl ist free = %i\n",shm_ctr->isfree);
-
 	if (shm_ctr->isfree == TRUE) {
 
 		/* new setting for devided, next place */
@@ -68,9 +67,9 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 		nextshm->isfree = TRUE; //setting isFree
 		nextshm->next = tmpnext; //setting next
 		nextshm->isLast = FALSE; // set is Last = 0
-nextshm->filename = malloc(sizeof(char) * 128);
-nextshm->filename = "NULL";
-
+		nextshm->filename = malloc(sizeof(char) * 128);
+		nextshm->filename = "NULL";
+		nextshm->filedata = (shm_ctr->filedata) + (shm_ctr->shm_size);
 
 		/* check if this was last one */
 		if (shm_ctr->isLast == TRUE) {
@@ -80,7 +79,8 @@ nextshm->filename = "NULL";
 		}
 
 		if (newsize == untilSize) {
-			LOG_TRACE(LOG_INFORMATIONAL, "After deviding I have a good block size.\n");
+			LOG_TRACE(LOG_INFORMATIONAL,
+					"After deviding I have a good block size.\n");
 
 			retrcode = TRUE;
 			return retrcode;
@@ -88,9 +88,9 @@ nextshm->filename = "NULL";
 			//print_single_shm_blocks(shm_ctr);
 			//print_single_shm_blocks(shm_ctr->next);
 
-			LOG_TRACE(LOG_NOTICE, "Recursive call in deviding because block size is to big (at moment = %i) ... \n",
+			LOG_TRACE(LOG_NOTICE,
+					"Recursive call in deviding because block size is to big (at moment = %i) ... \n",
 					newsize);
-
 
 			retrcode = devide(shm_ctr, untilSize);
 		}
@@ -98,7 +98,7 @@ nextshm->filename = "NULL";
 	}
 
 	/* if block is not free */
-	else{
+	else {
 		shm_ctr = (shm_ctr->next)->next;
 		retrcode = devide(shm_ctr, untilSize);
 	}
@@ -106,12 +106,88 @@ nextshm->filename = "NULL";
 	return retrcode;
 }
 
-int check_combine() {
+int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
+	LOG_TRACE(LOG_DEBUG, "In function deleteFile()\n");
+	int retcode = FALSE;
+//	LOG_TRACE(LOG_DEBUG, "In function deleteFile()\n");
+	/* if hit, make settings */
+	if (strcmp(filename, (shm_ctr->filename)) == 0) {
+		LOG_TRACE(LOG_DEBUG, "Filename found...\n");
 
-	return -1;
+		shm_ctr->filename = "NULL";
+		shm_ctr->isfree = TRUE;
+		printf("Filedata was: %s\n", shm_ctr->filedata);
+		memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
+		printf("Filedata is now: %s\n", shm_ctr->filedata);
+		return TRUE;
+	}
+
+	/* if at end of SHM and no hit, return FALSE */
+	else if (shm_ctr->isLast == TRUE) {
+		LOG_TRACE(LOG_DEBUG, "At the end of SHM. No filename found.\n");
+		return FALSE;
+	}
+
+	/* if no hit and not at end of shm, go to next */
+	else {
+		LOG_TRACE(LOG_DEBUG, "Recursive call of function deleteFile()\n");
+		retcode = deleteFile((shm_ctr->next), filename);
+	}
+
+	return retcode;
 }
 
-int combine() {
+int combine(struct shm_ctr_struct *shm_ctr) {
+	LOG_TRACE(LOG_DEBUG, "In function combine()\n");
+	int retcode = FALSE;
+
+	/* if block is not free, leave size of block an go further */
+	if (shm_ctr->isfree == FALSE) {
+		LOG_TRACE(LOG_DEBUG,
+				"Block is not free. Jump two times the blocksize\n");
+		//print_all_shm_blocks(shm_ctr);
+		retcode = combine((shm_ctr->next)->next);
+
+	}
+
+	/* if at end of shm return FALSE */
+	else if (shm_ctr->isLast == TRUE) {
+		LOG_TRACE(LOG_DEBUG, "At end of SHM. Return FALSE\n");
+		print_all_shm_blocks(shm_ctr);
+		return retcode;
+	}
+
+	/* if shm block is free and next is free */
+	else if ((shm_ctr->isfree) == TRUE && (shm_ctr->next)->isfree == TRUE
+			&& (shm_ctr->shm_size) == (shm_ctr->next)->shm_size) {
+		LOG_TRACE(LOG_DEBUG, "Found two blocks with same size and both free\n");
+		struct shm_ctr_struct *tmpnext = shm_ctr->next;
+
+		shm_ctr->shm_size = 2 * (shm_ctr->shm_size);
+
+		/* if next was last, point next now to myself */
+		if ((shm_ctr->next)->isLast == TRUE) {
+			shm_ctr->isLast = TRUE; //FALSE
+			shm_ctr->next = shm_ctr;
+		} else {
+			shm_ctr->next = tmpnext->next;
+		}
+
+		retcode = TRUE;
+	}
+
+	/* otherwhise, go to next block */
+	else {
+		LOG_TRACE(LOG_DEBUG, "Nothing to to. Go to next block.\n");
+		retcode = combine(shm_ctr->next);
+
+	}
+
+//free(tmpnext);
+
+	return retcode;
+}
+int check_combine() {
 
 	return -1;
 }
