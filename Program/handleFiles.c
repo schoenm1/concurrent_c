@@ -28,9 +28,9 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 
 	//struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
 	//char * testfilename = "Test.txt";
-	printf("Address of shm Place to check is %x\n", shm_ctr);
+	printf("Address of shm Place to check is %p\n", shm_ctr);
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
-	printf("Checked a good address is:  %x\n", place);
+	printf("Checked a good address is:  %p\n", place);
 
 	if (place == FALSE) {
 		printf(

@@ -14,15 +14,16 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 
 	struct shm_ctr_struct *ret_struct = FALSE;
 
-	printf("Size of shm Place is %i. IsFree = %i\n", shm_ctr->shm_size, shm_ctr->isfree);
+
+	LOG_TRACE(LOG_INFORMATIONAL, "Size of shm Place is %i. IsFree = %i\n", shm_ctr->shm_size, shm_ctr->isfree);
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize))
 			&& (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
 		ret_struct = shm_ctr;
-		printf("Found a good place.\n");
-		printf("Address of good shm Place is %x\n", shm_ctr);
-		printf("Address of good shm Place is %i\n", shm_ctr);
+	//	printf("Found a good place.\n");
+	//	printf("Address of good shm Place is %p\n", shm_ctr);
+	//	printf("Address of good shm Place is %i\n", &shm_ctr);
 		return ret_struct;
 	}
 
@@ -33,8 +34,7 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr,
 		return ret_struct;
 	}
 
-	printf(
-			"Did not found a good place here. Will go to next possible place...\n");
+	//printf("Did not found a good place here. Will go to next possible place...\n");
 	struct shm_ctr_struct *nextone = shm_ctr->next;
 	ret_struct = find_shm_place(nextone, filesize);
 
@@ -67,27 +67,31 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 		nextshm->shm_size = newsize; // setting size
 		nextshm->isfree = TRUE; //setting isFree
 		nextshm->next = tmpnext; //setting next
+		nextshm->isLast = FALSE; // set is Last = 0
 nextshm->filename = malloc(sizeof(char) * 128);
 nextshm->filename = "NULL";
 
 
 		/* check if this was last one */
 		if (shm_ctr->isLast == TRUE) {
-			shm_ctr->isLast = FALSE;
-			nextshm->isLast = TRUE;
+			shm_ctr->isLast = 0; //FALSE
+			nextshm->isLast = 1; //TRUE
 			nextshm->next = nextshm;
 		}
 
 		if (newsize == untilSize) {
-			printf("After deviding I have a good block size.\n");
+			LOG_TRACE(LOG_INFORMATIONAL, "After deviding I have a good block size.\n");
+
 			retrcode = TRUE;
 			return retrcode;
 		} else {
 			//print_single_shm_blocks(shm_ctr);
 			//print_single_shm_blocks(shm_ctr->next);
-			printf(
-					"Recursive call in deviding because block size is to big (at moment = %i) ... \n",
+
+			LOG_TRACE(LOG_NOTICE, "Recursive call in deviding because block size is to big (at moment = %i) ... \n",
 					newsize);
+
+
 			retrcode = devide(shm_ctr, untilSize);
 		}
 

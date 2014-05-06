@@ -1,13 +1,7 @@
-enum LOGLEVELS {
-	LOG_EMERGENCY,
-	LOG_ALERT,
-	LOG_CRITICAL,
-	LOG_ERROR,
-	LOG_WARNING,
-	LOG_NOTICE,
-	LOG_INFORMATIONAL,
-	LOG_DEBUG
-} LOG_LEVEL;
+
+
+
+
 /*
  enum SERVER_COMMANDS {
  CREATE, UPDATE, DELETE, LIST, READ
@@ -36,7 +30,7 @@ char * getFileContent(char *recMessage[]) {
 int getValidServerCommand(char *command) {
 //printf("command=\"%s\" size = %i\n",command,strlen(command));
 //printf("command should  be=\"%s\" length = %i\n","CREATE",strlen("CREATE"));
-	printf("Command = %s\n", command);
+	//printf("Command = %s\n", command);
 	if (strcmp(command, "CREATE") == 0)
 		return TRUE;
 	if (strcmp(command, "DELETE") == 0)
@@ -140,7 +134,7 @@ int setServerPort(int myserverPort) {
 void initValidServerArguments(int argc, char *argv[]) {
 	int i;
 	int retcode;
-	int counter_validArgs = 0;
+//	int counter_validArgs = 0;
 
 	/* Parse all Arguments (except arg[0]. This is File itself) */
 	for (i = 1; i < argc; i++) {

@@ -20,7 +20,6 @@ void copy_string(char *target, char *source) {
 
 
 
-
 /* will output all existing shared memory blocks which exists at the moment */
 void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
@@ -30,7 +29,7 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			"===============================================================================\n");
 	while (TRUE) {
 		printf(
-				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
+				"Block No %i:\t Block-Address = %p\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n",
 				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
 				myshm_ctr->filename, &(myshm_ctr->filename), myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {
@@ -103,7 +102,7 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 void print_single_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	printf(
 			"===============================================================================\n");
-	printf("Address: %x\t Block-Size = %i\t Filename = %s\n", shm_ctr->filedata,
+	printf("Address: %p\t Block-Size = %i\t Filename = %s\n", shm_ctr->filedata,
 			shm_ctr->shm_size, shm_ctr->filename);
 
 	printf(

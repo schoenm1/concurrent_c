@@ -14,11 +14,11 @@
 
 
  ---------------------------------------------------------------*/
-
+#define _XOPEN_SOURC
 #include "Log-Level.h"
 #define TOT_SHM_SIZE 65536
 #define MIM_SHM_BLOCK_SIZE 4
-#define MAX_FILE_LENGTH 32000
+#define MAX_FILE_LENGTH 1500
 #define MAX_WORD_SIZE 256
 #include <arpa/inet.h>  /* for sockaddr_in, inet_addr() and inet_ntoa() */
 #include <errno.h>
@@ -32,8 +32,9 @@
 #include <sys/types.h>
 #include <unistd.h>     /* for close() */
 #include <stdarg.h>
-
+#include <string.h>
 #include <itskylib.h>
+#include <time.h>
 #include "my.h" // global structs
 #include "shm_control.c" // global structs
 #include "myfunctions.c"
@@ -61,6 +62,17 @@ char _logLevel_arg[10] = LOGLEVEL_ARG
 char _serverPort_arg[10] = SERVERPORT_ARG
 ;
 
+/* fucntion prototypes */
+void ServerListen();
+int setTCPServer();
+void runClientCommand();
+int setup_shm();
+void my_handler();
+int initshm();
+int setLogLevel();
+void breakCharArrayInWords();
+void handle_tcp_client();
+
 /* global vars for TCP-Server */
 int servSock; /* Socket descriptor for server */
 int clntSock; /* Socket descriptor for client */
@@ -80,8 +92,6 @@ struct validArgs {
 struct validArgs validArguments[5];
 
 #include "valid-args.h"
-
-int setTCPServer();
 
 int setup_shm() {
 	/* set up shared Memory */
@@ -118,7 +128,7 @@ void my_handler(int signo) {
 
 /* initializing Shared Memory Control Set*/
 int initshm(char *shm_start) {
-	printf("Creating shm Control Set ...");
+	LOG_TRACE(LOG_INFORMATIONAL, "Creating shm Control Set ...");
 	shm_ctr = malloc(sizeof(struct shm_ctr_struct));
 	shm_ctr->shm_size = TOT_SHM_SIZE;
 	shm_ctr->isfree = TRUE;
@@ -127,44 +137,45 @@ int initshm(char *shm_start) {
 	shm_ctr->prev = shm_ctr;
 	shm_ctr->filename = "NULL";
 	shm_ctr->filedata = shm_start;
-	printf("... Done\n");
-	printf("Shared Memory ID = %i\n", shm_id);
-	printf("Filename is: %c\n", shm_ctr->filename);
-	printf("Shared Memory Start location = %p\n", &(shm_ctr->filedata));
+	LOG_TRACE(LOG_INFORMATIONAL, "... Done\n");
+	LOG_TRACE(LOG_INFORMATIONAL, "Shared Memory ID = %i\n", shm_id);
+	LOG_TRACE(LOG_INFORMATIONAL, "Filename is: %s\n", shm_ctr->filename);
+	LOG_TRACE(LOG_INFORMATIONAL, "Shared Memory Start location = %p\n",
+			&(shm_ctr->filedata));
 	return TRUE;
 }
 
 int main(int argc, char *argv[]) {
 	int retcode;
-	printf("\nServer started. Is now initializing the setup...\n");
+	LOG_TRACE(LOG_INFORMATIONAL,
+			"\nServer started. Is now initializing the setup...\n");
 
 	signal(SIGINT, my_handler);
+
+	LOG_TRACE(LOG_INFORMATIONAL, "Setting up the valid arguments...");
+	setValidServerArguments(); //setting up all valid arguments
+	LOG_TRACE(LOG_INFORMATIONAL, "... Done\n");
 
 	retcode = setup_shm();
 	handle_error(retcode, "Shared Memory could not be created.\n",
 			PROCESS_EXIT);
 
 	char *shm_start = shmat(shm_id, NULL, 0);
-	printf("... Done\n");
+	LOG_TRACE(LOG_INFORMATIONAL, "... Done\n");
 
 	/* init shared memory control*/
 	retcode = initshm(shm_start);
 	handle_error(retcode, "Could not create Shared Memory Control Set...\n",
 			PROCESS_EXIT);
 
-	printf("Setting up the valid arguments...");
-
-	setValidServerArguments(); //setting up all valid arguments
-	printf("... Done\n");
-
 	/* Testfile for testing memory control */
 	printf("\n");
 	int filesize = 1056;
 	printf("Want to write filename with size=%i to shm\n", filesize);
 	char * testfilename = "Test.txt";
-	printf("Adress of shm Place to check is %x\n", shm_ctr);
+	printf("Adress of shm Place to check is %p\n", shm_ctr);
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
-	printf("Checked a good address is:  %x\n", place);
+	printf("Checked a good address is:  %p\n", place);
 
 	/*if there is no good place found, devide shm blocks */
 	if (place == FALSE) {
@@ -180,7 +191,7 @@ int main(int argc, char *argv[]) {
 
 // if address of founded place + size of place < than
 	//	if ((&(place->filedata) + place->shm_size)< (&(shm_ctr->filedata) + TOT_SHM_SIZE)) {
-	printf("Address of place = %x\n", place);
+	printf("Address of place = %p\n", place);
 	if (!place == 0) {
 		printf("Inside of checking if return of place is valid...\n");
 		place->isfree = FALSE;
@@ -232,7 +243,6 @@ int setTCPServer() {
 	/* Create socket for incoming connections */
 	servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	handle_error(servSock, "socket() failed", PROCESS_EXIT);
-
 	/* Construct local address structure */
 	memset(&squareServAddr, 0, sizeof(squareServAddr));
 	/* Zero out structure */
@@ -293,36 +303,81 @@ void ServerListen() {
 }
 
 void runClientCommand(char *recMessage[], char *command, int clntSocket) {
+	LOG_TRACE(LOG_INFORMATIONAL, "Command from Client was: %s\n", command);
+	char *sendtoClient = (char *) malloc(MAX_FILE_LENGTH);
+	memset(sendtoClient, '\0', sizeof(sendtoClient));
 
 	/* CREATE command */
 	if (strcmp(command, "CREATE") == 0) {
-		printf("Will no try to create a new file...\n");
-		//int strlen(filecontent);
-		char *filecontent = malloc(sizeof(char) * MAX_FILE_LENGTH);
-		filecontent = strdup(getFileContent(recMessage));
-		//filesize = strlen(filecontent);
-		char *filename = recMessage[2];
-		printf("Filesize = %i \t Content = %s\n", strlen(filecontent),
-				filecontent);
-		char *returnvalue = malloc(sizeof(char) * 256);
-		returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
-		 LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s\n",
-				returnvalue);
-		send(clntSocket, returnvalue, strlen(returnvalue), 0);
 
-		free(returnvalue);
+		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...\n");
+		printf("#0 = In creating new file\n");
+		char * tmpchar = getFileContent(recMessage);
+		printf("rec Message = %s\n",recMessage);
+
+		char *filecontent = strdup(getFileContent(recMessage));
+		printf("#1 = In creating new file\n");
+		char *filename = recMessage[2];
+		printf("#2 = In creating new file\n");
+		LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s\n",
+				(int) strlen(filecontent), filecontent);
+
+		char *returnvalue = malloc(sizeof(char) * 256);
+		printf("#3 = In creating new file\n");
+		returnvalue = writeNewFile(shm_ctr, filename, filecontent,
+				strlen(filecontent));
+		LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s\n",
+				returnvalue);
+		printf("Will now send to the client Message mit Länge = %i: %s",
+				strlen(returnvalue), returnvalue);
+		printf("#4 = In creating new file\n");
+		send(clntSocket, returnvalue, strlen(returnvalue), 0);
+		printf("#5 = In creating new file\n");
+
+		//free(filecontent);
+		//free(returnvalue);
 	}
-//printf("recMessage [] = \"%s\" \tSize = %i\n", recMessage[2], strlen(recMessage[2]));
 
 	/* LIST shm = List Shared Memory command */
-	if (strcmp(command, "LIST") == 0 && strcmp(recMessage[2], "shm\n") == 0) {
+	//if (strcmp(command, "LIST") == 0 && strcmp(recMessage[2], "shm\n") == 0) {
+	if (strcmp(command, "LIST") == 0) {
+
 		print_all_shm_blocks(shm_ctr);
-		char *sendtoClient = (char *) malloc(8192);
+		//char *sendtoClient = (char *) malloc(8192);
 		sendtoClient = get_all_shm_blocks(shm_ctr);
-//printf("SendtoClient = %s\n", sendtoClient);
-		ssize_t sentSize = send(clntSocket, sendtoClient, strlen(sendtoClient),
-				0);
+
+		printf("Size of Send to Client = %i\n%s", strlen(sendtoClient),
+				sendtoClient);
+
+		send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+
 		free(sendtoClient);
+	}
+
+	/* DELETE <filename>: DELETE Filename from memory */
+	else if (strcmp(command, "DELETE") == 0) {
+		printf("Client wants to DELETE a file.\n");
+		int retcode;
+		retcode = checkifexists(shm_ctr, recMessage[2]);
+
+		/* if file does not exist, send message to Client */
+		if (retcode) {
+			sendtoClient = getSingleString(
+					"File with the name \"%s\" does not exist!\n",
+					recMessage[2]);
+			send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+
+		}
+		/* else delete the file */
+		else {
+
+		}
+
+	}
+	/* if nothing compared */
+	else {
+		send(clntSocket, "Nothing to commit", strlen("Nothing to commit"), 0);
+
 	}
 
 }
@@ -334,17 +389,19 @@ void breakCharArrayInWords(char *recMessage[], char *recBuffer[]) {
 	char breaksign[] = " ";
 	char *token = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	int count = 0;
+	printf("## 2 Now in breakCharArrayinWords ##\n");
 
 	/* get the first token */
 	token = strtok(recBuffer, breaksign);
+	printf("## 3 Now in breakCharArrayinWords ##\n");
 	printf("%i: Token = %s and Size of token = %i\n", count, token,
-			strlen(token));
-	//printf("recMessage[count]= %s\n", recMessage[count]);
-	//memset(recMessage[count], '\0', sizeof( recMessage[count] ));
-	//clear String
-	//char *tmp = token;
-	//printf("%i: string = %s and Size of string = %i\n", count, tmp, strlen(tmp));
-	//recMessage[count] = malloc(sizeof(char) * 1024);
+			(int) strlen(token));
+//printf("recMessage[count]= %s\n", recMessage[count]);
+//memset(recMessage[count], '\0', sizeof( recMessage[count] ));
+//clear String
+//char *tmp = token;
+//printf("%i: string = %s and Size of string = %i\n", count, tmp, strlen(tmp));
+//recMessage[count] = malloc(sizeof(char) * 1024);
 	recMessage[count] = token;
 	printf("recMessage[%i]= %s\n", count, recMessage[count]);
 	count++;
@@ -361,19 +418,24 @@ void breakCharArrayInWords(char *recMessage[], char *recBuffer[]) {
 
 void handle_tcp_client(int clntSocket) {
 	int retcode;
-	//char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
+//char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
 	char recBuffer[MAXRECWORDS]; /* Buffer for  string */
 	int recvMsgSize; /* Size of received message */
+	/* array to save the single words of the received message */
+	char *recMessage[MAXRECWORDS];
 
 	while (TRUE) {
 		/* reset Buffer for next transmission */
-		memset(recBuffer, '\0', sizeof( recBuffer ));
+		memset(recBuffer, 0, sizeof(recBuffer));
+		memset(recMessage, 0, sizeof(recMessage));
 
 		//printf("\nbefore Handling Client...\n\n");
 		//	print_all_shm_blocks(shm_ctr);
 
-		/* array to save the single words of the received message */
-		char *recMessage[MAXRECWORDS];
+		int i;
+		for (i = 0; i < 1000; i++) {
+			printf("C = %c", recMessage[i]);
+		}
 
 		/* Receive message from client */
 		printf("Waiting for reveicing message from Client.\n");
@@ -409,26 +471,21 @@ void handle_tcp_client(int clntSocket) {
 			}
 #endif
 
-			retcode = getValidServerCommand(recMessage[1]);
 			/* check if 1st word of message is a valid command */
-#ifdef DEBUG
-			if (LOGLEVEL >= LOG_NOTICE) {
+			retcode = getValidServerCommand(recMessage[1]);
 
-				LOG_TRACE(LOG_NOTICE,
-						"Command is \"%s\" and has a length of %i\n",
-						recMessage[1], strlen(recMessage[1]));
-
-				if (retcode) {
-					printf("It is a valid command: %s\n", recMessage[1]);
-				};
-			}
-#endif
+			LOG_TRACE(LOG_NOTICE, "Command is \"%s\" and has a length of %i\n",
+					recMessage[1], strlen(recMessage[1]));
 
 			/* if command is valid */
 			if (retcode) {
+				LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s\n",
+						recMessage[1]);
+				LOG_TRACE(LOG_INFORMATIONAL,
+						"Führe nun Befehl aus: %s\t Message = %s",
+						recMessage[1], recMessage);
 				runClientCommand(recMessage, recMessage[1], clntSocket);
-
-			}
+			};
 
 		}
 
