@@ -106,6 +106,27 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	return retrcode;
 }
 
+char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
+	LOG_TRACE(LOG_DEBUG, "Now in funtion readFile()\n");
+	char * retchar = "File not found";
+	/* if file found */
+	if (strcmp(filename, (shm_ctr->filename)) == 0) {
+		return shm_ctr->filedata;
+	}
+
+	/* if last = return not found */
+	else if (shm_ctr->isLast == TRUE) {
+		return "File not found. No content to display.";
+	}
+
+	else {
+		shm_ctr = (shm_ctr->next)->next;
+		LOG_TRACE(LOG_DEBUG, "Recursive call of readFile()\n");
+		retchar = readFile(shm_ctr, filename);
+	}
+
+	return retchar;
+}
 int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	LOG_TRACE(LOG_DEBUG, "In function deleteFile()\n");
 	int retcode = FALSE;

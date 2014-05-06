@@ -60,6 +60,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename,
 */
 		place->isfree = FALSE;
 		place->filename = strdup(filename);
+		place->filedata = strdup(filecontent);
 		return getSingleString("File \"%s\" successfully created.\n",(place->filename));
 		//print_all_shm_blocks(shm_ctr);
 

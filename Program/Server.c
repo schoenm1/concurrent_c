@@ -196,6 +196,8 @@ int main(int argc, char *argv[]) {
 		printf("Inside of checking if return of place is valid...\n");
 		place->isfree = FALSE;
 		place->filename = testfilename;
+		place->filedata = shm_start;
+		shm_start = "Dies ist der Text des Testfiles.\nEs ist nicht einfach zu Programmieren.";
 
 	}
 #ifdef DEBUG
@@ -335,7 +337,19 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		printf("#5 = In creating new file\n");
 
 		//free(filecontent);
-		//free(returnvalue);
+		free(returnvalue);
+	}
+
+	/* Reading File */
+	if (strcmp(command, "READ") == 0) {
+		char * returnvalue = readFile(shm_ctr, recMessage[2]);
+		send(clntSocket, returnvalue, strlen(returnvalue), 0);
+
+
+
+
+
+
 	}
 
 	/* LIST shm = List Shared Memory command */

@@ -7,18 +7,14 @@ int power(int x, int y) {
 	return (x * power(x, y - 1));
 }
 
-void copy_string(char *target, char *source) {
+/*void copy_string(char *target, char *source) {
 	while (*source) {
 		*target = *source;
 		source++;
 		target++;
 	}
 	*target = '\0';
-}
-
-
-
-
+}*/
 
 /* will output all existing shared memory blocks which exists at the moment */
 void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
@@ -51,23 +47,24 @@ char * getSingleString(char *msg, ...) {
 	char *retMsg = (char *) malloc(sizeof(char) * 65536);
 //printf("now in getSingelString...\n");
 
-va_list va;
-va_start(va,msg);
-vsprintf(buf,msg,va);
-sprintf(buff,"%s",buf);
-retMsg = strdup(buff);
+	va_list va;
+	va_start(va, msg);
+	vsprintf(buf, msg, va);
+	sprintf(buff, "%s", buf);
+	retMsg = strdup(buff);
 //printf("retMsg = %s\n",retMsg);
-free(buff);
-va_end(va);
+	free(buff);
+	va_end(va);
 //printf("BUFF = %s\n",buff);
 //printf("at end of getSingle String\n");
-return retMsg;
+	return retMsg;
 }
 
 char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
 	//char *all_shm_blocks;
-	char * one = "======================================= ALL BLOCKS OF SHARED MEMORY =======================================\n";
+	char * one =
+			"======================================= ALL BLOCKS OF SHARED MEMORY =======================================\n";
 	char * all_shm_blocks = (char *) malloc(8192);
 	strcpy(all_shm_blocks, one);
 
@@ -76,10 +73,12 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	while (TRUE) {
 		char * myblock = (char *) malloc(sizeof(malloc) * 256);
 		//printf("in TRUE of myblock....\n");
-		myblock = getSingleString("Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
-				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
-				myshm_ctr->filename, &(myshm_ctr->filename),
-				myshm_ctr->isLast);
+		myblock =
+				getSingleString(
+						"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n",
+						i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree,
+						myshm_ctr->filename, &(myshm_ctr->filename),
+						myshm_ctr->isLast);
 		strcat(all_shm_blocks, myblock);
 		//printf("Myblock = %s\n",myblock);
 
@@ -93,8 +92,9 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 
 		//printf("at end of get_all_shm_blocks:\n%s\n\n\n",all_shm_blocks);
 	}
-		char * last = "======================================= END OF SHARED MEMORY =======================================\n";
-		strcat(all_shm_blocks, last);
+	char * last =
+			"======================================= END OF SHARED MEMORY =======================================\n";
+	strcat(all_shm_blocks, last);
 
 	return all_shm_blocks;
 }
