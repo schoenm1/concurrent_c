@@ -5,10 +5,10 @@ CFLAGS=-Wall -g -O2 -std=gnu99 -I./include -L./lib
 LIBS=-lpthread -litsky
 LRT=-lrt
 
-all: Server Client
+all: Server Client Server_Thread
 
 clean:
-	rm -f lib/libitsky.a  lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o Server Client
+	rm -f lib/libitsky.a  lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o Server Client Server_Thread
 
 # external Libraries by Karl Brodowsky 
 
@@ -47,6 +47,9 @@ Server: Server.c lib/libitsky.a include/itskylib.h
 
 Client: Client.c lib/libitsky.a include/itskylib.h
 	gcc $(CFLAGS) Client.c $(LIBS) -o Client    $(LRT)
+    
+Client: Server_Thread.c lib/libitsky.a include/itskylib.h
+	gcc $(CFLAGS) Server_Thread.c $(LIBS) -o Server_Thread    $(LRT)
 
 
 lib/libitsky.a: lib/fsort.o lib/fsort-metrics.o lib/isort.o lib/ternary-hsort.o lib/lib.o lib/msort.o lib/psort.o lib/hsort.o lib/sort_common.o
