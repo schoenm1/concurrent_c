@@ -56,16 +56,15 @@ void cleanup(int shmid) {
 int round_up_int(int input) {
 	int output = FALSE;
 	int until = log(TOT_SHM_SIZE) / log(2);
-	printf("Now in round_up_int(). Filesize needed = %i\t until = %i\n",input, until);
+	LOG_TRACE(LOG_INFORMATIONAL, "Now in round_up_int(). Filesize needed = %i\t until = %i\n", input, until);
 	if (input > TOT_SHM_SIZE) {
-			return output;
+		return output;
 	}
-	//printf("2^6 = %i\n",power(2,6));
-int i;
+	int i;
 	for (i = 2; i < until; i++) {
-		if (input < power(2,i)) {
-			output = power(2,i);
-			printf("i = %i \t Output now set to = %i and return it.\n",i, output);
+		if (input < power(2, i)) {
+			output = power(2, i);
+			LOG_TRACE(LOG_INFORMATIONAL, "i = %i \t Output now set to = %i and return it.\n", i, output);
 			return output;
 			break;
 		}
@@ -75,18 +74,11 @@ int i;
 	return output;
 }
 
-getpossibleshmPos() {
-	//struct shm_ctr *_shm_ctr = *shm_ctr;
-
-}
-
 /* get next shm in linked list*/
 struct shm_ctr_struct* getNext(struct shm_ctr_struct *_shm_ctr) {
-
 	if ((_shm_ctr->next) != -1) {
 		return (_shm_ctr->next);
 	}
-
 	return -1;
 }
 

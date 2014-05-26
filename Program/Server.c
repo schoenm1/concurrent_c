@@ -20,6 +20,7 @@
 #define MIM_SHM_BLOCK_SIZE 4
 #define MAX_FILE_LENGTH 1500
 #define MAX_WORD_SIZE 256
+#define MUTEXSIZE 10
 #include <arpa/inet.h>  /* for sockaddr_in, inet_addr() and inet_ntoa() */
 #include <errno.h>
 #include<math.h>
@@ -173,9 +174,6 @@ int main(int argc, char *argv[]) {
 	myPThreadList->isLast = 1;
 	myPThreadList->nextClient = myPThreadList;
 
-
-
-
 	/* Testfile for testing memory control */
 	printf("\n");
 	int filesize = 1056;
@@ -187,7 +185,8 @@ int main(int argc, char *argv[]) {
 
 	/*if there is no good place found, devide shm blocks */
 	if (place == FALSE) {
-		printf("0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...\n");
+		LOG_TRACE(LOG_INFORMATIONAL, "0 here is no good place to write the file into... Trying no to devide the Shared Memory...");
+
 		int block_size_needed = round_up_int(filesize);
 		retcode = devide(shm_ctr, block_size_needed);
 		handle_error(retcode, "Could not devide the shared memory for the needed size...\n", PROCESS_EXIT);
@@ -390,19 +389,17 @@ void* handle_tcp_client(void* parameters) {
 		memset(recMessage, 0, sizeof(recMessage));
 
 		/* Receive message from client */
-		printf("Waiting for reveicing message from Client.\n");
+		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for reveicing message from Client.");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
 		handle_error(recvMsgSize, "recv() failed", NO_EXIT);
 		if (recvMsgSize == 0) {
 			istrue = 0;
 			break;
 		}
-
-		printf("Received message from Client %s: %s\n", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
+		LOG_TRACE(LOG_INFORMATIONAL, "Received message from Client %s: %s", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
 		//printf("Received Message Size = %i\n", recvMsgSize);
-		printf("rec Buffer = %s\n", recBuffer);
-
-		printf("\nbefore break Array into Words...\n\n");
+		//printf("rec Buffer = %s\n", recBuffer);
+		LOG_TRACE(LOG_INFORMATIONAL, "before break Array into Words...");
 		//print_all_shm_blocks(shm_ctr);
 		breakCharArrayInWords(recMessage, recBuffer);
 

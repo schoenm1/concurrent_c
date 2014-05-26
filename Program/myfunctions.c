@@ -46,7 +46,7 @@ char * getSingleString(char *msg, ...) {
 
 char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
-	char * one = "======================================= ALL BLOCKS OF SHARED MEMORY =======================================\n";
+	char * one = "=============================================== ALL BLOCKS OF SHARED MEMORY ===============================================\n";
 	char * all_shm_blocks = (char *) malloc(8192);
 	strcpy(all_shm_blocks, one);
 
@@ -66,18 +66,17 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			myshm_ctr = myshm_ctr->next;
 			i++;
 		}
-
 	}
-	char * last = "======================================= END OF SHARED MEMORY =======================================\n";
+	char * last = "=============================================== END OF SHARED MEMORY ===============================================\n";
 	strcat(all_shm_blocks, last);
 
 	return all_shm_blocks;
 }
 
 void print_single_shm_blocks(struct shm_ctr_struct *shm_ctr) {
-	printf("===============================================================================\n");
+	printf("=====================================================================================================\n");
 	printf("Address: %p\t Block-Size = %i\t Filename = %s\n", shm_ctr->filedata, shm_ctr->shm_size, shm_ctr->filename);
 
-	printf("===============================================================================\n");
+	printf("=====================================================================================================\n");
 }
 

@@ -9,9 +9,7 @@
 
 struct client_ctl_struct* getClient(struct client_ctl_struct *pthread_struct, int id) {
 	//int phtread_id = id;
-
 	return NULL;
-
 }
 
 /* waiting for joining all the PThreads  */
@@ -53,24 +51,20 @@ int addPThread(struct pthread_struct *_pthread, pthread_t pThread) {
 		_newPThread->isLast = TRUE;
 	}
 	printallPThreads();
-		printf(" End of addPThread\n");
+	printf(" End of addPThread\n");
 	return retcode;
 }
 
-
-void printallPThreads(struct pthread_struct *pthread_struct){
-int count = 0;
-while (pthread_struct->isLast){
-	printf("PThread %i = %i", count, pthread_struct->thread);
+void printallPThreads(struct pthread_struct *pthread_struct) {
+	int count = 0;
+	while (pthread_struct->isLast) {
+		printf("PThread %i = %i", count, pthread_struct->thread);
 		pthread_struct = pthread_struct->nextClient;
-count++;
-}
-printf("PThread %i = %i", count, pthread_struct->thread);
-
-
+		count++;
+	}
+	printf("PThread %i = %i", count, pthread_struct->thread);
 
 }
-
 
 /* delete the PThread from the PThread Client list, if Client disconnect */
 int detachPThread(struct pthread_struct *pthread_struct, int id) {

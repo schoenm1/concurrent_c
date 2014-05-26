@@ -116,7 +116,7 @@ void my_handler(int signo) {
 			/* the message to send is: <length of following message><message> e.g. 5abcd (the '0' char will be added to <length of msg> */
 			strcat(sendbuffer, intlen);
 			strcat(sendbuffer, " ");
-			printf("Size of square_buffer (just with len) = %i\n", strlen(sendbuffer));
+			printf("Size of buffer (just with len) = %i\n", strlen(sendbuffer));
 			strcat(sendbuffer, tmpsquare_buffer);
 
 			if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {

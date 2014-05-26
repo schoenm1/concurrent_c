@@ -12,7 +12,7 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesi
 
 	struct shm_ctr_struct *ret_struct = FALSE;
 
-	LOG_TRACE(LOG_INFORMATIONAL, "Size of shm Place is %i. IsFree = %i\n", shm_ctr->shm_size, shm_ctr->isfree);
+	LOG_TRACE(LOG_INFORMATIONAL, "Size of shm Place is %i. IsFree = %i", shm_ctr->shm_size, shm_ctr->isfree);
 
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize)) && (shm_ctr->isfree == TRUE)) {
@@ -67,12 +67,12 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 		}
 
 		if (newsize == untilSize) {
-			LOG_TRACE(LOG_INFORMATIONAL, "After deviding I have a good block size.\n");
+			LOG_TRACE(LOG_INFORMATIONAL, "After deviding I have a good block size.");
 
 			retrcode = TRUE;
 			return retrcode;
 		} else {
-			LOG_TRACE(LOG_NOTICE, "Recursive call in deviding because block size is to big (at moment = %i) ... \n", newsize);
+			LOG_TRACE(LOG_NOTICE, "Recursive call in deviding because block size is to big (at moment = %i) ...", newsize);
 			retrcode = devide(shm_ctr, untilSize);
 		}
 
@@ -87,33 +87,13 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	return retrcode;
 }
 
-char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
-	LOG_TRACE(LOG_DEBUG, "Now in funtion readFile()\n");
-	char * retchar = "File not found";
-	/* if file found */
-	if (strcmp(filename, (shm_ctr->filename)) == 0) {
-		return shm_ctr->filedata;
-	}
 
-	/* if last = return not found */
-	else if (shm_ctr->isLast == TRUE) {
-		return "File not found. No content to display.";
-	}
-
-	else {
-		shm_ctr = (shm_ctr->next)->next;
-		LOG_TRACE(LOG_DEBUG, "Recursive call of readFile()\n");
-		retchar = readFile(shm_ctr, filename);
-	}
-
-	return retchar;
-}
 int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
-	LOG_TRACE(LOG_DEBUG, "In function deleteFile()\n");
+	LOG_TRACE(LOG_DEBUG, "In function deleteFile()");
 	int retcode = FALSE;
 	/* if hit, make settings */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
-		LOG_TRACE(LOG_DEBUG, "Filename found...\n");
+		LOG_TRACE(LOG_DEBUG, "Filename found...");
 
 		shm_ctr->filename = "NULL";
 		shm_ctr->isfree = TRUE;
@@ -124,19 +104,19 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	}
 	/* if at end of SHM and no hit, return FALSE */
 	else if (shm_ctr->isLast == TRUE) {
-		LOG_TRACE(LOG_DEBUG, "At the end of SHM. No filename found.\n");
+		LOG_TRACE(LOG_DEBUG, "At the end of SHM. No filename found.");
 		return FALSE;
 	}
 	/* if no hit and not at end of shm, go to next */
 	else {
-		LOG_TRACE(LOG_DEBUG, "Recursive call of function deleteFile()\n");
+		LOG_TRACE(LOG_DEBUG, "Recursive call of function deleteFile()");
 		retcode = deleteFile((shm_ctr->next), filename);
 	}
 	return retcode;
 }
 
 int combine(struct shm_ctr_struct *shm_ctr) {
-	LOG_TRACE(LOG_DEBUG, "In function combine()\n");
+	LOG_TRACE(LOG_DEBUG, "In function combine()");
 	int retcode = FALSE;
 
 	/* if block is not free, leave size of block an go further */
