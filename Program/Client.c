@@ -96,6 +96,7 @@ void my_handler(int signo) {
 		handle_error(retcode, "connect() to Server failed", PROCESS_EXIT);
 
 		/* Run forever */
+
 		while (TRUE) {
 			int num;
 			char tmpsquare_buffer[BUFSIZE];

@@ -36,6 +36,7 @@
 #include <time.h>
 #include "my.h" // global structs
 #include "shm_control.c" // global structs
+#include "pthread_control.c" // control of Pthreads
 #include "myfunctions.c"
 #include <pthread.h> /* for pthreads */
 /* ====================================================================================== */
@@ -55,7 +56,7 @@ int shm_id;
 #define SERVERNAME "Server";
 int LOGLEVEL = 4;
 int _MAX_LENGTH_ARG = 5; // defines the maximum Length of arguments. e.g. "-l"
-pthread_t threadlist[100];
+struct pthread_struct *myPThreadList;
 
 /* all global variables for Arguments */
 char _logLevel_arg[10] = LOGLEVEL_ARG
@@ -83,7 +84,6 @@ unsigned short ServerPort; /* Server port */
 unsigned int client_address_len; /* Length of client address data structure */
 
 struct shm_ctr_struct *shm_ctr;
-//char *default_Filename = "NULL";
 
 struct validArgs {
 	int isSet;
@@ -108,19 +108,22 @@ int setup_shm() {
 	}
 	create_shm(shm_key, "create", "shmget failed", IPC_CREAT | IPC_EXCL);
 	shm_id = create_shm(shm_key, "create", "shmget failed", 0);
-
 	return 1;
 }
 
 void my_handler(int signo) {
+	int retcode;
 	if (signo == SIGUSR1) {
 		printf("Received other than SIGINT. Server is cleaning up shared memory and is going to close...\n");
-		joinAllPthreads();
+		//retcode = joinPThread(myPThreadList);
+		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
+
 		/* clean up shared memory */
 		cleanup(shm_id);
 	} else {
 		printf("Received SIGINT. Server is cleaning up shared memory and is going to close...\n");
-		joinAllPthreads();
+		//retcode = joinPThread(myPThreadList);
+		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
 		/* clean up shared memory */
 		cleanup(shm_id);
 		exit(1);
@@ -165,6 +168,14 @@ int main(int argc, char *argv[]) {
 	retcode = initshm(shm_start);
 	handle_error(retcode, "Could not create Shared Memory Control Set...\n", PROCESS_EXIT);
 
+	/* init struct for PThread handling Clients */
+	myPThreadList = (struct pthread_struct *) malloc(sizeof(struct pthread_struct));
+	myPThreadList->isLast = 1;
+	myPThreadList->nextClient = myPThreadList;
+
+
+
+
 	/* Testfile for testing memory control */
 	printf("\n");
 	int filesize = 1056;
@@ -184,7 +195,6 @@ int main(int argc, char *argv[]) {
 	}
 
 // if address of founded place + size of place < than
-	//	if ((&(place->filedata) + place->shm_size)< (&(shm_ctr->filedata) + TOT_SHM_SIZE)) {
 	printf("Address of place = %p\n", place);
 	if (!place == 0) {
 		printf("Inside of checking if return of place is valid...\n");
@@ -194,8 +204,6 @@ int main(int argc, char *argv[]) {
 		shm_start = "Dies ist der Text des Testfiles.\nEs ist nicht einfach zu Programmieren.";
 
 	}
-	//LOG_TRACE(LOG_INFORMATIONAL, "Will now output all existing shared memory blocks\n");
-	//	print_all_shm_blocks(shm_ctr);
 
 	/* ====================================================================================== */
 
@@ -251,22 +259,14 @@ int setTCPServer() {
 	return 1;
 }
 
-int setLogLevel(int logLevel) {
-#ifndef DEBUG
-#define  DEBUG
-#endif
-	LOGLEVEL = logLevel;
-	return 1;
-}
-
 void ServerListen() {
 	LOG_TRACE(LOG_INFORMATIONAL, "Server is now going to Listening Mode for Clients.");
 	LOG_TRACE(LOG_INFORMATIONAL, "Client can connect to Server on Port %i", ServerPort);
-	int pthread_count = 0;
+	pthread_t _myPThread;
 
 	/* Run forever */
 	while (TRUE) {
-		pthread_t newPThread;
+
 		/* Set the size of the in-out parameter */
 		client_address_len = sizeof(ClientSocketAddress);
 
@@ -280,32 +280,16 @@ void ServerListen() {
 		cps.clientSocket = clientSocket;
 
 		/*handle the client and create per client a single thread */
-		pthread_create(&newPThread, NULL, &handle_tcp_client, &cps);
-		threadlist[pthread_count]= newPThread;
-		pthread_count++;
-		LOG_TRACE(LOG_INFORMATIONAL, "Anzahl Clients = %i",pthread_count);
-
-
+		pthread_create(&_myPThread, NULL, &handle_tcp_client, &cps);
+		addPThread(myPThreadList, _myPThread);
 
 		/* clntSock is connected to a client! */
 		LOG_TRACE(LOG_WARNING, "Handling Client %s", inet_ntoa(ClientSocketAddress.sin_addr));
 
-
-		//handle_tcp_client(clientSocket);
 	}
 	/* NOT REACHED: */
 	exit(0);
 }
-
-void joinAllPthreads(){
-
-
-
-}
-
-
-
-
 
 void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 	LOG_TRACE(LOG_INFORMATIONAL, "Command from Client was: %s", command);
@@ -316,24 +300,17 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 	if (strcmp(command, "CREATE") == 0) {
 
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...");
-		//printf("#0 = In creating new file\n");
 		char * tmpchar = getFileContent(recMessage);
 		printf("rec Message = %s\n", recMessage);
 
 		char *filecontent = strdup(getFileContent(recMessage));
-		//printf("#1 = In creating new file\n");
 		char *filename = recMessage[2];
-		//printf("#2 = In creating new file\n");
 		LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
 
 		char *returnvalue = malloc(sizeof(char) * 256);
-		//printf("#3 = In creating new file\n");
 		returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
 		LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
-		//printf("Will now send to the client Message mit Länge = %i: %s", strlen(returnvalue), returnvalue);
-		//printf("#4 = In creating new file\n");
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
-		//printf("#5 = In creating new file\n");
 
 		//free(filecontent);
 		free(returnvalue);
@@ -343,19 +320,13 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 	if (strcmp(command, "READ") == 0) {
 		char * returnvalue = readFile(shm_ctr, recMessage[2]);
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
-
 	}
 
 	if (strcmp(command, "LIST") == 0) {
-
-		print_all_shm_blocks(shm_ctr);
-		//char *sendtoClient = (char *) malloc(8192);
+		//print_all_shm_blocks(shm_ctr);
 		sendtoClient = get_all_shm_blocks(shm_ctr);
-
-		printf("Size of Send to Client = %i\n%s", strlen(sendtoClient), sendtoClient);
-
+		//printf("Size of Send to Client = %i\n%s", strlen(sendtoClient), sendtoClient);
 		send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
-
 		free(sendtoClient);
 	}
 
@@ -428,7 +399,7 @@ void* handle_tcp_client(void* parameters) {
 		}
 
 		printf("Received message from Client %s: %s\n", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
-		printf("Received Message Size = %i\n", recvMsgSize);
+		//printf("Received Message Size = %i\n", recvMsgSize);
 		printf("rec Buffer = %s\n", recBuffer);
 
 		printf("\nbefore break Array into Words...\n\n");
@@ -438,20 +409,13 @@ void* handle_tcp_client(void* parameters) {
 #ifdef  DEBUG
 		if (LOGLEVEL >= LOG_NOTICE) {
 			LOG_TRACE(LOG_NOTICE, "Checking now if expected length of message is the effective length. If yes, transmission was ok.");
-			//char *tmp;
 			LOG_TRACE(LOG_NOTICE, "Size of transmitted message should be: %s\t Size is: %i", recMessage[0], recvMsgSize);
-			/*printf("Size should be: %s\t Size is: %i\n", recMessage[0],
-			 recvMsgSize);
-			 */}
+		}
 #endif
 		/* check is effective message is equal to expected message size */
 		int effLength = (int) atoi(recMessage[0]);
 		if (effLength == recvMsgSize) {
-#ifdef DEBUG
-			if (LOGLEVEL >= LOG_NOTICE) {
-				LOG_TRACE(LOG_NOTICE, "All OK!");
-			}
-#endif
+			LOG_TRACE(LOG_NOTICE, "All OK!");
 
 			/* check if 1st word of message is a valid command */
 			retcode = getValidServerCommand(recMessage[1]);
@@ -475,29 +439,27 @@ void* handle_tcp_client(void* parameters) {
 }
 
 void breakCharArrayInWords(char *recMessage[], char *recBuffer[]) {
-	//printf("## Now in breakCharArrayinWords ##\n");
-
 	/* break now the received Message into a string array where the sign " " breaks words */
 	char breaksign[] = " ";
 	char *token = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	int count = 0;
-	//printf("## 2 Now in breakCharArrayinWords ##\n");
-
 	/* get the first token */
 	token = strtok(recBuffer, breaksign);
-	//printf("## 3 Now in breakCharArrayinWords ##\n");
-	//printf("complete message = %s", recBuffer);
-	//printf("%i: Token = %s and Size of token = %i\n", count, token, (int) strlen(token));
 	recMessage[count] = token;
-	//printf("recMessage[%i]= %s\n", count, recMessage[count]);
 	count++;
-
 	/* walk through other tokens */
 	while (token != NULL) {
 		token = strtok(NULL, breaksign);
 		recMessage[count] = malloc(sizeof(char) * MAX_WORD_SIZE);
 		recMessage[count] = token;
-		//printf("in while: recMessage[%i]= %s\n", count, recMessage[count]);
 		count++;
 	}
+}
+
+int setLogLevel(int logLevel) {
+#ifndef DEBUG
+#define  DEBUG
+#endif
+	LOGLEVEL = logLevel;
+	return 1;
 }

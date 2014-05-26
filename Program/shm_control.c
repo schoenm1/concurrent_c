@@ -8,7 +8,6 @@
  */
 
 /* In this file the control of shared memory is implemented */
-
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesize) {
 
 	struct shm_ctr_struct *ret_struct = FALSE;
@@ -19,20 +18,13 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesi
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize)) && (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
 		ret_struct = shm_ctr;
-		//	printf("Found a good place.\n");
-		//	printf("Address of good shm Place is %p\n", shm_ctr);
-		//	printf("Address of good shm Place is %i\n", &shm_ctr);
 		return ret_struct;
 	}
 
 	/* check if at end of Shared Memory. If yes, return FALSE */
-	//struct shm_ctr *ab = shm_ctr->next;
 	if (shm_ctr == (shm_ctr->next)) {
-		//printf("At the end of all shared memory places... No hit found to enter the filename.\n");
 		return ret_struct;
 	}
-
-	//printf("Did not found a good place here. Will go to next possible place...\n");
 	struct shm_ctr_struct *nextone = shm_ctr->next;
 	ret_struct = find_shm_place(nextone, filesize);
 
@@ -42,10 +34,8 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesi
  is bigger than the file length, but less than 2 times the file length */
 
 int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
-	//printf("Now in devide(). I want to devide until I reach Block size of %i\n",untilSize);
 	int retrcode = FALSE;
 	/* check if place can be devided */
-//	printf("Shm_ctl ist free = %i\n",shm_ctr->isfree);
 	if (shm_ctr->isfree == TRUE) {
 
 		/* new setting for devided, next place */
@@ -82,11 +72,7 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 			retrcode = TRUE;
 			return retrcode;
 		} else {
-			//print_single_shm_blocks(shm_ctr);
-			//print_single_shm_blocks(shm_ctr->next);
-
 			LOG_TRACE(LOG_NOTICE, "Recursive call in deviding because block size is to big (at moment = %i) ... \n", newsize);
-
 			retrcode = devide(shm_ctr, untilSize);
 		}
 
@@ -125,7 +111,6 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	LOG_TRACE(LOG_DEBUG, "In function deleteFile()\n");
 	int retcode = FALSE;
-//	LOG_TRACE(LOG_DEBUG, "In function deleteFile()\n");
 	/* if hit, make settings */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
 		LOG_TRACE(LOG_DEBUG, "Filename found...\n");
@@ -137,19 +122,16 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 		printf("Filedata is now: %s\n", shm_ctr->filedata);
 		return TRUE;
 	}
-
 	/* if at end of SHM and no hit, return FALSE */
 	else if (shm_ctr->isLast == TRUE) {
 		LOG_TRACE(LOG_DEBUG, "At the end of SHM. No filename found.\n");
 		return FALSE;
 	}
-
 	/* if no hit and not at end of shm, go to next */
 	else {
 		LOG_TRACE(LOG_DEBUG, "Recursive call of function deleteFile()\n");
 		retcode = deleteFile((shm_ctr->next), filename);
 	}
-
 	return retcode;
 }
 
@@ -186,7 +168,6 @@ int combine(struct shm_ctr_struct *shm_ctr) {
 		} else {
 			shm_ctr->next = tmpnext->next;
 		}
-
 		retcode = TRUE;
 	}
 
@@ -194,15 +175,11 @@ int combine(struct shm_ctr_struct *shm_ctr) {
 	else {
 		LOG_TRACE(LOG_DEBUG, "Nothing to to. Go to next block.\n");
 		retcode = combine(shm_ctr->next);
-
 	}
-
 //free(tmpnext);
-
 	return retcode;
 }
 int check_combine() {
-
 	return -1;
 }
 

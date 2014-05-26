@@ -10,11 +10,12 @@ struct shm_ctr_struct {
 
 
 /* struct for handling the client pthreads */
-struct client_ctl_struct {
+struct pthread_struct {
 	pthread_t thread;
 	struct client_ctl_struct *nextClient;
-	int clntSocket;
+	int isLast; //indicates the end of shared memory
 };
+
 
 /* struct for creating new Client pthreads and the params */
 struct client_param_struct {
