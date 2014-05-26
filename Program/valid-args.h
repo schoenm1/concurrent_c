@@ -1,32 +1,18 @@
-/*
- enum SERVER_COMMANDS {
- CREATE, UPDATE, DELETE, LIST, READ
- } SERVER_COMMANDS;
- */
-
 char * getFileContent(char *recMessage[]) {
-//	printf("Now in funktion getFileContent()\n");
 	int i;
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	memset(retchar, '\0', sizeof(retchar)); //clear String
 	strcat(retchar, recMessage[3]);
 
-//printf("Momentaner String = %s\n",retchar);
-
 	for (i = 4; i < sizeof(recMessage) - 1; i++) {
-//	printf("Setze nur fŸr i=%i Strings zusammen\n",i);
 		strcat(retchar, " ");
 		strcat(retchar, recMessage[i]);
 	}
-//printf("Message String = %s\n",retchar);
 	return retchar;
 
 }
 
 int getValidServerCommand(char *command) {
-//printf("command=\"%s\" size = %i\n",command,strlen(command));
-//printf("command should  be=\"%s\" length = %i\n","CREATE",strlen("CREATE"));
-	//printf("Command = %s\n", command);
 	if (strcmp(command, "CREATE") == 0)
 		return TRUE;
 	if (strcmp(command, "DELETE") == 0)
@@ -48,31 +34,30 @@ char * getLogLevel(int log_level, char *lvl) {
 	switch (log_level) {
 
 	case LOG_EMERGENCY:
-		lvl = "LOG_EMERGENCY";
+		lvl = "LOG_EMERGENCY    ";
 		break;
 	case LOG_ALERT:
-		lvl = "LOG_ALERT";
+		lvl = "LOG_ALERT        ";
 		break;
 	case LOG_CRITICAL:
-		lvl = "LOG_CRITICAL";
+		lvl = "LOG_CRITICAL     ";
 		break;
 	case LOG_ERROR:
-		lvl = "LOG_ERROR";
+		lvl = "LOG_ERROR        ";
 		break;
 	case LOG_WARNING:
-		lvl = "LOG_WARNING";
+		lvl = "LOG_WARNING      ";
 		break;
 	case LOG_NOTICE:
-		lvl = "LOG_NOTICE";
+		lvl = "LOG_NOTICE       ";
 		break;
 	case LOG_INFORMATIONAL:
 		lvl = "LOG_INFORMATIONAL";
 		break;
 	case LOG_DEBUG:
-		lvl = "LOG_DEBUG";
+		lvl = "LOG_DEBUG   ";
 		break;
 	}
-	//printf("**************** - LOGLEVEL = %s - ********************************\n",lvl);
 	return lvl;
 }
 
@@ -96,7 +81,7 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 		va_end(va);
 
 		free(buff);
-	//	free(L_LEVEL);
+		//	free(L_LEVEL);
 
 	}
 
@@ -135,7 +120,6 @@ int setServerPort(int myserverPort) {
 void initValidServerArguments(int argc, char *argv[]) {
 	int i;
 	int retcode;
-//	int counter_validArgs = 0;
 
 	/* Parse all Arguments (except arg[0]. This is File itself) */
 	for (i = 1; i < argc; i++) {

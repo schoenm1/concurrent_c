@@ -1,132 +1,232 @@
-/* (C) IT Sky Consulting GmbH 2014
- * http://www.it-sky-consulting.com/
- * Author: Karl Brodowsky
- * Date: 2014-02-27
- * License: GPL v2 (See https://de.wikipedia.org/wiki/GNU_General_Public_License )
+/*
+ * main.c
  *
- * This file is inspired by
- * http://cs.baylor.edu/~donahoo/practical/CSockets/code/TCPEchoServer.c
- * and
- * http://cs.baylor.edu/~donahoo/practical/CSockets/code/HandleTCPClient.c
+ *  Created on: Apr 26, 2014
+ *      Author: fish-guts
  */
 
-#include <arpa/inet.h>  /* for sockaddr_in and inet_addr() and inet_ntoa() */
-#include <errno.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <stdio.h>      /* for printf() and fprintf() and ... */
-#include <stdlib.h>     /* for atoi() and exit() and ... */
-#include <string.h>     /* for memset() and ... */
-#include <sys/socket.h> /* for socket(), bind(), recv, send(), and connect() */
-#include <sys/types.h>
-#include <unistd.h>     /* for close() */
-#include <pthread.h>
+#include "main.h"
 
-#include <itskylib.h>
 
-#define RCVBUFSIZE 32   /* Size of receive buffer */
-#define MAXPENDING 5    /* Maximum outstanding connection requests */
+/* our main server buffer */
+char serverbuf[4096];
+int quitting;
 
-void usage(const char *argv0, const char *msg) {
-  if (msg != NULL && strlen(msg) > 0) {
-    printf("%s\n\n", msg);
-  }
-  printf("Usage\n\n");
-  printf("%s <Server Port>\n", argv0);
-  exit(1);
+thread *threadlist = NULL;
+
+
+void parse(void) {
+	char source[1024];
+	char command[1024];
+	char buf[1024];
+	char err[1024];
+	char *pch;
+	int ac;
+	char **av;
+	cmd *ic;
+	strscpy(buf, serverbuf, sizeof(buf));
+	if (*buf == ':') {
+		pch = strpbrk(buf, " ");
+		if (!pch)
+			return;
+		*pch = 0;
+		while (isspace(*++pch))
+			;
+		strscpy(source, buf + 1, sizeof(source));
+		strscpy(buf, pch, sizeof(buf));
+
+	} else {
+		*source = 0;
+	}
+	if (!*buf)
+		return;
+	pch = strpbrk(buf, " ");
+	if (pch) {
+		*pch = 0;
+		while (isspace(*++pch))
+			;
+	} else
+		pch = buf + strlen(buf);
+	strscpy(command, buf, sizeof(command));
+	ac = tokenize(pch, &av);
+	if ((ic = find_cmd(command))) {
+		if (ic->func)
+			ic->func(source, ac, av);
+	} else {
+		fprintf(stderr, "Unknown command: %s\n", serverbuf);
+		sprintf(buf,"Unknown Command: %s\n",serverbuf);
+		send(client_sock,buf,sizeof(buf),0);
+	}
+	free(av);
+
 }
 
-void *handle_tcp_client(void *client_socket_ptr);   /* TCP client handling function */
+void add_thread(thread *t) {
+	t->next = threadlist;
+	if (threadlist)
+		threadlist->prev = t;
+	threadlist = t;
 
-int main(int argc, char *argv[]) {
-
-  int retcode;
-
-  if (is_help_requested(argc, argv)) {
-    usage(argv[0], "");
-  }
-
-  int server_socket;                    /* Socket descriptor for server */
-  int client_socket;                    /* Socket descriptor for client */
-  struct sockaddr_in server_address; /* Local address */
-  struct sockaddr_in client_address; /* Client address */
-  unsigned short server_port;     /* Server port */
-  unsigned int client_address_len;            /* Length of client address data structure */
-
-  if (argc != 2) {
-    /* Test for correct number of arguments */
-    usage(argv[0], "wrong number of arguments");
-  }
-  server_port = atoi(argv[1]);  /* First arg:  local port */
-
-  /* Create socket for incoming connections */
-  server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-  handle_error(server_socket, "socket() failed", PROCESS_EXIT);
-
-  /* Construct local address structure */
-  memset(&server_address, 0, sizeof(server_address));   /* Zero out structure */
-  server_address.sin_family = AF_INET;                /* Internet address family */
-  server_address.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-  server_address.sin_port = htons(server_port);      /* Local port */
-
-  /* Bind to the local address */
-  retcode = bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address));
-  handle_error(retcode, "bind() failed", PROCESS_EXIT);
-
-  /* Mark the socket so it will listen for incoming connections */
-  retcode = listen(server_socket, MAXPENDING);
-  handle_error(retcode, "listen() failed", PROCESS_EXIT);
-
-  while (TRUE) { /* Run forever */
-    /* Set the size of the in-out parameter */
-    client_address_len = sizeof(client_address);
-
-    /* Wait for a client to connect */
-    client_socket = accept(server_socket, (struct sockaddr *) &client_address, &client_address_len);
-    handle_error(client_socket, "accept() failed", PROCESS_EXIT);
-
-    printf("Handling client %s\n", inet_ntoa(client_address.sin_addr));
-    /* client_socket is connected to a client! */
-
-    pthread_t thread;
-    int *client_socket_ptr = (int *) malloc(sizeof(int));
-    *client_socket_ptr = client_socket;
-    pthread_create(&thread, NULL, handle_tcp_client, client_socket_ptr);
-    pthread_detach(thread);
-  }
-  /* NOT REACHED: */
-  exit(0);
 }
 
-void* handle_tcp_client(void *client_socket_ptr) {
-  int client_socket = *((int *) client_socket_ptr);
-  free(client_socket_ptr); /* malloc was made before starting this thread */
-  char square_buffer[RCVBUFSIZE];      /* Buffer for square string */
-  int recv_msg_size;                    /* Size of received message */
 
-  while (TRUE) {
-    /* Receive message from client */
-    recv_msg_size = recv(client_socket, square_buffer, RCVBUFSIZE - 1, 0);
-    handle_error(recv_msg_size, "recv() failed", PROCESS_EXIT);
+void launch_app(char *argv[]) {
+	if ((strcmp(argv[1], "start")) == 0)
+		startup();
+	else if ((strcmp(argv[1], "stop")) == 0)
+		stop_server();
+	else {
+		fprintf(stderr,
+				"Invalid Command: %s. Valid Commands are ./fileserver [start|stop]\n",
+				argv[1]);
+		exit(EXIT_FAILURE);
+	}
+}
 
-    if (recv_msg_size == 0) {
-      /* zero indicates end of transmission */
-      break;
-    }
-    square_buffer[recv_msg_size] = '\000';
-    /* Send received string and receive again until end of transmission */
-    /* Square message and send it back to client */
-    int x = atoi(square_buffer);
-    int y = x*x;
-    sprintf(square_buffer, "%12d", y);
-    int send_msg_size = strlen(square_buffer);
-    ssize_t sent_size = send(client_socket, square_buffer, send_msg_size, 0);
-    if (sent_size != recv_msg_size) {
-      die_with_error("send() failed");
-    }
-    /* See if there is more data to receive in the next round...*/
-  }
+int main(int argc, char* argv[]) {
+	if (argc > 1)
+		launch_app(argv);
+	else {
+		fprintf(stderr,
+				"No argument supplied. Valid Argument are [start|stop]\n");
+		exit(EXIT_SUCCESS);
+	}
+	return 0;
+}
 
-  close(client_socket);    /* Close client socket */
-  return NULL;
+void print_start_msg(void) {
+	fprintf(stderr, "###############################\n");
+	fprintf(stderr, "Welcome to Severin'ŝ FileServer\n");
+	fprintf(stderr, "###############################\n");
+}
+
+void stop_server(void) {
+	exit(EXIT_SUCCESS);
+}
+
+void startup(void) {
+	print_start_msg();
+
+	// daemonize, not yet needed.
+	/*	pid_t pid, sid;
+	 if (getppid() == 1)
+	 return;
+	 pid = fork();
+	 if (pid < 0)
+	 exit(EXIT_FAILURE);
+	 if (pid > 0)
+	 exit(EXIT_SUCCESS);
+	 umask(0);
+	 sid = setsid();
+	 if (sid < 0)
+	 exit(EXIT_FAILURE);
+	 int rc;
+	 if ((chdir("/")) < 0)
+	 exit(EXIT_FAILURE);
+	 // done, now we need to open some sockets and wait for connections;
+	 * */
+
+	start_server();
+}
+
+void start_server(void) {
+	int s, len, rc;
+	int tid;
+	long t;
+	char buf[100000];
+
+	struct sockaddr_in addr;
+	struct sockaddr_in client;
+	pthread_t client_thread;
+	pthread_mutex_t mx;
+
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+
+	unsigned short port = PORT;
+
+	// clear the struct
+	memset((char*) &addr, 0, sizeof(addr));
+
+	fprintf(stderr, "\n\nStarting server...");
+	// let's set some values
+
+	/* type of socket created in socket() */
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = INADDR_ANY;
+	/* 7000 is the port to use for connections */
+	addr.sin_port = htons((unsigned short) PORT);
+
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	/* bind the socket to the port specified above */
+
+	if ((rc = bind(sock, (struct sockaddr *) &addr, sizeof(addr))) < 0) {
+		fprintf(stderr, "Error binding address: %s\n", strerror(errno));
+		exit(EXIT_FAILURE);
+	} else {
+		fprintf(stderr, "Bind Successful\n");
+	}
+
+	if ((listen(sock, serverbuf) < 0)) {
+		fprintf(stderr, "Listen Failed\n");
+		exit(EXIT_FAILURE);
+	} else {
+		fprintf(stderr, "Server started successfully, listening on port %d\n",
+				PORT);
+	}
+	// the  main server loop
+	while (!quitting) {
+		len = sizeof(struct sockaddr_in);
+
+		client_sock = accept(sock, (struct sockaddr *) &client, &len);
+		if (client_sock < 0) {
+			fprintf(stderr, "Accept failed\n");
+		} else {
+			/* This is the client process */
+
+			thread *t = scalloc(sizeof(thread), 1);
+			t->mx = &mx;
+			t->t = pthread_self();
+			pthread_mutex_init(&mx,NULL);
+			pthread_mutex_lock(&mx);
+			tid = pthread_create(&client_thread, NULL, doprocessing, &t);
+			add_thread(t);
+			if (tid) {
+				fprintf(stderr, "Error creating thread: %d\n", tid);
+			}
+		}
+	}
+}
+
+void *doprocessing(thread *t) {
+	pthread_mutex_t *mx;
+	pthread_mutex_t *mxq;
+	int n,s;
+	char buf[100000];
+	bzero(buf, sizeof(buf));
+
+
+	if (n < 0) {
+		fprintf(stderr, "ERROR writing to socket");
+		exit(1);
+	}
+	while (!quitting) {
+		s = recv(client_sock, buf, sizeof(serverbuf), 0);
+		if (s>0) {
+			buf[s] = 0;
+			// we use LF as a line breaker, its easier to parse the commands
+			char *pch = strtok(buf, "\n");
+			while (pch != NULL) {
+				strcpy(serverbuf, pch);
+				parse();
+				serverbuf[s] = 0;
+				pch = strtok(NULL, "\n");
+			}
+		} else {
+			fprintf(stderr, "Client disconnected\n");
+			close(client_sock);
+			pthread_exit(t->t);
+			pthread_mutex_unlock(&mxq);
+
+		}
+	}
 }
