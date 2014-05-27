@@ -7,52 +7,37 @@
  5) write file into shm
  */
 
-/** init the mutex arary in for the file */
-void initMutexesperFile(struct shm_ctr_struct *shm_ctr) {
-	int count = 10;
-	LOG_TRACE(LOG_INFORMATIONAL, "Size of Mutex Array = %i", count);
-	for (int i = 0; i < count; ++i) {
-		pthread_mutex_init(&(shm_ctr->filemutex[i]), NULL);
-	}
-}
 
 
-/* search in Array for one mutex which is not locked */
-int lockOneMutexForReading(struct shm_ctr_struct *shm_ctr) {
-	int retcode = FALSE;
-	for (int i = 0; i < 10; ++i) {
+/* forward function declaration */
+int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename);
 
-		retcode = pthread_mutex_lock(&(shm_ctr->filemutex[i]));
-		printf("# Retcode = %i", retcode);
-		if (retcode == TRUE)
-			return TRUE;
-	}
 
-	return FALSE;
-}
 
 char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
-	lockOneMutexForReading(shm_ctr);
+	/* make a readlock on the file */
+	pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
+
 	LOG_TRACE(LOG_DEBUG, "Now in funtion readFile()\n");
-	char * retchar = "File not found";
-	/* if file found */
-	if (strcmp(filename, (shm_ctr->filename)) == 0) {
-		return shm_ctr->filedata;
-	}
+		char * retchar = "File not found";
+		/* if file found */
+		if (strcmp(filename, (shm_ctr->filename)) == 0) {
+			return shm_ctr->filedata;
+		}
 
-	/* if last = return not found */
-	else if (shm_ctr->isLast == TRUE) {
-		return "File not found. No content to display.";
-	}
+		/* if last = return not found */
+		else if (shm_ctr->isLast == TRUE) {
+			return "File not found. No content to display.";
+		}
 
-	else {
-		shm_ctr = (shm_ctr->next)->next;
-		LOG_TRACE(LOG_DEBUG, "Recursive call of readFile()\n");
-		retchar = readFile(shm_ctr, filename);
-	}
+		else {
+			shm_ctr = (shm_ctr->next)->next;
+			LOG_TRACE(LOG_DEBUG, "Recursive call of readFile()\n");
+			retchar = readFile(shm_ctr, filename);
+		}
 
-	return retchar;
-}
+		return retchar;
+	}
 
 char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
 	printf("Now in Function writeNewFile()\n");
@@ -90,7 +75,10 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 		place->isfree = FALSE;
 		place->filename = strdup(filename);
 		place->filedata = strdup(filecontent);
-		initMutexesperFile(place);
+
+		/* init the read write lock for this file */
+		pthread_rwlock_init(&(place->rwlockFile), NULL);/* Default initialization */
+
 		return getSingleString("File \"%s\" successfully created.\n", (place->filename));
 	}
 	return -1;
@@ -99,7 +87,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 /* will check if the file currenctly exists in shm */
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retrcode = FALSE;
-	/*printf("Searching for Filename = %s\n", filename);
+	//printf("Searching for Filename = %s\n", filename);
 
 	 /* if stringcompare = True return True */
 	if (strcmp((shm_ctr->filename), filename) == 0) {

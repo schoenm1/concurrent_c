@@ -6,13 +6,13 @@ struct shm_ctr_struct {
 	struct shm_ctr_struct *prev;
 	char *filename;
 	char *filedata; // just this pointer is a pointer to Shared memory
-	pthread_mutex_t *filemutex[10]; //array of mutexes
+	pthread_rwlock_t  rwlockFile; //Read-write lock for file
 };
 
 /* struct for handling the client pthreads */
 struct pthread_struct {
 	pthread_t thread;
-	struct client_ctl_struct *nextClient;
+	struct pthread_struct *nextClient;
 	int isLast; //indicates the end of shared memory
 };
 

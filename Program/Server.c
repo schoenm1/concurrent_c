@@ -299,8 +299,8 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 	if (strcmp(command, "CREATE") == 0) {
 
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...");
-		char * tmpchar = getFileContent(recMessage);
-		printf("rec Message = %s\n", recMessage);
+		//	char * tmpchar = getFileContent(recMessage);
+		printf("rec Message = %s\n", *recMessage);
 
 		char *filecontent = strdup(getFileContent(recMessage));
 		char *filename = recMessage[2];
@@ -317,8 +317,15 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 
 	/* Reading File */
 	if (strcmp(command, "READ") == 0) {
+
 		char * returnvalue = readFile(shm_ctr, recMessage[2]);
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
+
+
+		/* unlock the read lock */
+		pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
+
+		//free(returnvalue);
 	}
 
 	if (strcmp(command, "LIST") == 0) {
@@ -399,7 +406,7 @@ void* handle_tcp_client(void* parameters) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Received message from Client %s: %s", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
 		//printf("Received Message Size = %i\n", recvMsgSize);
 		//printf("rec Buffer = %s\n", recBuffer);
-		LOG_TRACE(LOG_INFORMATIONAL, "before break Array into Words...");
+		//LOG_TRACE(LOG_INFORMATIONAL, "before break Array into Words...");
 		//print_all_shm_blocks(shm_ctr);
 		breakCharArrayInWords(recMessage, recBuffer);
 
@@ -422,7 +429,7 @@ void* handle_tcp_client(void* parameters) {
 			/* if command is valid */
 			if (retcode) {
 				LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s", recMessage[1]);
-				LOG_TRACE(LOG_INFORMATIONAL, "Führe nun Befehl aus: %s", recMessage[1]);
+				//LOG_TRACE(LOG_INFORMATIONAL, "Führe nun Befehl aus: %s", recMessage[1]);
 				runClientCommand(recMessage, recMessage[1], clntSocket);
 			};
 

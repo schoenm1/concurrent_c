@@ -7,6 +7,12 @@
  * Project:		https://github.com/schoenm1/concurrent_c.git
  */
 
+
+void print_all_shm_blocks();
+void LOG_TRACE(int lvl, char *msg, ...);
+
+
+
 /* In this file the control of shared memory is implemented */
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesize) {
 
