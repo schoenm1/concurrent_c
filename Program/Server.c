@@ -65,7 +65,7 @@ char _logLevel_arg[10] = LOGLEVEL_ARG
 char _serverPort_arg[10] = SERVERPORT_ARG
 ;
 
-/* function prototypes */
+/* forward function definition */
 void ServerListen();
 int setTCPServer();
 void runClientCommand();

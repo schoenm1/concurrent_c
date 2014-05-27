@@ -152,7 +152,6 @@ void initValidServerArguments(int argc, char *argv[]) {
 			}
 			i++;
 		}
-
 	}
 }
 
