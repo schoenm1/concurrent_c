@@ -43,10 +43,8 @@ int joinPThread(struct pthread_struct *_thisPThread) {
 /* add the PThread to the PThread Client list, if a new Client is connecting  */
 int addPThread(struct pthread_struct *_pthread, pthread_t pThread) {
 	int retcode = FALSE;
-	printf("Now in function addPThread ");
+	LOG_TRACE(LOG_DEBUG, "Now in function addPThread");
 	struct pthread_struct *_tmpPThread = (struct pthread_struct *) malloc(sizeof(struct pthread_struct));
-	//struct pthread_struct *_pthread = pthread_struct;
-	printf(" 1 ");
 
 	/* if _pthread is Last, add new PThread at the end of the list */
 	while (TRUE) {
@@ -59,9 +57,9 @@ int addPThread(struct pthread_struct *_pthread, pthread_t pThread) {
 			_newPThread->nextClient = _newPThread; //link next to himself
 			_newPThread->isLast = TRUE;
 			printallPThreads(_pthread);
-			printf(" End of addPThread\n");
+			LOG_TRACE(LOG_DEBUG, " End of addPThread");
+			return retcode;
 		}
-
 		else {
 			_tmpPThread = _tmpPThread->nextClient;
 		}

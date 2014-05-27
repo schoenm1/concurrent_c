@@ -65,7 +65,7 @@ char _logLevel_arg[10] = LOGLEVEL_ARG
 char _serverPort_arg[10] = SERVERPORT_ARG
 ;
 
-/* fucntion prototypes */
+/* function prototypes */
 void ServerListen();
 int setTCPServer();
 void runClientCommand();
@@ -75,6 +75,7 @@ int initshm();
 int setLogLevel();
 void breakCharArrayInWords();
 void* handle_tcp_client();
+int pthread_create(pthread_t * __restrict, const pthread_attr_t * __restrict, void *(*)(void *), void * __restrict);
 
 /* global vars for TCP-Server */
 int servSock; /* Socket descriptor for server */
@@ -105,7 +106,7 @@ int setup_shm() {
 	/*create shm 'unique' key */
 	key_t shm_key = ftok(REF_FILE, 1);
 	if (shm_key < 0) {
-		handle_error(-1, "ftok failed", PROCESS_EXIT);
+		handle_error(-1, "ftok failed", NO_EXIT);
 	}
 	create_shm(shm_key, "create", "shmget failed", IPC_CREAT | IPC_EXCL);
 	shm_id = create_shm(shm_key, "create", "shmget failed", 0);
@@ -204,8 +205,6 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	/* ====================================================================================== */
-
 	/* if no arguments is chosen, output the usage of the Server */
 	if (argc == 1) {
 		usage();
@@ -229,7 +228,6 @@ int main(int argc, char *argv[]) {
 
 	/* clean up shared memory */
 	cleanup(shm_id);
-
 }
 
 int setTCPServer() {
@@ -270,7 +268,7 @@ void ServerListen() {
 		client_address_len = sizeof(ClientSocketAddress);
 
 		/* Wait for a client to connect */
-		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for Client for connecting...\n");
+		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for Client to connect...");
 		clientSocket = accept(servSock, (struct sockaddr *) &ClientSocketAddress, &client_address_len);
 		handle_error(clientSocket, "accept() failed", 0);
 
@@ -291,7 +289,7 @@ void ServerListen() {
 }
 
 void runClientCommand(char *recMessage[], char *command, int clntSocket) {
-	LOG_TRACE(LOG_INFORMATIONAL, "Command from Client was: %s", command);
+	//LOG_TRACE(LOG_INFORMATIONAL, "Command from Client was: %s", command);
 	char *sendtoClient = (char *) malloc(MAX_FILE_LENGTH);
 	memset(sendtoClient, '\0', sizeof(sendtoClient));
 
@@ -308,30 +306,29 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 
 		char *returnvalue = malloc(sizeof(char) * 256);
 		returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
-		LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
-		send(clntSocket, returnvalue, strlen(returnvalue), 0);
-
-		//free(filecontent);
+		if (returnvalue > 0) {
+			LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+		}
 		free(returnvalue);
+		//free(filecontent);
 	}
 
 	/* Reading File */
 	if (strcmp(command, "READ") == 0) {
 
 		char * returnvalue = readFile(shm_ctr, recMessage[2]);
+		LOG_TRACE(LOG_INFORMATIONAL, "READ Command: Sending message to Client: %s", returnvalue);
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
 
 
 		/* unlock the read lock */
-		pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
-
+		//pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
 		//free(returnvalue);
 	}
 
 	if (strcmp(command, "LIST") == 0) {
-		//print_all_shm_blocks(shm_ctr);
 		sendtoClient = get_all_shm_blocks(shm_ctr);
-		//printf("Size of Send to Client = %i\n%s", strlen(sendtoClient), sendtoClient);
 		send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
 		free(sendtoClient);
 	}
@@ -357,7 +354,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 				sendtoClient = getSingleString("File with name \"%s\" was successfully deleted.", recMessage[2]);
 				send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
 			}
-			printf("Will now try to combine free blocks...\n");
+			LOG_TRACE(LOG_INFORMATIONAL, "Will now try to combine free blocks...");
 			retcode = combine(shm_ctr);
 			/* repeat until there is no more deviding option */
 
@@ -384,17 +381,14 @@ void* handle_tcp_client(void* parameters) {
 	int clntSocket = p->clientSocket;
 	printf("#3 In Handle Client\n");
 	int retcode;
-//char *recMessage[MAXRECWORDS]; /* array to save the single words of the received message */
 	char recBuffer[MAXRECWORDS]; /* Buffer for  string */
 	int recvMsgSize; /* Size of received message */
 	/* array to save the single words of the received message */
 	char *recMessage[MAXRECWORDS];
-
 	while (istrue) {
 		/* reset Buffer for next transmission */
 		memset(recBuffer, 0, sizeof(recBuffer));
 		memset(recMessage, 0, sizeof(recMessage));
-
 		/* Receive message from client */
 		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for reveicing message from Client.");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
@@ -404,18 +398,10 @@ void* handle_tcp_client(void* parameters) {
 			break;
 		}
 		LOG_TRACE(LOG_INFORMATIONAL, "Received message from Client %s: %s", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
-		//printf("Received Message Size = %i\n", recvMsgSize);
-		//printf("rec Buffer = %s\n", recBuffer);
-		//LOG_TRACE(LOG_INFORMATIONAL, "before break Array into Words...");
-		//print_all_shm_blocks(shm_ctr);
 		breakCharArrayInWords(recMessage, recBuffer);
 
-#ifdef  DEBUG
-		if (LOGLEVEL >= LOG_NOTICE) {
-			LOG_TRACE(LOG_NOTICE, "Checking now if expected length of message is the effective length. If yes, transmission was ok.");
-			LOG_TRACE(LOG_NOTICE, "Size of transmitted message should be: %s\t Size is: %i", recMessage[0], recvMsgSize);
-		}
-#endif
+		//LOG_TRACE(LOG_NOTICE, "Checking now if expected length of message is the effective length. If yes, transmission was ok.");
+		//LOG_TRACE(LOG_NOTICE, "Size of transmitted message should be: %s\t Size is: %i", recMessage[0], recvMsgSize);
 		/* check is effective message is equal to expected message size */
 		int effLength = (int) atoi(recMessage[0]);
 		if (effLength == recvMsgSize) {
@@ -424,21 +410,16 @@ void* handle_tcp_client(void* parameters) {
 			/* check if 1st word of message is a valid command */
 			retcode = getValidServerCommand(recMessage[1]);
 
-			LOG_TRACE(LOG_NOTICE, "Command is \"%s\" and has a length of %i", recMessage[1], strlen(recMessage[1]));
+			//LOG_TRACE(LOG_NOTICE, "Command is \"%s\" and has a length of %i", recMessage[1], strlen(recMessage[1]));
 
 			/* if command is valid */
 			if (retcode) {
 				LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s", recMessage[1]);
-				//LOG_TRACE(LOG_INFORMATIONAL, "Führe nun Befehl aus: %s", recMessage[1]);
 				runClientCommand(recMessage, recMessage[1], clntSocket);
 			};
-
 		}
-
 		recBuffer[recvMsgSize] = '\000'; // set End Termination at the end of the Buffer
-
 	}
-
 	close(clntSocket); /* Close client socket */
 }
 

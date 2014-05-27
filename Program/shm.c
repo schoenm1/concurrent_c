@@ -68,7 +68,6 @@ int round_up_int(int input) {
 			return output;
 			break;
 		}
-
 	}
 
 	return output;

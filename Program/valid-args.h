@@ -24,7 +24,7 @@ int getValidServerCommand(char *command) {
 	if (strcmp(command, "LIST") == 0)
 		return TRUE;
 
-	printf("no match found...\n");
+	LOG_TRACE(LOG_INFORMATIONAL, "no match found for command %s", command);
 	return FALSE;
 }
 
@@ -65,10 +65,9 @@ char * getLogLevel(int log_level, char *lvl) {
 void LOG_TRACE(int lvl, char *msg, ...) {
 	char buf[1024];
 	char *buff = (char *) malloc(sizeof(char) * 1024);
-	char *L_LEVEL = malloc(sizeof(char) * 24);
-
+	//char *L_LEVEL = malloc(sizeof(char) * 24);
 	if (LOGLEVEL >= lvl) {
-
+		char *L_LEVEL = "NULL";
 		L_LEVEL = getLogLevel(lvl, L_LEVEL);
 		printf("# %s %s:\t", __DATE__, __TIME__);
 
@@ -80,10 +79,10 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 		printf("%s", buff);
 		va_end(va);
 
-		free(buff);
 		//	free(L_LEVEL);
 
 	}
+	free(buff);
 
 }
 

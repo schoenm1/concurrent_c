@@ -100,7 +100,7 @@ void my_handler(int signo) {
 		while (TRUE) {
 			int num;
 			char tmpsquare_buffer[BUFSIZE];
-			printf("> Enter Command for Server:\n");
+			printf("\n# Enter Command for Server: ");
 			fgets(tmpsquare_buffer, BUFSIZE - 2, stdin);
 
 			/* check length of buffer and add int before it. This is the control for the server to check if he received the complete message */
@@ -116,18 +116,17 @@ void my_handler(int signo) {
 			/* the message to send is: <length of following message><message> e.g. 5abcd (the '0' char will be added to <length of msg> */
 			strcat(sendbuffer, intlen);
 			strcat(sendbuffer, " ");
-			printf("Size of buffer (just with len) = %i\n", strlen(sendbuffer));
 			strcat(sendbuffer, tmpsquare_buffer);
 
 			if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {
 				fprintf(stderr, "Failure Sending Message\n");
 
 			} else {
-				printf("> Message being sent: %s\n", sendbuffer);
+				printf("# Message being sent: %s\n", sendbuffer);
 				recbuffer[0] = '\0';
 				recv(sock, recbuffer, sizeof(recbuffer), 0);
 
-				printf("> Message Received From Server\n%s", recbuffer);
+				printf("# Message from Server#\n%s\n", recbuffer);
 			}
 		}
 		closeSocket();
