@@ -373,7 +373,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 
 }
 
-void* handle_tcp_client(void* parameters) {
+void*   handle_tcp_client(void* parameters) {
 	int istrue = 1;
 	LOG_TRACE(LOG_INFORMATIONAL, "New PThread created for Client.\t ID = %u", (unsigned int) pthread_self());
 	/* Cast the given parameter back to int ClntSocket  */

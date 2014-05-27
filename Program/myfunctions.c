@@ -7,6 +7,21 @@ int power(int x, int y) {
 	return (x * power(x, y - 1));
 }
 
+/* returns a char pointer with a fix length. This is needed for a synchronized output */
+char * getfixCharLen(char *mychar, int mylength) {
+	char * retchar = strdup(mychar);
+	//= (char *) malloc(mylength);
+	printf("in getfixcharlen\n");
+
+	while (strlen(retchar) < mylength) {
+		printf("in while of getfixcharlen\n");
+		printf("strlen(retchar) = %i\n", strlen(retchar));
+		strcat(retchar, " ");
+	}
+printf("Filename = \"%s\"\n", retchar);
+	return retchar;
+}
+
 /* will output all existing shared memory blocks which exists at the moment */
 void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
@@ -15,8 +30,10 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	printf("\nWill now output all shm-blocks...\n");
 	printf("===============================================================================\n");
 	while (TRUE) {
-		printf("Block No %i:\t Block-Address = %p\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
-				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, myshm_ctr->filename, &(myshm_ctr->filename), myshm_ctr->isLast);
+		printf("Filename = \"%s\"\n", getfixCharLen(myshm_ctr->filename, 20));
+		printf("Block No %i:\t Block-Address = %p  \t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
+				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
+				myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {
 			break;
 		} else {
@@ -46,7 +63,8 @@ char * getSingleString(char *msg, ...) {
 
 char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
-	char * one = "=============================================== ALL BLOCKS OF SHARED MEMORY ===============================================\n";
+	char * one =
+			"=============================================== ALL BLOCKS OF SHARED MEMORY ===============================================\n";
 	char * all_shm_blocks = (char *) malloc(8192);
 	strcpy(all_shm_blocks, one);
 
@@ -55,8 +73,9 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	while (TRUE) {
 		char * myblock = (char *) malloc(sizeof(malloc) * 256);
 		myblock = getSingleString(
-				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x\t isLast = %i\n", i,
-				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, myshm_ctr->filename, &(myshm_ctr->filename), myshm_ctr->isLast);
+				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x   \t isLast = %i\n", i,
+				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
+				myshm_ctr->isLast);
 		strcat(all_shm_blocks, myblock);
 
 		free(myblock);

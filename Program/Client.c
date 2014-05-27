@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
 			recbuffer[0] = '\0';
 			recv(sock, recbuffer, sizeof(recbuffer), 0);
 
-			printf("# Message from Server#\n%s\n", recbuffer);
+			printf("# Message from Server: %s\n", recbuffer);
 		}
 	}
 	closeSocket();
