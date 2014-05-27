@@ -55,7 +55,7 @@ char * getLogLevel(int log_level, char *lvl) {
 		lvl = "LOG_INFORMATIONAL";
 		break;
 	case LOG_DEBUG:
-		lvl = "LOG_DEBUG   ";
+		lvl = "LOG_DEBUG        ";
 		break;
 	}
 	return lvl;
@@ -70,7 +70,6 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 		char *L_LEVEL = "NULL";
 		L_LEVEL = getLogLevel(lvl, L_LEVEL);
 		printf("# %s %s:\t", __DATE__, __TIME__);
-
 		va_list va;
 		va_start(va, msg);
 		vsprintf(buf, msg, va);
