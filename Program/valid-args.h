@@ -1,3 +1,4 @@
+/* returns the content of the file, which is included in the char-array */
 char * getFileContent(char *recMessage[]) {
 	int i;
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
@@ -24,15 +25,13 @@ int getValidServerCommand(char *command) {
 		return TRUE;
 	if (strcmp(command, "LIST") == 0)
 		return TRUE;
-
 	LOG_TRACE(LOG_INFORMATIONAL, "no match found for command %s", command);
 	return FALSE;
 }
 
+/* returns the log-level compared to the given int */
 char * getLogLevel(int log_level, char *lvl) {
-
 	switch (log_level) {
-
 	case LOG_EMERGENCY:
 		lvl = "LOG_EMERGENCY    ";
 		break;
@@ -74,17 +73,14 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 		va_start(va, msg);
 		vsprintf(buf, msg, va);
 		sprintf(buff, "%s\t%s\n", L_LEVEL, buf);
-
 		printf("%s", buff);
 		va_end(va);
-
 		//	free(L_LEVEL);
-
 	}
 	free(buff);
-
 }
 
+/* set the valid arguments for the server */
 void setValidServerArguments() {
 	/* init LOGLEVEL */
 	validArguments[0].isSet = 0;
@@ -97,6 +93,7 @@ void setValidServerArguments() {
 	strncpy(validArguments[1].arg, _serverPort, strlen(_serverPort));
 }
 
+/* set the TCP-Port of the server, on which the server is listening for clients */
 int setServerPort(int myserverPort) {
 	int _myServerPort = myserverPort;
 	if (_myServerPort <= 1024 || _myServerPort > 65535) {
@@ -115,6 +112,7 @@ int setServerPort(int myserverPort) {
 	return -1;
 }
 
+/* init the valid server arguments, which are given as args on starting the server on command line */
 void initValidServerArguments(int argc, char *argv[]) {
 	int i;
 	int retcode;
@@ -158,6 +156,7 @@ void initValidServerArguments(int argc, char *argv[]) {
 	}
 }
 
+/* if no arguments are given, output the help, how to use the server and its arguments */
 void usage() {
 	printf("\nFollowing parameters are allowed:\n");
 	printf("Parameter \tDescription \t\tDefault Value\tExample\n");
@@ -165,6 +164,6 @@ void usage() {
 	printf("-l \t\tLog-Level \t\tnot set yet \t./Server -l [0-7]\n");
 	printf("-p \t\tServer Port \t\t7000\t\t./Server -p [1024-65535]\n");
 	printf("==========================================================================\n");
-	printf(
-			"\nYou can also combine all the parameters. If you would use a parameter twice ore more,\n the following parameters will be ignored.\n\n\n");
+	printf("\nYou can also combine all the parameters. If you would use a parameter twice ore more,\n");
+	printf("the following parameters will be ignored.\n\n\n");
 }
