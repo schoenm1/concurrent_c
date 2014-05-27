@@ -1,6 +1,6 @@
 /*
  * File: 		Client.c
- * Author: 		Micha Schönenberger
+ * Author: 		Micha Sch≈°nenberger
  * Modul:		Concurrent Programming in C
  *
  * Created:     14.04.2014

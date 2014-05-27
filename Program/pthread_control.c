@@ -13,8 +13,6 @@ void printallPThreads(struct pthread_struct *pthread_struct);
 
 
 
-
-
 struct client_ctl_struct* getClient(struct client_ctl_struct *pthread_struct, int id) {
 	//int phtread_id = id;
 	return NULL;
@@ -68,7 +66,7 @@ int addPThread(struct pthread_struct *_pthread, pthread_t pThread) {
 }
 
 
-
+/* not really implemented yet */
 void printallPThreads(struct pthread_struct *pthread_struct) {
 	int count = 0;
 	while (pthread_struct->isLast) {

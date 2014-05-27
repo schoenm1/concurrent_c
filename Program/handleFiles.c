@@ -22,7 +22,7 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 			LOG_TRACE(LOG_INFORMATIONAL, "Locked RWLock for Reading filename \"%s\"", shm_ctr->filename);
 		char * filedata = (char*) malloc(sizeof(char) * MAX_FILE_LENGTH);
 		filedata = strdup(shm_ctr->filedata);
-		pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
+		pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
 		if (retcode == 0)
 			LOG_TRACE(LOG_INFORMATIONAL, "Unlocked RWLock for Reading filename \"%s\"", shm_ctr->filename);
 		return filedata;

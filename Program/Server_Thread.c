@@ -1,6 +1,6 @@
 /*
  * File: 		Main.c
- * Author: 		Micha Schšnenberger
+ * Author: 		Micha SchÅ¡nenberger
  * Modul:		Concurrent Programming in C
  *
  * Created:     07.04.2014
@@ -35,7 +35,7 @@
 #include <string.h>
 #include <itskylib.h>
 #include <time.h>
-#include "my.h" // global structs
+#include "mystructs.h" // global structs
 #include "shm_control.c" // global structs
 #include "myfunctions.c"
 /* ====================================================================================== */
@@ -324,7 +324,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		printf("#3 = In creating new file\n");
 		returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
 		LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s\n", returnvalue);
-		printf("Will now send to the client Message mit Länge = %i: %s", strlen(returnvalue), returnvalue);
+		printf("Will now send to the client Message mit LÃ¤nge = %i: %s", strlen(returnvalue), returnvalue);
 		printf("#4 = In creating new file\n");
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
 		printf("#5 = In creating new file\n");
@@ -492,7 +492,7 @@ void* handle_tcp_client(void *client_socket_ptr) {
 			/* if command is valid */
 			if (retcode) {
 				LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s", recMessage[1]);
-				LOG_TRACE(LOG_INFORMATIONAL, "F�hre nun Befehl aus: %s", recMessage[1]);
+				LOG_TRACE(LOG_INFORMATIONAL, "Fhre nun Befehl aus: %s", recMessage[1]);
 				runClientCommand(recMessage, recMessage[1], client_socket);
 			};
 

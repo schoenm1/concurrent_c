@@ -23,7 +23,7 @@
 #define MUTEXSIZE 10
 #include <arpa/inet.h>  /* for sockaddr_in, inet_addr() and inet_ntoa() */
 #include <errno.h>
-#include<math.h>
+#include <math.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <stdio.h>      /* for printf() and fprintf() and ... */
@@ -35,7 +35,7 @@
 #include <string.h>
 #include <itskylib.h>
 #include <time.h>
-#include "my.h" // global structs
+#include "mystructs.h" // global structs
 #include "shm_control.c" // global structs
 #include "pthread_control.c" // control of Pthreads
 #include "myfunctions.c"
@@ -359,7 +359,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 			retcode = combine(shm_ctr);
 			/* repeat until there is no more deviding option */
 
-			print_all_shm_blocks(shm_ctr);
+			//print_all_shm_blocks(shm_ctr);
 			while (retcode) {
 				retcode = combine(shm_ctr);
 				print_all_shm_blocks(shm_ctr);
@@ -378,9 +378,8 @@ void* handle_tcp_client(void* parameters) {
 	LOG_TRACE(LOG_INFORMATIONAL, "New PThread created for Client.\t ID = %u", (unsigned int) pthread_self());
 	/* Cast the given parameter back to int ClntSocket  */
 	struct client_param_struct* p = (struct client_param_struct*) parameters;
-	printf("clientSocket = %i", p->clientSocket);
 	int clntSocket = p->clientSocket;
-	printf("#3 In Handle Client\n");
+	LOG_TRACE(LOG_INFORMATIONAL, "clientSocket = %i", clntSocket);
 	int retcode;
 	char recBuffer[MAXRECWORDS]; /* Buffer for  string */
 	int recvMsgSize; /* Size of received message */
@@ -401,8 +400,6 @@ void* handle_tcp_client(void* parameters) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Received message from Client %s: %s", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
 		breakCharArrayInWords(recMessage, recBuffer);
 
-		//LOG_TRACE(LOG_NOTICE, "Checking now if expected length of message is the effective length. If yes, transmission was ok.");
-		//LOG_TRACE(LOG_NOTICE, "Size of transmitted message should be: %s\t Size is: %i", recMessage[0], recvMsgSize);
 		/* check is effective message is equal to expected message size */
 		int effLength = (int) atoi(recMessage[0]);
 		if (effLength == recvMsgSize) {
@@ -410,8 +407,6 @@ void* handle_tcp_client(void* parameters) {
 
 			/* check if 1st word of message is a valid command */
 			retcode = getValidServerCommand(recMessage[1]);
-
-			//LOG_TRACE(LOG_NOTICE, "Command is \"%s\" and has a length of %i", recMessage[1], strlen(recMessage[1]));
 
 			/* if command is valid */
 			if (retcode) {

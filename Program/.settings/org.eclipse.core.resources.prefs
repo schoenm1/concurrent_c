@@ -1,3 +1,4 @@
 eclipse.preferences.version=1
+encoding/Client.c=UTF-8
 encoding/Server.c=UTF-8
-encoding/tmp.c=UTF-8
+encoding/Server_Thread.c=UTF-8

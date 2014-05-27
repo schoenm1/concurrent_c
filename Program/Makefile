@@ -48,7 +48,7 @@ Server: Server.c lib/libitsky.a include/itskylib.h
 Client: Client.c lib/libitsky.a include/itskylib.h
 	gcc $(CFLAGS) Client.c $(LIBS) -o Client    $(LRT)
     
-Client: Server_Thread.c lib/libitsky.a include/itskylib.h
+Server_Thread.c: Server_Thread.c lib/libitsky.a include/itskylib.h
 	gcc $(CFLAGS) Server_Thread.c $(LIBS) -o Server_Thread    $(LRT)
 
 
