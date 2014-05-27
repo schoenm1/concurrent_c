@@ -10,14 +10,23 @@
 /* forward function declaration */
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename);
 
-
-
 char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
+	int retcode;
 	LOG_TRACE(LOG_DEBUG, "Now in funtion readFile()\n");
 	char * retchar = "File not found";
 	/* if file found */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
-		return shm_ctr->filedata;
+		/* lock for Reading*/
+		retcode = pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
+		if (retcode == 0)
+			LOG_TRACE(LOG_INFORMATIONAL, "Locked RWLock for Reading filename \"%s\"", shm_ctr->filename);
+		char * filedata = (char*) malloc(sizeof(char) * MAX_FILE_LENGTH);
+		filedata = strdup(shm_ctr->filedata);
+		pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
+		if (retcode == 0)
+			LOG_TRACE(LOG_INFORMATIONAL, "Unlocked RWLock for Reading filename \"%s\"", shm_ctr->filename);
+		return filedata;
+
 	}
 
 	/* if last = return not found */
@@ -33,7 +42,6 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 
 	return retchar;
 }
-
 
 char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
 	printf("Now in Function writeNewFile()\n");

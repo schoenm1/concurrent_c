@@ -101,6 +101,7 @@ int setup_shm() {
 	printf("Setting up shared Memory ...");
 
 	/* create REF File, if it not exists */
+	remove(REF_FILE);
 	create_if_missing(REF_FILE, S_IRUSR | S_IWUSR);
 
 	/*create shm 'unique' key */
@@ -320,7 +321,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		char * returnvalue = readFile(shm_ctr, recMessage[2]);
 		LOG_TRACE(LOG_INFORMATIONAL, "READ Command: Sending message to Client: %s", returnvalue);
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
-
+		free(returnvalue);
 
 		/* unlock the read lock */
 		//pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));

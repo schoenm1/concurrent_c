@@ -12,6 +12,7 @@ char * getFileContent(char *recMessage[]) {
 
 }
 
+/* return TRUE, if command is a valid server command, otherwhise return FALSE */
 int getValidServerCommand(char *command) {
 	if (strcmp(command, "CREATE") == 0)
 		return TRUE;
@@ -29,7 +30,6 @@ int getValidServerCommand(char *command) {
 }
 
 char * getLogLevel(int log_level, char *lvl) {
-//	char *lvl = malloc(sizeof(char) * 24);
 
 	switch (log_level) {
 
@@ -65,7 +65,7 @@ char * getLogLevel(int log_level, char *lvl) {
 void LOG_TRACE(int lvl, char *msg, ...) {
 	char buf[1024];
 	char *buff = (char *) malloc(sizeof(char) * 1024);
-	//char *L_LEVEL = malloc(sizeof(char) * 24);
+	//char *L_LEVEL = (char *) malloc(sizeof(char) * 48);
 	if (LOGLEVEL >= lvl) {
 		char *L_LEVEL = "NULL";
 		L_LEVEL = getLogLevel(lvl, L_LEVEL);
