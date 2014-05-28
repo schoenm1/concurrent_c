@@ -103,34 +103,6 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	return retrcode;
 }
 
-/* if a file should be delete, the used shared memory will be free after.
- * This function will set new pointer of the shm_ctr_struct which is handling the files */
-int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
-	LOG_TRACE(LOG_DEBUG, "In function deleteFile()");
-	int retcode = FALSE;
-	/* if hit, make settings */
-	if (strcmp(filename, (shm_ctr->filename)) == 0) {
-		LOG_TRACE(LOG_DEBUG, "Filename found...");
-
-		shm_ctr->filename = "NULL";
-		shm_ctr->isfree = TRUE;
-		printf("Filedata was: %s\n", shm_ctr->filedata);
-		memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
-		printf("Filedata is now: %s\n", shm_ctr->filedata);
-		return TRUE;
-	}
-	/* if at end of SHM and no hit, return FALSE */
-	else if (shm_ctr->isLast == TRUE) {
-		LOG_TRACE(LOG_DEBUG, "At the end of SHM. No filename found.");
-		return FALSE;
-	}
-	/* if no hit and not at end of shm, go to next */
-	else {
-		LOG_TRACE(LOG_DEBUG, "Recursive call of function deleteFile()");
-		retcode = deleteFile((shm_ctr->next), filename);
-	}
-	return retcode;
-}
 
 /* after deleting a file, the free block can perhaps be combine with a neighbouring
  *  free space.

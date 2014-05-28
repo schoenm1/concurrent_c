@@ -15,7 +15,7 @@
 
  ---------------------------------------------------------------*/
 #define _XOPEN_SOURC
-#include "Log-Level.h"
+#include "Logs.h"
 #define TOT_SHM_SIZE 65536
 #define MIM_SHM_BLOCK_SIZE 4
 #define MAX_FILE_LENGTH 1500
@@ -294,7 +294,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 	char *sendtoClient = (char *) malloc(MAX_FILE_LENGTH);
 	memset(sendtoClient, '\0', sizeof(sendtoClient));
 
-	/* CREATE command */
+/* CREATE command */
 	if (strcmp(command, "CREATE") == 0) {
 
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...");
@@ -315,7 +315,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		//free(filecontent);
 	}
 
-	/* Reading File */
+/* Reading File */
 	if (strcmp(command, "READ") == 0) {
 
 		char * returnvalue = readFile(shm_ctr, recMessage[2]);
@@ -334,7 +334,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		free(sendtoClient);
 	}
 
-	/* DELETE <filename>: DELETE Filename from memory */
+/* DELETE <filename>: DELETE Filename from memory */
 	else if (strcmp(command, "DELETE") == 0) {
 		printf("Client wants to DELETE a file.\n");
 		int retcode;
@@ -366,8 +366,9 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 			}
 		}
 	}
-	/* if nothing compared */
+/* if nothing compared */
 	else {
+		LOG_TRACE(LOG_DEBUG, "No match. Send nothing to commit to client");
 		send(clntSocket, "Nothing to commit", strlen("Nothing to commit"), 0);
 	}
 

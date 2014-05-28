@@ -31,7 +31,7 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	printf("===============================================================================\n");
 	while (TRUE) {
 		printf("Filename = \"%s\"\n", getfixCharLen(myshm_ctr->filename, 20));
-		printf("Block No %i:\t Block-Address = %p  \t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
+		printf("Block No %i:\t Block-Address = %p \t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
 				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
 				myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {

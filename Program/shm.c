@@ -33,19 +33,17 @@
 #include <itskylib.h>
 
 const char *REF_FILE = "./shm_sem_ref.dat";
-
 #define PERM 0600
-
 #define ALPHA_SIZE 256
 
-//const int SIZE = sizeof(struct data);
-
+/* creates the shared memory */
 int create_shm(key_t key, const char *txt, const char *etxt, int flags) {
 	int shm_id = shmget(key, TOT_SHM_SIZE, flags | PERM);
 	handle_error(shm_id, etxt, PROCESS_EXIT);
 	return shm_id;
 }
 
+/* clean up the shared memory */
 void cleanup(int shmid) {
 	int retcode;
 	retcode = shmctl(shmid, IPC_RMID, NULL);
@@ -56,7 +54,7 @@ void cleanup(int shmid) {
 int round_up_int(int input) {
 	int output = FALSE;
 	int until = log(TOT_SHM_SIZE) / log(2);
-	LOG_TRACE(LOG_INFORMATIONAL, "Now in round_up_int(). Filesize needed = %i\t until = %i\n", input, until);
+	LOG_TRACE(LOG_INFORMATIONAL, "Now in round_up_int(). Filesize needed = %i\t until = %i", input, until);
 	if (input > TOT_SHM_SIZE) {
 		return output;
 	}
@@ -64,12 +62,11 @@ int round_up_int(int input) {
 	for (i = 2; i < until; i++) {
 		if (input < power(2, i)) {
 			output = power(2, i);
-			LOG_TRACE(LOG_INFORMATIONAL, "i = %i \t Output now set to = %i and return it.\n", i, output);
+			LOG_TRACE(LOG_INFORMATIONAL, "i = %i \t Output now set to = %i and return it.", i, output);
 			return output;
 			break;
 		}
 	}
-
 	return output;
 }
 
@@ -80,7 +77,7 @@ struct shm_ctr_struct* getNext(struct shm_ctr_struct *_shm_ctr) {
 	}
 	return -1;
 }
-
+/* returns the size of the shm-block */
 int getSizeshmPos(struct shm_ctr_struct *_shm_ctr) {
 	int tmp = _shm_ctr->shm_size;
 	return tmp;
