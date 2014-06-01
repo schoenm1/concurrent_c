@@ -1,14 +1,30 @@
 /* returns the content of the file, which is included in the char-array */
 char * getFileContent(char *recMessage[]) {
-	int i;
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	memset(retchar, '\0', sizeof(retchar)); //clear String
-	strcat(retchar, recMessage[3]);
 
-	for (i = 4; i < sizeof(recMessage) - 1; i++) {
-		strcat(retchar, " ");
-		strcat(retchar, recMessage[i]);
+	LOG_TRACE(LOG_DEBUG, "1 - In getFileContent");
+	int i;
+	LOG_TRACE(LOG_DEBUG, "2 - In getFileContent");
+	LOG_TRACE(LOG_DEBUG, "3 - In getFileContent");
+	strcat(retchar, recMessage[3]);
+	LOG_TRACE(LOG_DEBUG, "4 - In getFileContent. Size of recMessage =%i", sizeof(recMessage));
+
+	int j = 0;
+	for (j = 0; j < MAX_FILE_LENGTH; j++) {
+		if (recMessage[j] == NULL)
+			break;
+		printf("recMessage[%i] = %s\n", j, recMessage[j]);
 	}
+
+	for (i = 4; i < j - 1; i++) {
+		LOG_TRACE(LOG_DEBUG, "In i=%i - In getFileContent", i);
+		strcat(retchar, " ");
+		LOG_TRACE(LOG_DEBUG, "In i=%i - retchar = %s", i, retchar);
+		strcat(retchar, recMessage[i]);
+		LOG_TRACE(LOG_DEBUG, "In i=%i - retchar = %s", i, retchar);
+	}
+	LOG_TRACE(LOG_DEBUG, "5 - In getFileContent");
 	return retchar;
 }
 

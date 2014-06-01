@@ -14,28 +14,37 @@
 
 /* forward function definition */
 void print_all_shm_blocks();
+
 void LOG_TRACE(int lvl, char *msg, ...);
+char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr);
 
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesize) {
 	struct shm_ctr_struct *ret_struct = FALSE;
 
 	LOG_TRACE(LOG_DEBUG, "Size of shm Place is %i. IsFree = %i", shm_ctr->shm_size, shm_ctr->isfree);
-
+	print_single_shm_blocks(shm_ctr);
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
+
+	printf("#1 find_shm_place\n");
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize)) && (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
+		printf("#2 find_shm_place\n");
 		ret_struct = shm_ctr;
 		return ret_struct;
 	}
 
+	printf("#3 find_shm_place\n");
 	/* check if at end of Shared Memory. If yes, return FALSE */
 	if (shm_ctr == (shm_ctr->next)) {
+		printf("#4 find_shm_place\n");
 		return ret_struct;
 	}
+	printf("#5 find_shm_place\n");
 	/* if no place were found, call recursive function with next shm_ctl */
 	struct shm_ctr_struct *nextone = shm_ctr->next;
+	printf("#6 find_shm_place\n");
 	ret_struct = find_shm_place(nextone, filesize);
-
+	printf("#7 find_shm_place\n");
 	/* if a good place for the file was found, return the pointer of the address, otherwise the return is FALSE */
 	return ret_struct;
 }
@@ -118,44 +127,57 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
  *  not free |      free     |Ênot free | ...
  */
 int combine(struct shm_ctr_struct *shm_ctr) {
+	print_single_shm_blocks(shm_ctr);
 	LOG_TRACE(LOG_DEBUG, "In function combine()");
 	int retcode = FALSE;
 
 	/* if block is not free, leave size of block an go further */
 	if (shm_ctr->isfree == FALSE) {
+		printf("shm is NOT free\n");
 		LOG_TRACE(LOG_DEBUG, "Block is not free. Jump two times the blocksize\n");
-		//print_all_shm_blocks(shm_ctr);
+
 		retcode = combine((shm_ctr->next)->next);
 	}
 
 	/* if at end of shm return FALSE */
 	else if (shm_ctr->isLast == TRUE) {
+		printf("shm is LAST\n");
 		LOG_TRACE(LOG_DEBUG, "At end of SHM. Return FALSE\n");
-		print_all_shm_blocks(shm_ctr);
 		return retcode;
 	}
 
 	/* if shm block is free and next is free */
 	else if ((shm_ctr->isfree) == TRUE && (shm_ctr->next)->isfree == TRUE && (shm_ctr->shm_size) == (shm_ctr->next)->shm_size) {
-		LOG_TRACE(LOG_DEBUG, "Found two blocks with same size and both free\n");
+		LOG_TRACE(LOG_DEBUG, "Found two blocks with same size and both free");
+		printf(get_all_shm_blocks(shm_ctr));
+//		print_single_shm_blocks(shm_ctr);
+		printf("#1 - DEBUG combine found ...\n");
 		struct shm_ctr_struct *tmpnext = shm_ctr->next;
-
+		printf("#2 - DEBUG combine found ...\n");
+		print_single_shm_blocks(shm_ctr->next);
+		printf("#3 - DEBUG combine found ...\n");
 		shm_ctr->shm_size = 2 * (shm_ctr->shm_size);
-
+		printf("#4 - DEBUG combine found ...\n");
 		/* if next was last, point next now to myself */
 		if ((shm_ctr->next)->isLast == TRUE) {
+			printf("#5 - DEBUG combine found ...\n");
 			shm_ctr->isLast = TRUE; //FALSE
 			shm_ctr->next = shm_ctr;
 		} else {
+			printf("#6 - DEBUG combine found ...\n");
 			shm_ctr->next = tmpnext->next;
+			printf("#7 - DEBUG combine found ...\n");
 		}
 		retcode = TRUE;
 	}
 
 	/* otherwhise, go to next block */
 	else {
+		printf("#8 - DEBUG combine found ...\n");
 		LOG_TRACE(LOG_DEBUG, "Nothing to to. Go to next block.\n");
 		retcode = combine(shm_ctr->next);
 	}
+	printf("#9 - End of combine:  Retcode = %i\n", retcode);
+
 	return retcode;
 }

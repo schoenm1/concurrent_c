@@ -12,7 +12,8 @@ int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename);
 
 char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retcode;
-	LOG_TRACE(LOG_DEBUG, "Now in funtion readFile()\n");
+	LOG_TRACE(LOG_DEBUG, "Now in function readFile()");
+	printf("Try to find filename: %s\n", filename);
 	char * retchar = "File not found";
 	/* if file found */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
@@ -36,7 +37,7 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 
 	else {
 		shm_ctr = (shm_ctr->next)->next;
-		LOG_TRACE(LOG_DEBUG, "Recursive call of readFile()\n");
+		LOG_TRACE(LOG_DEBUG, "Recursive call of readFile()");
 		retchar = readFile(shm_ctr, filename);
 	}
 
@@ -44,7 +45,7 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 }
 
 char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
-	LOG_TRACE(LOG_DEBUG, "Now in Function writeNewFile()\n");
+	LOG_TRACE(LOG_DEBUG, "Now in Function writeNewFile()");
 	int retcode;
 	//int totfilesize = filesize + 1; //because termination \0
 	char *returnchar = malloc(sizeof(char) * 64);
@@ -71,7 +72,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 		int block_size_needed = round_up_int(filesize);
 		retcode = devide(shm_ctr, block_size_needed);
 		if (!retcode) {
-			return "There was no place in the shared memory for creating the file!\n";
+			return "There was no place in the shared memory for creating the file!";
 		}
 		place = find_shm_place(shm_ctr, filesize);
 	}
@@ -84,7 +85,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 		/* init the read write lock for this file */
 		pthread_rwlock_init(&(place->rwlockFile), NULL);/* Default initialization */
 
-		return getSingleString("File \"%s\" successfully created.\n", (place->filename));
+		return getSingleString("File \"%s\" successfully created.", (place->filename));
 	}
 	return -1;
 }
@@ -96,13 +97,13 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retcode = FALSE;
 	/* if hit, make settings */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
-		LOG_TRACE(LOG_DEBUG, "Filename found...");
+		LOG_TRACE(LOG_DEBUG, "Filename \"%s\" found...", filename);
 
 		shm_ctr->filename = "NULL";
 		shm_ctr->isfree = TRUE;
 		printf("Filedata was: %s\n", shm_ctr->filedata);
 		memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
-		printf("Filedata is now: %s\n", shm_ctr->filedata);
+		//printf("Filedata is now: %s\n", shm_ctr->filedata);
 		return TRUE;
 	}
 	/* if at end of SHM and no hit, return FALSE */
