@@ -117,16 +117,17 @@ int setup_shm() {
 void my_handler(int signo) {
 	int retcode;
 	if (signo == SIGUSR1) {
-		printf("Received other than SIGINT. Server is cleaning up shared memory and is going to close...\n");
-		//retcode = joinPThread(myPThreadList);
+		LOG_TRACE(LOG_NOTICE, "Received other than SIGINT. Server is cleaning up shared memory and is going to close...");
+		retcode = joiningAllPThreads(myPThreadStruct);
 		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
-
 		/* clean up shared memory */
 		cleanup(shm_id);
 	} else {
-		printf("Received SIGINT. Server is cleaning up shared memory and is going to close...\n");
-		//retcode = joinPThread(myPThreadList);
+		LOG_TRACE(LOG_NOTICE, "Received SIGINT. Server is cleaning up shared memory and is going to close...");
+		retcode = joiningAllPThreads(myPThreadStruct);
 		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
+		if (retcode == 0)
+			LOG_TRACE(LOG_NOTICE, "Successfully joined all Client PThreads");
 		/* clean up shared memory */
 		cleanup(shm_id);
 		exit(1);
@@ -176,36 +177,35 @@ int main(int argc, char *argv[]) {
 	myPThreadStruct->isLast = 1;
 	myPThreadStruct->nextClient = myPThreadStruct;
 
-	/* Testfile for testing memory control */
-	printf("\n");
-	int filesize = 1056;
-	printf("Want to write filename with size=%i to shm\n", filesize);
-	char * testfilename = "Test.txt";
-	printf("Adress of shm Place to check is %p\n", shm_ctr);
-	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
-
-	printf("Checked a good address is:  %p\n", place);
-
-	/*if there is no good place found, devide shm blocks */
-	if (place == FALSE) {
-		LOG_TRACE(LOG_INFORMATIONAL, "0 here is no good place to write the file into... Trying no to devide the Shared Memory...");
-
-		int block_size_needed = round_up_int(filesize);
-		retcode = devide(shm_ctr, block_size_needed);
-		handle_error(retcode, "Could not devide the shared memory for the needed size...\n", PROCESS_EXIT);
-		place = find_shm_place(shm_ctr, filesize);
-	}
+//	/* Testfile for testing memory control */
+//	printf("\n");
+//	int filesize = 1056;
+//	printf("Want to write filename with size=%i to shm\n", filesize);
+//	char * testfilename = "Test.txt";
+//	printf("Adress of shm Place to check is %p\n", shm_ctr);
+//	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
+//
+//	printf("Checked a good address is:  %p\n", place);
+//
+//	/*if there is no good place found, devide shm blocks */
+//	if (place == FALSE) {
+//		LOG_TRACE(LOG_INFORMATIONAL, "0 here is no good place to write the file into... Trying no to devide the Shared Memory...");
+//		int block_size_needed = round_up_int(filesize);
+//		retcode = devide(shm_ctr, block_size_needed);
+//		handle_error(retcode, "Could not devide the shared memory for the needed size...\n", PROCESS_EXIT);
+//		place = find_shm_place(shm_ctr, filesize);
+//	}
 
 // if address of founded place + size of place < than
-	printf("Address of place = %p\n", place);
-	if (!place == 0) {
-		printf("Inside of checking if return of place is valid...\n");
-		place->isfree = FALSE;
-		place->filename = testfilename;
-		char * Testfilecontent = "Dies ist der Text des Testfiles.\nEs ist nicht einfach zu Programmieren.";
-		place->filedata = strdup(Testfilecontent);
-
-	}
+//	printf("Address of place = %p\n", place);
+//	if (!place == 0) {
+//		printf("Inside of checking if return of place is valid...\n");
+//		place->isfree = FALSE;
+//		place->filename = testfilename;
+//		char * Testfilecontent = "Dies ist der Text des Testfiles.\nEs ist nicht einfach zu Programmieren.";
+//		place->filedata = strdup(Testfilecontent);
+//
+//	}
 
 	/* if no arguments is chosen, output the usage of the Server */
 	if (argc == 1) {
@@ -291,10 +291,18 @@ void ServerListen() {
 	exit(0);
 }
 
-void runClientCommand(char *recMessage[], char *command, int clntSocket) {
+void runClientCommand(char *recMessage[], char *command, int clntSocket, int thread_count) {
 	//LOG_TRACE(LOG_INFORMATIONAL, "Command from Client was: %s", command);
 	char *sendtoClient = (char *) malloc(MAX_FILE_LENGTH);
 	memset(sendtoClient, '\0', sizeof(sendtoClient));
+
+	/* if Client want to exit, join PThread and Exit */
+	if (strcmp(command, "EXIT") == 0) {
+		LOG_TRACE(LOG_INFORMATIONAL, "Received EXIT from a Client");
+		LOG_TRACE(LOG_INFORMATIONAL, "T%i: PThread is now going to exit", thread_count);
+		pthread_exit(NULL);
+
+	}
 
 	/* CREATE command */
 	if (strcmp(command, "CREATE") == 0) {
@@ -349,7 +357,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket) {
 		/* if file does not exist, send message to Client */
 		if (!retcode) {
 			sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
-	 		send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+			send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
 		}
 		/* else delete the file */
 		else {
@@ -392,6 +400,7 @@ void* handle_tcp_client(void* parameters) {
 	LOG_TRACE(LOG_INFORMATIONAL, "New PThread created for Client.\t ID = %u", (unsigned int) pthread_self());
 	/* Cast the given parameter back to int ClntSocket  */
 	struct client_param_struct* p = (struct client_param_struct*) parameters;
+	int thread_count = p->thread_count;
 	int clntSocket = p->clientSocket;
 	LOG_TRACE(LOG_INFORMATIONAL, "clientSocket = %i", clntSocket);
 	int retcode;
@@ -409,6 +418,7 @@ void* handle_tcp_client(void* parameters) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for reveicing message from Client.");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
 		handle_error(recvMsgSize, "recv() failed", NO_EXIT);
+		LOG_TRACE(LOG_DEBUG, "Received msg from Client");
 		if (recvMsgSize == 0) {
 			break;
 		}
@@ -425,7 +435,7 @@ void* handle_tcp_client(void* parameters) {
 			/* if command is valid */
 			if (retcode) {
 				LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s", recMessage[1]);
-				runClientCommand(recMessage, recMessage[1], clntSocket);
+				runClientCommand(recMessage, recMessage[1], clntSocket, thread_count);
 			};
 		}
 		recBuffer[recvMsgSize] = '\000'; // set End Termination at the end of the Buffer

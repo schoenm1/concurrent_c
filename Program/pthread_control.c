@@ -55,7 +55,6 @@ int joiningAllPThreads(struct pthread_struct *myPThreadList) {
 	handle_error(retcode, "PT: Failing to join PThread", NO_EXIT);
 	return retcode;
 }
-
 /* try to join possible PThreads */
 /*int tryJoiningPThread(struct pthread_struct *_thisPThread) {
  int retcode;
