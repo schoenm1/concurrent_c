@@ -47,14 +47,13 @@ int create_shm(key_t key, const char *txt, const char *etxt, int flags) {
 void cleanup(int shmid) {
 	int retcode;
 	retcode = shmctl(shmid, IPC_RMID, NULL);
-	handle_error(retcode, "removing of shm failed", NO_EXIT);
+	handle_error(retcode, "Removing of shm failed", NO_EXIT);
 }
 
 /* round up an input integer to the next 2^x int. e.g. input = 102, output will be 128 */
 int round_up_int(int input) {
 	int output = FALSE;
 	int until = log(TOT_SHM_SIZE) / log(2);
-	LOG_TRACE(LOG_INFORMATIONAL, "Now in round_up_int(). Filesize needed = %i\t until = %i", input, until);
 	if (input > TOT_SHM_SIZE) {
 		return output;
 	}

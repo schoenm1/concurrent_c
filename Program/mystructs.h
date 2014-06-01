@@ -14,9 +14,12 @@ struct pthread_struct {
 	pthread_t thread;
 	struct pthread_struct *nextClient;
 	int isLast; //indicates the end of shared memory
+	int PThread_count;
 };
 
 /* struct for creating new Client pthreads and the params */
 struct client_param_struct {
 	int clientSocket;
+	int thread_count;
+	pid_t thread_ID;
 };

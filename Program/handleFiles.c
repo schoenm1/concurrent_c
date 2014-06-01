@@ -44,7 +44,7 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 }
 
 char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
-	printf("Now in Function writeNewFile()\n");
+	LOG_TRACE(LOG_DEBUG, "Now in Function writeNewFile()\n");
 	int retcode;
 	//int totfilesize = filesize + 1; //because termination \0
 	char *returnchar = malloc(sizeof(char) * 64);
@@ -52,7 +52,6 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 
 	/* check if file already exists */
 	retcode = checkifexists(shm_ctr, filename);
-	//printf("File exists = %i\n", retcode);
 
 	if (retcode == TRUE) {
 		LOG_TRACE(LOG_DEBUG, "File \"%s\" already exists", filename);
@@ -90,7 +89,6 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 	return -1;
 }
 
-
 /* if a file should be delete, the used shared memory will be free after.
  * This function will set new pointer of the shm_ctr_struct which is handling the files */
 int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
@@ -119,7 +117,6 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	}
 	return retcode;
 }
-
 
 /* will check if the file currenctly exists in shm */
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {

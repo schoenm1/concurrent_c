@@ -7,17 +7,19 @@
  * Project:		https://github.com/schoenm1/concurrent_c.git
  */
 
-/* This file shm_control is a shared memory control handling which implements a 'buddy' system. */
+/* This file shm_control is a shared memory control handling which implements a 'buddy' system.
+ * A Java simulation of the Buddy System can be found at:
+ * http://www.fh-zwickau.de/golubski/bildungsportal/buddyalgorithmus/buddyalgorithmus.htm
+ * */
 
 /* forward function definition */
 void print_all_shm_blocks();
 void LOG_TRACE(int lvl, char *msg, ...);
 
-/* In this file the control of shared memory is implemented */
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesize) {
 	struct shm_ctr_struct *ret_struct = FALSE;
 
-	LOG_TRACE(LOG_INFORMATIONAL, "Size of shm Place is %i. IsFree = %i", shm_ctr->shm_size, shm_ctr->isfree);
+	LOG_TRACE(LOG_DEBUG, "Size of shm Place is %i. IsFree = %i", shm_ctr->shm_size, shm_ctr->isfree);
 
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize)) && (shm_ctr->isfree == TRUE)) {
@@ -102,7 +104,6 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	}
 	return retrcode;
 }
-
 
 /* after deleting a file, the free block can perhaps be combine with a neighbouring
  *  free space.

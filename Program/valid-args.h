@@ -24,12 +24,11 @@ int getValidServerCommand(char *command) {
 		return TRUE;
 	if (strcmp(command, "LIST") == 0)
 		return TRUE;
+	if (strcmp(command, "EXIT") == 0)
+		return TRUE;
 	LOG_TRACE(LOG_INFORMATIONAL, "no match found for command %s", command);
 	return FALSE;
 }
-
-
-
 
 /* LOG_TRACE(log level, format, args ) */
 void LOG_TRACE(int lvl, char *msg, ...) {
@@ -50,7 +49,6 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 	}
 	free(buff);
 }
-
 
 /* set the valid arguments for the server */
 void setValidServerArguments() {

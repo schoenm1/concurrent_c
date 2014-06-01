@@ -10,16 +10,30 @@ int power(int x, int y) {
 /* returns a char pointer with a fix length. This is needed for a synchronized output */
 char * getfixCharLen(char *mychar, int mylength) {
 	char * retchar = strdup(mychar);
-	//= (char *) malloc(mylength);
-	printf("in getfixcharlen\n");
-
 	while (strlen(retchar) < mylength) {
-		printf("in while of getfixcharlen\n");
-		printf("strlen(retchar) = %i\n", strlen(retchar));
 		strcat(retchar, " ");
 	}
-printf("Filename = \"%s\"\n", retchar);
 	return retchar;
+}
+
+
+
+void breakCharArrayInWords(char *recMessage[], char *recBuffer[]) {
+	/* break now the received Message into a string array where the sign " " breaks words */
+	char breaksign[] = " ";
+	char *token = malloc(sizeof(char) * MAX_FILE_LENGTH);
+	int count = 0;
+	/* get the first token */
+	token = strtok(recBuffer, breaksign);
+	recMessage[count] = token;
+	count++;
+	/* walk through other tokens */
+	while (token != NULL) {
+		token = strtok(NULL, breaksign);
+		recMessage[count] = malloc(sizeof(char) * MAX_WORD_SIZE);
+		recMessage[count] = token;
+		count++;
+	}
 }
 
 /* will output all existing shared memory blocks which exists at the moment */
@@ -28,12 +42,13 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	int i = 1;
 
 	printf("\nWill now output all shm-blocks...\n");
-	printf("===============================================================================\n");
+	printf(
+			"============================================================================================================================\n");
 	while (TRUE) {
 		printf("Filename = \"%s\"\n", getfixCharLen(myshm_ctr->filename, 20));
-		printf("Block No %i:\t Block-Address = %p \t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
-				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
-				myshm_ctr->isLast);
+		printf("Block No %i:\t Block-Address = %p\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
+				getfixCharLen(myshm_ctr, 10), myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20),
+				&(myshm_ctr->filename), myshm_ctr->isLast);
 		if (myshm_ctr->isLast == TRUE) {
 			break;
 		} else {
@@ -41,7 +56,8 @@ void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			i++;
 		}
 	}
-	printf("===============================================================================\n");
+	printf(
+			"=============================================================================================================================================================\n");
 
 }
 
@@ -61,6 +77,7 @@ char * getSingleString(char *msg, ...) {
 	return retMsg;
 }
 
+/* prepares the output of all shared memory blocks to send to the client over TCP/IP */
 char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
 	char * one =
@@ -73,8 +90,8 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	while (TRUE) {
 		char * myblock = (char *) malloc(sizeof(malloc) * 256);
 		myblock = getSingleString(
-				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x   \t isLast = %i\n", i,
-				myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
+				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x   \t isLast = %i\n",
+				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
 				myshm_ctr->isLast);
 		strcat(all_shm_blocks, myblock);
 

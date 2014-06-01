@@ -1,6 +1,6 @@
 /*
  * File: 		Client.c
- * Author: 		Micha Schšnenberger
+ * Author: 		Micha Schönenberger
  * Modul:		Concurrent Programming in C
  *
  * Created:     14.04.2014
@@ -29,6 +29,7 @@
 #include <unistd.h>     /* for close() */
 #include <signal.h>
 #include <itskylib.h>
+#include <unistd.h>
 
 #define BUFSIZE 65535   /* Size of receive buffer */
 int sock; /* Socket descriptor */
@@ -36,15 +37,10 @@ struct sockaddr_in server_address; /* Square server address */
 unsigned short server_port; /* Square server port */
 char *server_ip; /* Server IP address (dotted quad) */
 
-
-
 unsigned short int send_length;
-
 
 /* function predefines */
 void closeSocket();
-
-
 
 void usage(const char *argv0, const char *msg) {
 	if (msg != NULL && strlen(msg) > 0) {
@@ -56,13 +52,19 @@ void usage(const char *argv0, const char *msg) {
 }
 
 void my_handler(int signo) {
-	if (signo == SIGUSR1 || signo == SIG_IGN) {
-		printf("Closing now the Client...\n");
-		closeSocket();
+	if (signo == SIGTERM) {
+		printf("SIGTERM erhalten und ignoriert\n");
+	} else if (signo == SIGINT) {
+		printf("Ctrl-C erhalten.\nSchicke nun dem Server den Befehl zum Beenden.\n");
+		char sendbuffer[BUFSIZE];
+		calcMsgToSend(sendbuffer, "EXIT");
+		send(sock, sendbuffer, strlen(sendbuffer), 0);
+		usleep(100);
+		exit(1);
+	} else {
+		printf("unbekanntes Signal %d ignoriert\n", signo);
 	}
 }
-
-
 
 int main(int argc, char *argv[]) {
 	signal(SIGINT, my_handler);
@@ -109,21 +111,9 @@ int main(int argc, char *argv[]) {
 		char tmpsquare_buffer[BUFSIZE];
 		printf("\n# Enter Command for Server: ");
 		fgets(tmpsquare_buffer, BUFSIZE - 2, stdin);
-
-		/* check length of buffer and add int before it. This is the control for the server to check if he received the complete message */
-		/* clears the buffer for next transmission */
-		memset(recbuffer, 0, strlen(recbuffer));
-		memset(sendbuffer, 0, strlen(sendbuffer));
-		recbuffer[0] = '\0';
-
-		char intlen[10];
-		/* 8 for int +1 for space, +1 for \0 */
-		sprintf(intlen, "%9d", strlen(tmpsquare_buffer)+8+1 +1);
-
-		/* the message to send is: <length of following message><message> e.g. 5abcd (the '0' char will be added to <length of msg> */
-		strcat(sendbuffer, intlen);
-		strcat(sendbuffer, " ");
-		strcat(sendbuffer, tmpsquare_buffer);
+		strcat(tmpsquare_buffer, " ");
+		clearBuffers(sendbuffer, recbuffer);
+		calcMsgToSend(sendbuffer, tmpsquare_buffer);
 
 		if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {
 			fprintf(stderr, "Failure Sending Message\n");
@@ -140,6 +130,26 @@ int main(int argc, char *argv[]) {
 
 }
 
+/* clear the recbuffer and the sendbuffer */
+void clearBuffers(char sendbuffer[BUFSIZE], char recbuffer[BUFSIZE]) {
+	/* check length of buffer and add int before it. This is the control for the server to check if he received the complete message */
+	/* clears the buffer for next transmission */
+	memset(recbuffer, 0, strlen(recbuffer));
+	memset(sendbuffer, 0, strlen(sendbuffer));
+	recbuffer[0] = '\0';
+}
+
+/* here the message will be calculated. This is a short transmission protocol to ensure that all traffic was sent */
+void calcMsgToSend(char sendbuffer[BUFSIZE], char tmpsquare_buffer[BUFSIZE]) {
+	char intlen[10];
+	/* 8 for int +1 for space, +1 for \0 */
+	sprintf(intlen, "%9d", strlen(tmpsquare_buffer)+8+1 +1);
+
+	/* the message to send is: <length of following message><message> e.g. 5abcd (the '0' char will be added to <length of msg> */
+	strcat(sendbuffer, intlen);
+	strcat(sendbuffer, " ");
+	strcat(sendbuffer, tmpsquare_buffer);
+}
 
 void closeSocket() {
 	close(sock);
