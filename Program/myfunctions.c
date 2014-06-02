@@ -1,3 +1,16 @@
+/*
+ * File:   		myfunctions.c
+ * Author: 		Micha Schšnenberger
+ * Modul:		Concurrent Programming in C
+ *
+ * Created:     09.04.2014
+ * Project:		https://github.com/schoenm1/concurrent_c.git
+ */
+
+/* This file contains self-written functions, which are needed for the Server.c
+ *
+ */
+
 /*  power recursive  return x^y */
 int power(int x, int y) {
 	if (y == 0)
@@ -16,31 +29,23 @@ char * getfixCharLen(char *mychar, int mylength) {
 	return retchar;
 }
 
-/* will output all existing shared memory blocks which exists at the moment */
-void print_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
-	struct shm_ctr_struct *myshm_ctr = shm_ctr;
-	int i = 1;
-
-	char * shmAddress;
-	sprintf(shmAddress, "", shm_ctr);
-	printf("\nWill now output all shm-blocks...\n");
-	printf(
-			"============================================================================================================================\n");
-	while (TRUE) {
-		printf("Filename = \"%s\"\n", getfixCharLen(myshm_ctr->filename, 20));
-		printf("Block No %i:\t Block-Address = %p\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %p\t isLast = %i\n", i,
-				getfixCharLen(shmAddress, 10), myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20),
-				&(myshm_ctr->filename), myshm_ctr->isLast);
-		if (myshm_ctr->isLast == TRUE) {
+/* round up an input integer to the next 2^x int. e.g. input = 102, output will be 128 */
+int round_up_int(int input) {
+	int output = FALSE;
+	int until = log(TOT_SHM_SIZE) / log(2);
+	if (input > TOT_SHM_SIZE) {
+		return output;
+	}
+	int i;
+	for (i = 2; i < until; i++) {
+		if (input < power(2, i)) {
+			output = power(2, i);
+			LOG_TRACE(LOG_INFORMATIONAL, "i = %i \t Output now set to = %i and return it.", i, output);
+			return output;
 			break;
-		} else {
-			myshm_ctr = myshm_ctr->next;
-			i++;
 		}
 	}
-	printf(
-			"=============================================================================================================================================================\n");
-
+	return output;
 }
 
 /* make from multiple arguments one string */

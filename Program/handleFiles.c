@@ -2,14 +2,25 @@
  there are some conditions before writing a new file to shm
  1) file must not exist
  2) filesize can not be bigger than free space in shm
- 3) search a good place in shm (SHM is a 'buddy' sytem') / if need devide shm
+ 3) search a good place in shm (SHM is a 'buddy' system') / if needed the shm will be devide
  4) make shure space is locked
  5) write file into shm
  */
 
-/* forward function declaration */
+/* forward declarations of functions */
+char * readFile(struct shm_ctr_struct *shm_ctr, char *filename);
+char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize);
+int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename);
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename);
+extern int round_up_int(int input);
 
+/*
+ * BEGIN OF handleFiles.c
+ */
+
+/* return the content of a file as a char Pointer
+ * Before reading the file content, a read lock will be made.
+ */
 char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retcode;
 	LOG_TRACE(LOG_DEBUG, "Now in function readFile()");
@@ -20,12 +31,12 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 		/* lock for Reading*/
 		retcode = pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
 		if (retcode == 0)
-			LOG_TRACE(LOG_INFORMATIONAL, "Locked RWLock for Reading filename \"%s\"", shm_ctr->filename);
+			LOG_TRACE(LOG_NOTICE, "Locked RWLock for Reading filename \"%s\"", shm_ctr->filename);
 		char * filedata = (char*) malloc(sizeof(char) * MAX_FILE_LENGTH);
 		filedata = strdup(shm_ctr->filedata);
 		pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
 		if (retcode == 0)
-			LOG_TRACE(LOG_INFORMATIONAL, "Unlocked RWLock for Reading filename \"%s\"", shm_ctr->filename);
+			LOG_TRACE(LOG_NOTICE, "Unlocked RWLock for Reading filename \"%s\"", shm_ctr->filename);
 		return filedata;
 
 	}
@@ -44,22 +55,24 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	return retchar;
 }
 
+/* write a new file with its content to the shared memory.
+ * @return: Pointer to the shm control struct where the pointer of the filename and filecontent is
+ */
 char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
 	LOG_TRACE(LOG_DEBUG, "Now in Function writeNewFile()");
 	int retcode;
-	//int totfilesize = filesize + 1; //because termination \0
 	char *returnchar = malloc(sizeof(char) * 64);
 	memset(returnchar, '\0', sizeof(returnchar)); //clear return String
 
 	/* check if file already exists */
 	retcode = checkifexists(shm_ctr, filename);
-
+	/* if extist, return "File already exist */
 	if (retcode == TRUE) {
-		LOG_TRACE(LOG_DEBUG, "File \"%s\" already exists", filename);
-		return "File already exists\n";
+		LOG_TRACE(LOG_INFORMATIONAL, "File \"%s\" already exists", filename);
+		return "File already exist\n";
 	}
 	/* if file does not exists, create a new file */
-	LOG_TRACE(LOG_DEBUG, "File with name %s does not exists. I will create it.", filename);
+	LOG_TRACE(LOG_INFORMATIONAL, "File with name %s does not exists. I will create it.", filename);
 
 	LOG_TRACE(LOG_DEBUG, "Address of shm Place to check is %p", shm_ctr);
 	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
@@ -122,7 +135,6 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 /* will check if the file currenctly exists in shm */
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retrcode = FALSE;
-	//printf("Searching for Filename = %s\n", filename);
 
 	/* if stringcompare = True return True */
 	if (strcmp((shm_ctr->filename), filename) == 0) {
@@ -131,7 +143,7 @@ int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename) {
 
 	/* if at end of shm_ctr, return false */
 	if (shm_ctr->isLast) {
-		printf("At the end of SHM-Block. No correct file name found.\n");
+		LOG_TRACE(LOG_DEBUG, "At the end of SHM-Block. No correct file name found.");
 		return FALSE;
 	}
 	/* else go to next shm_ctr */

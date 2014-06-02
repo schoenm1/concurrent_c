@@ -1,15 +1,19 @@
+/*
+ * File:   		valid-args.h
+ * Author: 		Micha Schšnenberger
+ * Modul:		Concurrent Programming in C
+ *
+ * Created:     20.04.2014
+ * Project:		https://github.com/schoenm1/concurrent_c.git
+ */
+
 /* returns the content of the file, which is included in the char-array */
 char * getFileContent(char *recMessage[]) {
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	memset(retchar, '\0', sizeof(retchar)); //clear String
 
-	LOG_TRACE(LOG_DEBUG, "1 - In getFileContent");
 	int i;
-	LOG_TRACE(LOG_DEBUG, "2 - In getFileContent");
-	LOG_TRACE(LOG_DEBUG, "3 - In getFileContent");
 	strcat(retchar, recMessage[3]);
-	LOG_TRACE(LOG_DEBUG, "4 - In getFileContent. Size of recMessage =%i", sizeof(recMessage));
-
 	int j = 0;
 	for (j = 0; j < MAX_FILE_LENGTH; j++) {
 		if (recMessage[j] == NULL)
@@ -18,13 +22,9 @@ char * getFileContent(char *recMessage[]) {
 	}
 
 	for (i = 4; i < j - 1; i++) {
-		LOG_TRACE(LOG_DEBUG, "In i=%i - In getFileContent", i);
 		strcat(retchar, " ");
-		LOG_TRACE(LOG_DEBUG, "In i=%i - retchar = %s", i, retchar);
 		strcat(retchar, recMessage[i]);
-		LOG_TRACE(LOG_DEBUG, "In i=%i - retchar = %s", i, retchar);
 	}
-	LOG_TRACE(LOG_DEBUG, "5 - In getFileContent");
 	return retchar;
 }
 
@@ -46,11 +46,10 @@ int getValidServerCommand(char *command) {
 	return FALSE;
 }
 
-/* LOG_TRACE(log level, format, args ) */
+/* will create a log entry */
 void LOG_TRACE(int lvl, char *msg, ...) {
 	char buf[1024];
 	char *buff = (char *) malloc(sizeof(char) * 1024);
-	//char *L_LEVEL = (char *) malloc(sizeof(char) * 48);
 	if (LOGLEVEL >= lvl) {
 		char *L_LEVEL = "NULL";
 		L_LEVEL = getLogLevel(lvl, L_LEVEL);
@@ -61,7 +60,6 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 		sprintf(buff, "%s\t%s\n", L_LEVEL, buf);
 		printf("%s", buff);
 		va_end(va);
-		//	free(L_LEVEL);
 	}
 	free(buff);
 }
@@ -112,7 +110,6 @@ void initValidServerArguments(int argc, char *argv[]) {
 		if (strcmp(argv[i], _logLevel_arg) == 0) {
 			printf("-> Hit for Loglevel\n\n");
 			int _mylogLevel = (int) atoi(argv[i + 1]);
-			//printf("********* arg = %i",validArguments[0].isSet);
 			if (validArguments[0].isSet == 0) {
 				retcode = setLogLevel(_mylogLevel);
 				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);

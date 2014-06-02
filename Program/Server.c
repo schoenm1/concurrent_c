@@ -65,17 +65,18 @@ char _logLevel_arg[10] = LOGLEVEL_ARG
 char _serverPort_arg[10] = SERVERPORT_ARG
 ;
 
-/* forward function definition */
-void ServerListen();
-int setTCPServer();
-void runClientCommand();
+/* forward declarations of functions */
 int setup_shm();
-void my_handler();
-int initshm();
+void my_handler(int signo);
+int initshm(char *shm_start);
+int setTCPServer();
+void ServerListen();
+void runClientCommand(char *recMessage[], char *command, int clntSocket, int thread_count);
+void handle_tcp_client(void* parameters);
+void breakCharArrayInWords(char *recMessage[], char *recBuffer[]);
 int setLogLevel();
-void breakCharArrayInWords();
-void* handle_tcp_client();
-int pthread_create(pthread_t * __restrict, const pthread_attr_t * __restrict, void *(*)(void *), void * __restrict);
+
+//int pthread_create(pthread_t * __restrict, const pthread_attr_t * __restrict, void *(*)(void *), void * __restrict);
 
 /* global vars for TCP-Server */
 int servSock; /* Socket descriptor for server */
@@ -86,7 +87,6 @@ unsigned short ServerPort; /* Server port */
 unsigned int client_address_len; /* Length of client address data structure */
 
 struct shm_ctr_struct *shm_ctr;
-
 struct validArgs {
 	int isSet;
 	char arg[10];
@@ -114,22 +114,26 @@ int setup_shm() {
 	return 1;
 }
 
+/* Handles the Signals which are received by the Client */
 void my_handler(int signo) {
 	int retcode;
-	if (signo == SIGUSR1) {
-		LOG_TRACE(LOG_NOTICE, "Received other than SIGINT. Server is cleaning up shared memory and is going to close...");
-		retcode = joiningAllPThreads(myPThreadStruct);
-		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
-		/* clean up shared memory */
-		cleanup(shm_id);
-	} else {
-		LOG_TRACE(LOG_NOTICE, "Received SIGINT. Server is cleaning up shared memory and is going to close...");
+	if (signo == SIGTERM) {
+		LOG_TRACE(LOG_NOTICE, "Received SIGTERM. Server is cleaning up shared memory and is going to close...");
 		retcode = joiningAllPThreads(myPThreadStruct);
 		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
 		if (retcode == 0)
 			LOG_TRACE(LOG_NOTICE, "Successfully joined all Client PThreads");
-		/* clean up shared memory */
 		cleanup(shm_id);
+		LOG_TRACE(LOG_NOTICE, "Bye bye . . .");
+		exit(1);
+	} else {
+		LOG_TRACE(LOG_NOTICE, "Received other than . Server is cleaning up shared memory and is going to close...");
+		retcode = joiningAllPThreads(myPThreadStruct);
+		handle_error(retcode, "Could not joining all PThreads", PROCESS_EXIT);
+		if (retcode == 0)
+			LOG_TRACE(LOG_NOTICE, "Successfully joined all Client PThreads");
+		cleanup(shm_id);
+		LOG_TRACE(LOG_NOTICE, "Bye bye . . .");
 		exit(1);
 	}
 }
@@ -177,50 +181,20 @@ int main(int argc, char *argv[]) {
 	myPThreadStruct->isLast = 1;
 	myPThreadStruct->nextClient = myPThreadStruct;
 
-//	/* Testfile for testing memory control */
-//	printf("\n");
-//	int filesize = 1056;
-//	printf("Want to write filename with size=%i to shm\n", filesize);
-//	char * testfilename = "Test.txt";
-//	printf("Adress of shm Place to check is %p\n", shm_ctr);
-//	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
-//
-//	printf("Checked a good address is:  %p\n", place);
-//
-//	/*if there is no good place found, devide shm blocks */
-//	if (place == FALSE) {
-//		LOG_TRACE(LOG_INFORMATIONAL, "0 here is no good place to write the file into... Trying no to devide the Shared Memory...");
-//		int block_size_needed = round_up_int(filesize);
-//		retcode = devide(shm_ctr, block_size_needed);
-//		handle_error(retcode, "Could not devide the shared memory for the needed size...\n", PROCESS_EXIT);
-//		place = find_shm_place(shm_ctr, filesize);
-//	}
-
-// if address of founded place + size of place < than
-//	printf("Address of place = %p\n", place);
-//	if (!place == 0) {
-//		printf("Inside of checking if return of place is valid...\n");
-//		place->isfree = FALSE;
-//		place->filename = testfilename;
-//		char * Testfilecontent = "Dies ist der Text des Testfiles.\nEs ist nicht einfach zu Programmieren.";
-//		place->filedata = strdup(Testfilecontent);
-//
-//	}
-
 	/* if no arguments is chosen, output the usage of the Server */
 	if (argc == 1) {
 		usage();
-	} else {
+	}
+	/* if arguments are chosen, validate the arguments */
+	else {
 		printf("Verify valid arguments ...\n");
 		initValidServerArguments(argc, argv);
 	}
-
+	/* if no port for the server was chosen, set it to default port = 7000 */
 	if (validArguments[1].isSet == 0) {
 		printf("There was no argument for the Server-Port. It will no be set to default = 7000\n");
 		ServerPort = 7000;
 		validArguments[1].isSet = 1;
-
-	} else {
 
 	}
 
@@ -335,11 +309,6 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 		char * returnvalue = readFile(shm_ctr, recMessage[2]);
 		LOG_TRACE(LOG_INFORMATIONAL, "READ Command: Sending message to Client: %s", returnvalue);
 		send(clntSocket, returnvalue, strlen(returnvalue), 0);
-		//free(returnvalue);
-
-		/* unlock the read lock */
-		//pthread_rwlock_rdlock(&(shm_ctr->rwlockFile));
-		//free(returnvalue);
 	}
 
 	else if (strcmp(command, "LIST") == 0) {
@@ -376,12 +345,10 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 			printf("retcode after 1st comine is: %i\n", retcode);
 			/* repeat until there is no more deviding option */
 
-			//print_all_shm_blocks(shm_ctr);
 			while (retcode == TRUE) {
 				printf("\n\n\n", retcode);
 				retcode = combine(shm_ctr);
 				printf(get_all_shm_blocks(shm_ctr));
-				//print_all_shm_blocks(shm_ctr);
 			}
 		}
 	}
@@ -395,7 +362,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 
 }
 
-void* handle_tcp_client(void* parameters) {
+void handle_tcp_client(void* parameters) {
 	int istrue = 1;
 	LOG_TRACE(LOG_INFORMATIONAL, "New PThread created for Client.\t ID = %u", (unsigned int) pthread_self());
 	/* Cast the given parameter back to int ClntSocket  */
@@ -418,7 +385,6 @@ void* handle_tcp_client(void* parameters) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for reveicing message from Client.");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
 		handle_error(recvMsgSize, "recv() failed", NO_EXIT);
-		LOG_TRACE(LOG_DEBUG, "Received msg from Client");
 		if (recvMsgSize == 0) {
 			break;
 		}
@@ -427,8 +393,6 @@ void* handle_tcp_client(void* parameters) {
 		/* check is effective message is equal to expected message size */
 		int effLength = (int) atoi(recMessage[0]);
 		if (effLength == recvMsgSize) {
-			LOG_TRACE(LOG_NOTICE, "All OK!");
-
 			/* check if 1st word of message is a valid command */
 			retcode = getValidServerCommand(recMessage[1]);
 
