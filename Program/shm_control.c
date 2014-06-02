@@ -14,7 +14,6 @@
 
 /* forward declarations of functions */
 extern void LOG_TRACE(int lvl, char *msg, ...);
-extern void print_single_shm_blocks(struct shm_ctr_struct *shm_ctr);
 int devide(struct shm_ctr_struct *shm_ctr, int untilSize);
 int combine(struct shm_ctr_struct *shm_ctr);
 
@@ -22,11 +21,12 @@ int combine(struct shm_ctr_struct *shm_ctr);
  * BEGIN OF shm_control.c
  */
 
+/* return the place of the shm_ctr_struct which is perfect for the file.
+ * If no place was found, return -1 as pointer*/
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesize) {
 	struct shm_ctr_struct *ret_struct = FALSE;
 
 	LOG_TRACE(LOG_DEBUG, "Size of shm Place is %i. IsFree = %i", shm_ctr->shm_size, shm_ctr->isfree);
-	//print_single_shm_blocks(shm_ctr);
 	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize)) && (shm_ctr->isfree == TRUE)) {
@@ -98,7 +98,11 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 			return retrcode;
 			/* if the size is not good, call recursive the function and split it, until the size is good */
 		} else {
-			LOG_TRACE(LOG_NOTICE, "PT: Recursive call in deviding because block size is to big (at moment = %i) ...", newsize);
+			if (newsize <= 2)
+				return FALSE;
+
+			LOG_TRACE(LOG_NOTICE, "PT: Recursive call in deviding because block size is to big (at moment = %i / should be: %i) ...",
+					newsize, untilSize);
 			retrcode = devide(shm_ctr, untilSize);
 		}
 	}
@@ -124,7 +128,7 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
  *  not free |      free     |Ênot free | ...
  */
 int combine(struct shm_ctr_struct *shm_ctr) {
-	print_single_shm_blocks(shm_ctr);
+	//print_single_shm_blocks(shm_ctr); //for manual debugging
 	LOG_TRACE(LOG_DEBUG, "PT: In function combine()");
 	int retcode = FALSE;
 
@@ -138,7 +142,6 @@ int combine(struct shm_ctr_struct *shm_ctr) {
 
 	/* if at end of shm return FALSE */
 	else if (shm_ctr->isLast == TRUE) {
-		printf("shm is LAST\n");
 		LOG_TRACE(LOG_DEBUG, "PT: At end of SHM. Return FALSE\n");
 		return retcode;
 	}

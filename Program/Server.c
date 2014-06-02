@@ -49,7 +49,7 @@ int shm_id;
 
 /* all needed for handle Files */
 #include "handleFiles.c"
-#define BUFSIZE 128   /* Size of receive buffer */
+#define BUFSIZE 8192   /* Size of receive buffer */
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
 #define MAXRECWORDS 30000/* Maximum of words receiving from the client */
 #define SERVERPORT_ARG "-p";
@@ -282,8 +282,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 	if (strcmp(command, "CREATE") == 0) {
 
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...");
-		//	char * tmpchar = getFileContent(recMessage);
-		printf("rec Message = %s\n", *recMessage);
+		//printf("rec Message = %s\n", *recMessage);
 
 		char *tmpcontent = (char *) malloc(MAX_FILE_LENGTH);
 		tmpcontent = getFileContent(recMessage);
@@ -293,14 +292,13 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 		char *filename = strdup(recMessage[2]);
 		LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
 
-		char *returnvalue = malloc(sizeof(char) * 256);
+		char *returnvalue = malloc(sizeof(char) * MAX_FILE_LENGTH);
 		returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
 		if (returnvalue > 0) {
 			LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
 			send(clntSocket, returnvalue, strlen(returnvalue), 0);
 		}
 		free(returnvalue);
-		//free(filecontent);
 	}
 
 	/* Reading File */
@@ -314,7 +312,58 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 	else if (strcmp(command, "LIST") == 0) {
 		sendtoClient = get_all_shm_blocks(shm_ctr);
 		send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
-		//free(sendtoClient);
+	}
+
+	else if (strcmp(command, "UPDATE") == 0) {
+		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to UPDATE the file \"%i\"", recMessage[2]);
+		int retcode;
+		retcode = checkifexists(shm_ctr, recMessage[2]);
+		 /* if file does not exist, send message to Client */
+		if (!retcode) {
+			sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
+		  	send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+		}
+		/* if file exist, delete it and create it new */
+		else {
+			retcode = deleteFile(shm_ctr, recMessage[2]);
+			/* if deleting was successful, call runClientCommand and */
+			if (retcode) {
+
+				/* combine now the free blocks */
+				retcode = combine(shm_ctr);
+				/* repeat until there is no more deviding option */
+				while (retcode == TRUE) {
+					retcode = combine(shm_ctr);
+				}
+
+				/* create the new file with the content */
+				char *tmpcontent = (char *) malloc(MAX_FILE_LENGTH);
+				tmpcontent = getFileContent(recMessage);
+				char *filecontent = strdup(tmpcontent);
+				free(tmpcontent);
+
+				char *filename = strdup(recMessage[2]);
+				LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
+
+				char *returnvalue = malloc(sizeof(char) * 256);
+				returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
+				if (returnvalue > 0) {
+					LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
+					send(clntSocket, returnvalue, strlen(returnvalue), 0);
+				}
+				free(returnvalue);
+
+			}
+
+			/*if deleting was not successful */
+			else {
+				LOG_TRACE(LOG_INFORMATIONAL, "Updating file \"%s\" was not successful", recMessage[2]);
+				sendtoClient = getSingleString("Updating file \"%s\" was not successful", recMessage[2]);
+				send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+			}
+
+		}
+
 	}
 
 	/* DELETE <filename>: DELETE Filename from memory */
@@ -341,10 +390,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 			}
 			LOG_TRACE(LOG_INFORMATIONAL, "Will now try to combine free blocks...");
 			retcode = combine(shm_ctr);
-
-			printf("retcode after 1st comine is: %i\n", retcode);
 			/* repeat until there is no more deviding option */
-
 			while (retcode == TRUE) {
 				printf("\n\n\n", retcode);
 				retcode = combine(shm_ctr);

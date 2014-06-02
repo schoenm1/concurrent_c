@@ -67,30 +67,32 @@ char * getSingleString(char *msg, ...) {
 /* prepares the output of all shared memory blocks to send to the client over TCP/IP */
 char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 	struct shm_ctr_struct *myshm_ctr = shm_ctr;
+
 	char * one =
-			"=============================================== ALL BLOCKS OF SHARED MEMORY ===============================================\n";
+			"=============================================== ALL BLOCKS OF SHARED MEMORY ==================================================================\n";
 	char * all_shm_blocks = (char *) malloc(8192);
 	strcpy(all_shm_blocks, one);
 
 	int i = 1;
 
-	while (TRUE) {
-		char * myblock = (char *) malloc(sizeof(malloc) * 256);
-		myblock = getSingleString(
-				"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x   \t isLast = %i\n",
-				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
-				myshm_ctr->isLast);
-		strcat(all_shm_blocks, myblock);
+		while (TRUE) {
+			char * myblock = (char *) malloc(sizeof(malloc) * 256);
+			myblock = getSingleString(
+					"Block No %i:\t Block-Address = %x\t\t Block-Size = %i\t isFree = %i Filename = %s\t PTR Filename = %x   \t isLast = %i\n",
+					i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), &(myshm_ctr->filename),
+					myshm_ctr->isLast);
+			strcat(all_shm_blocks, myblock);
 
-		free(myblock);
-		if (myshm_ctr->isLast == TRUE) {
-			break;
-		} else {
-			myshm_ctr = myshm_ctr->next;
-			i++;
+			free(myblock);
+			if (myshm_ctr->isLast == TRUE) {
+				break;
+			} else {
+				myshm_ctr = myshm_ctr->next;
+				i++;
+			}
 		}
-	}
-	char * last = "=============================================== END OF SHARED MEMORY ===============================================\n";
+	char * last =
+			"============================================================== END OF SHARED MEMORY =======================================================================================\n";
 	strcat(all_shm_blocks, last);
 
 	return all_shm_blocks;

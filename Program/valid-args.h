@@ -15,16 +15,25 @@ char * getFileContent(char *recMessage[]) {
 	int i;
 	strcat(retchar, recMessage[3]);
 	int j = 0;
+
+	/*just for manual debugging */
 	for (j = 0; j < MAX_FILE_LENGTH; j++) {
 		if (recMessage[j] == NULL)
 			break;
 		printf("recMessage[%i] = %s\n", j, recMessage[j]);
 	}
-
 	for (i = 4; i < j - 1; i++) {
 		strcat(retchar, " ");
 		strcat(retchar, recMessage[i]);
 	}
+
+	/*if content is empty or less than 2 signs, return NULL as content */
+	if (strlen(retchar) <= 2) {
+		LOG_TRACE(LOG_DEBUG, "Content of File was empty or less than four signs. Now it is \"NULL...\"");
+		memset(retchar, '\0', sizeof(retchar)); //clear String
+		strcat(retchar, "NULL...");
+	}
+
 	return retchar;
 }
 

@@ -23,8 +23,7 @@ extern int round_up_int(int input);
  */
 char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retcode;
-	LOG_TRACE(LOG_DEBUG, "Now in function readFile()");
-	printf("Try to find filename: %s\n", filename);
+	LOG_TRACE(LOG_DEBUG, "Now in function readFile(). Try to find filename \"%s\"", filename);
 	char * retchar = "File not found";
 	/* if file found */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
@@ -90,13 +89,22 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 		place = find_shm_place(shm_ctr, filesize);
 	}
 
+	/* if a good place was found */
 	if (place != FALSE) {
 		place->isfree = FALSE;
-		place->filename = strdup(filename);
-		place->filedata = strdup(filecontent);
-
 		/* init the read write lock for this file */
 		pthread_rwlock_init(&(place->rwlockFile), NULL);/* Default initialization */
+		/* lock the file */
+		retcode = pthread_rwlock_wrlock(&(shm_ctr->rwlockFile));
+		if (retcode == 0)
+			LOG_TRACE(LOG_NOTICE, "Locked RWLock for Writing new filename \"%s\"", filename);
+		place->filename = strdup(filename);
+		place->filedata = strdup(filecontent);
+		LOG_TRACE(LOG_NOTICE, "File \"%s\" successfully created in RWLock", place->filename);
+		/*unlock the file */
+		pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
+		if (retcode == 0)
+			LOG_TRACE(LOG_NOTICE, "Unlocked RWLock for Writing filename \"%s\"", shm_ctr->filename);
 
 		return getSingleString("File \"%s\" successfully created.", (place->filename));
 	}
@@ -113,10 +121,9 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 		LOG_TRACE(LOG_DEBUG, "Filename \"%s\" found...", filename);
 
 		shm_ctr->filename = "NULL";
-		shm_ctr->isfree = TRUE;
-		printf("Filedata was: %s\n", shm_ctr->filedata);
+		LOG_TRACE(LOG_DEBUG, "Filedata was until now: %s\n", shm_ctr->filedata);
 		memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
-		//printf("Filedata is now: %s\n", shm_ctr->filedata);
+		shm_ctr->isfree = TRUE;
 		return TRUE;
 	}
 	/* if at end of SHM and no hit, return FALSE */

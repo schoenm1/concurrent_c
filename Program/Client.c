@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #define BUFSIZE 65535   /* Size of receive buffer */
+#define SENDBUFFER 8192  /* Size of receive buffer */
 int sock; /* Socket descriptor */
 struct sockaddr_in server_address; /* Square server address */
 unsigned short server_port; /* Square server port */
@@ -125,15 +126,20 @@ int main(int argc, char *argv[]) {
 		clearBuffers(sendbuffer, recbuffer);
 		calcMsgToSend(sendbuffer, tmpsquare_buffer);
 
-		if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {
-			fprintf(stderr, "Failure Sending Message\n");
+		if (strlen(sendbuffer) >= SENDBUFFER - 20) {
+			printf("The message to send is to long. Use a shorter text!\n");
 
 		} else {
-			printf("# Message being sent: %s\n", sendbuffer);
-			recbuffer[0] = '\0';
-			recv(sock, recbuffer, sizeof(recbuffer), 0);
+			if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {
+				fprintf(stderr, "Failure Sending Message\n");
 
-			printf("# Message from Server: %s\n", recbuffer);
+			} else {
+				printf("# Message being sent: %s\n", sendbuffer);
+				recbuffer[0] = '\0';
+				recv(sock, recbuffer, sizeof(recbuffer), 0);
+
+				printf("# Message from Server: %s\n", recbuffer);
+			}
 		}
 	}
 	closeSocket();
