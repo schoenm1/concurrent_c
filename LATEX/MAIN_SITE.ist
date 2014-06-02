@@ -1,0 +1,13 @@
+% makeindex−Stildatei
+quote ’=’ % anstelle des Standardzeichens "
+%suffix_2p "\\,f." % S.bereich "uber 2 S.: Zahl\,f.
+%suffix_3p "\\,ff." % S.bereich "uber 3 S. Zahl\,ff.
+%suffix_mp "\\,ff." % S.bereich >3 Seiten: Zahl\,ff.
+headings_flag 1 % "Uberschriften einf"ugen (Gro"sbuchstabe)
+heading_prefix "{\\bfseries\\hfil " % vor ("Uberschriften) buchstabe einf"ugen
+heading_suffix "\\hfil}\\nopagebreak\n" % danach einf"ugen
+symhead_positive "Symbole" % "Uberschrift f"ur Symbole
+numhead_positive "Zahlen" % f"ur Zahlen
+delim_0 "\\dotfill " % Seitenzahlen mit \dotfill trennen
+delim_1 "\\dotfill " % Seitenzahlen mit \dotfill trennen,Unterebene
+delim_2 "\\dotfill " % Seitenzahlen mit \dotfill trennen,Unterunterebene

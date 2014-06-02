@@ -1,0 +1,125 @@
+\chapter{Einleitung}
+\label{sec:Einleitung}
+%============== N E W  ==== S E C T I O N  ======== 
+\section{Rahmenbedingungen} \index{Rahmenbedingungen|(}
+\label{subsec:Ausganslage}
+Die Aufgabenstellung und die Rahmenbedingungen wurden über Github (\url{https://github.com/telmich/zhaw_seminar_concurrent_c_programming}) veröffentlicht.\\
+Anbei ein Auszug aus den wichtigsten Eckdaten und Anforderungen:
+\index{Rahmenbedingungen|)}
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Geplante Termine}
+\begin{table}[h!]
+\begin{minipage}{10cm}
+\begin{tabular}[t]{|l|l|} \hline
+ \cellcolor{darkgrey} &  \cellcolor{darkgrey}  \\ 
+\cellcolor{darkgrey} \multirow{-2}{3cm}{\textbf{Datum}} &
+\cellcolor{darkgrey} \multirow{-2}{6cm}{\textbf{Beschreibung}}  \\  \cline{1-2}
+13.03.2014 & Kick-Off Meeting   \\ \cline{1-2}
+16.03.2016 & Abgabe der schriftlichen Arbeit (1 Woche vor Präsentation) \\ \cline{1-2}
+22.06.2014 & Präsentation der Arbeit \\   \cline{1-2}
+01.07.2014 & Präsentation der Arbeit\\   \cline{1-2}
+02.07.2014 & optionale Teilnahme an anderen Präsentationen\\   \cline{1-2}
+03.07.2014 & optionale Teilnahme an anderen Präsentationen\\   \cline{1-2}
+21.07.2014 & Notenabgabe\\   \cline{1-2}
+\end{tabular}
+\caption{geplante Termine}
+\label{tab:geplante_Termine}
+\end{minipage}
+\end{table}
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Administratives}
+\begin{itemize}
+\item Abgabe Arbeit via git repository auf github.com
+\item Zum Zeitpunkt "Abgabe Arbeit" werden alle git repositories geklont, Änderungen danach werden *NICHT* für die Benotung beachtet.
+\end{itemize}
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Abgabebedingungen}
+\begin{itemize}
+
+\item git repo auf github vorhanden
+\item Applikation lauffähig unter Linux
+\item Nach \grqq make\grqq\ Eingabe existiert
+\begin{itemize}
+\item \grqq run\grqq: Binary des Servers
+\begin{itemize}
+\item[-] Sollte nicht abstürzen / SEGV auftreten
+\end{itemize}
+\item \grqq test\grqq: Executable zum Testen des Servers
+\end{itemize}
+\item \grqq doc.pdf\grqq: Dokumentation
+\item Einleitung
+\item Anleitung zur Nutzung
+\item Weg, Probleme, Lösungen
+\item Fazit
+\item Keine Prosa - sondern guter technischer Bericht
+\item Deutsch oder English möglich
+\end{itemize}
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Vortrag / Präsentation}
+\begin{itemize}
+\item 10 - 15 Minuten + 5 Minuten Fragen
+\item Richtzeiten:
+\item Einleitung (2-3) min
+\item Weg, Probleme, Lösungen (4-10) min
+\item Implementation zeigen (2-5) min
+\item Fragen (2-5) min
+\item Vortrag ist nicht (nur) für den Dozenten
+\end{itemize}
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Lernziele}
+\begin{itemize}
+\item Die Besucher des Seminars verstehen was Concurrency bedeutet und welche Probleme und Lösungssansätze es gibt.
+\item Sie sind in der Lage Programme in der Programmiersprache C zu schreiben, die auf gemeinsame Ressourcen gleichzeitig zugreifen.
+\item Das Seminar setzt Kenntnisse der Programmiersprache C voraus.
+\end{itemize}
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Lerninhalte}
+\begin{itemize}
+\item Selbstständige Definition des Funktionsumfangs des Programmes unter Berücksichtigung der verfügbaren Ressourcen im Seminar.
+\item Konzeption und Entwicklung eines Programms, das gleichzeitig auf einen Speicherbereich zugreift.
+\item Die Implementation erfolgt mithilfe von Threads oder Forks und Shared Memory (SHM).
+\end{itemize}
+
+%============== N E W  ==== S E C T I O N  ======== 
+\section{Das Projekt}
+\label{sec:Das Projekt}
+\begin{itemize}
+\item kein globaler Lock (!)
+\item Kommunikation via TCP/IP (empfohlen) - Wahlweise auch Unix Domain Socket
+\item fork + shm (empfohlen)
+\begin{itemize}
+\item oder pthreads
+\item für jede Verbindung einen prozess/thread
+\item Hauptthread/prozess kann bind/listen/accept machen
+\end{itemize}
+\item Fokus liegt auf dem Serverteil
+\begin{itemize}
+\item Client ist hauptsächlich zum Testen da
+\item Server wird durch Skript vom Dozent getestet
+\end{itemize}
+\item Wenn die Eingabe valid ist, bekommt der Client ein OK
+\begin{itemize}
+\item Locking, gleichzeitiger Zugriff im Server lösen
+\item Client muss *nie* retry machen
+\end{itemize}
+\item Protokolldefinitionen in protokoll/
+\item Alle Indeces beginnen bei 0
+\item Debug-Ausgaben von Client/Server auf stderr
+\end{itemize}
+
+\textbf{Fileserver}
+\begin{itemize}
+\item Dateien sind nur im Speicher vorhanden
+\item Das echte Dateisystem darf NICHT benutzt werden
+\item Mehrere gleichzeitige Clients
+\item Lock auf Dateiebene
+\end{itemize}
+
+
+%============== N E W  ==== S E C T I O N  ======== 
+\section{Ausgangslage}
+Die Aufgabenstellung, wie sie oben beschrieben ist, ist für einen nicht Programmierer gemäss Dozent eine grosse Herausforderung. Mindestens vier Studenten, zu denen auch ich zähle, haben ihre Bedenken geäussert, dass diese Aufgabenstellung fast nicht zu erreichen ist. Ein Informatiker, dessen Zuhause ist das Programmieren ist geschweige denn die Sprache \grqq C\grqq, wird für eine minimalistische Lösung bei weitem mehr Stunden benötigen als die 60 Stunden, welche für dieses Seminararbeit gedacht sind.\\
+Damit für den Dozenten besser ersichtlich ist, wie viel Zeit aufgewendet wurde und für welche Teile der Arbeit, werden im Kapitel \ref{chapter:Aufwände} (Aufwände) die Zeiten erfasst und ausgewiesen.
+
+
+

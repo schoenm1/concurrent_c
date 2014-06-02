@@ -1,0 +1,26 @@
+Wichtig!!!!
+
+
+Um das Abkürzungsverzeichnis zu aktualisieren, ist der Aufruf
+
+
+makeindex MAIN_SITE.nlo -s nomencl.ist -o MAIN_SITE.nls
+
+
+in der Konsole im Hauptordner notwendig!!!!
+
+
+
+Indexdatei anpassen:
+
+
+
+Formatierungen sind in MAIN_SITE.ind abgelegt
+makeindex MAIN_SITE.idx
+makeindex -s MAIN_SITE.ist MAIN_SITE
+
+
+
+makeindex MAIN_SITE.nlo -s nomencl.ist -o MAIN_SITE.nls
+makeindex MAIN_SITE.idx
+makeindex -s MAIN_SITE.ist MAIN_SITE

@@ -1,0 +1,247 @@
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%	    																														|
+% Formatvorlage für Arbeiten von Micha Schönenberger																					|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%      																														|
+% Version V0.1 erstellt von Micha Schönenberger, 03. Oktober 2012																		|
+%      																														|
+% super Page: http://www.weinelt.de/latex/noindent.html																					|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+% -------------------------------------------------------------------------------META INFORMATIONEN-----------------------------------------------------------------------------------------------------
+% 																															|
+% Informationen über das Dokument, wie z.B. Titel, Autor, Matrikelnr. etc werden in der Datei _Meta.tex definiert und können danach global	verwendet werden.   |    								
+% 																															|
+\input{Meta}									%lade Meta Datei      																|
+% 																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -----------------------------------------------------------------------------------DOKUMENTENKOPF-----------------------------------------------------------------------------------------------------
+% Diese Vorlage basiert auf "scrreprt" aus dem koma-script.  																				|    			
+% Die Option "draft" sollte beim fertigen Dokument ausgeschaltet werden.																	|
+%      																														|
+%																															|
+\documentclass[								%																				|
+	11pt,										% Schriftgröße																		|
+	DIV10,									% funktioniert nur mit Koma-Script-Klassen funktioniert / wird die Grösse des bedruckbaren Bereiches (der Satzspiegel) verändert.
+											%Je grösser die Zahl, desto grösser der bedruckbare Bereich.									|
+	german,									% für Umlaute, Silbentrennung etc.														|
+	a4paper,         								% Papierformat																		|
+	oneside,									% einseitiges Dokument																|
+	titlepage,									% es wird eine Titelseite verwendet														|
+	halfparskip,								% Abstand zwischen Absätzen (halbe Zeile)												|
+	normalheadings,							% Größe der Überschriften verkleinern													|
+	liststotoc,									% Verzeichnisse im Inhaltsverzeichnis aufführen											|
+	bibtotoc, 							% Literaturverzeichnis im Inhaltsverzeichnis aufführen[bibtotoc, bibtotocnumbered]					|
+	idxtotoc,									% Index im Inhaltsverzeichnis aufführen													|
+	tablecaptionabove,							% Beschriftung von T-Eisenellen unterhalb ausgeben											|
+	final										% Status des Dokuments (final/draft)													|
+]{scrbook}										% KOMA Script-Klassen: scrbook, scrreprt, scrartcl, scrlttr2. Die Angabe einer Dokumentenklasse ist obligatorisch.
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -----------------------------------------------------------------------------------WEITERE PACKAGES----------------------------------------------------------------------------------------------------
+% Weitere Packages, die benötigt werden, sind in die Datei Packages.tex "ausgelagert", um die Vorlage möglichst übersichtlich zu halten.   					|
+%      																														|
+\input{Packages}								%lade ausgelagerte Packages															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------INDEX- UND ABKÜRZUNGSVERZEICHNIS----------------------------------------------------------------------------------------
+% Standardmässig sollte ein Index- und Abkürzungsverzeichnis erstellt werden											   					|
+%      																														|
+\makeindex									% erstellt ein Index-Verzeichnis														|
+\makenomenclature								% erstellt ein Abkürzungsverzeichnis													|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% ------------------------------------------------------------------KOPF- UND FUSSZEILE, SEITENRÄNDER...---------------------------------------------------------------------------------------
+% Diese Einstellungen sind im Dokument Seitenstil ausgelagert.																			|
+%      																														|
+\input{Seitenstil}								%lade spezifische Kopf- und Fusszeilen								   					|
+%      		
+%																												|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% ------------------------------------------------------------------------------SILBENTRENNUNG------------------------------------------------------------------------------------------------------------
+% Eigene Definitionen für Silbentrennung																							|
+%      																														|
+\include{Silbentrennung}							%lade spezifische Silbentrennungsfile								   					|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------HIER BEGINNT DAS EIGENTLICHE DOKUMENT--------------------------------------------------------------------------------------
+%      																														|
+% Grundsätzlich werden alle einzelne Kapitel ausgelagert.																				|
+% Diese Dokument liest nur die Unter-Dokumente ein.																					|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------------LITERATURVERZEICHNIS--------------------------------------------------------------------------------------------------
+%      																														|
+% Das Literaturverzeichnis wird aus der Datenbank Bibliographie.bib erstellt. Die genaue Verwendung von bibtex wird hier jedoch nicht erklärt.				|
+% Link: http://de.wikipedia.org/wiki/BibTeX																							|
+%\nocite{*} 
+
+%\bibliographystyle{natdin}
+%\usepackage[numbers]{natbib}
+
+									%																				|
+%\usepackage[style=numeric]{biblatex}																								|
+%\bibliographystyle{geralpha}					v	% DIN-Stil des Literaturverzeichnisses													|
+%\bibliography{ver}{}					% Aufruf: bibtex Bibliographie.bib														|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+\begin{document}
+
+% -------------------------------------------------------------HIER BEGINNT DAS EIGENTLICHE DOKUMENT--------------------------------------------------------------------------------------
+%      																														|
+\setcounter{secnumdepth}{3}						% legt Schachtelungstiefe bei Nummerierung von Überschriften fest							|
+\setcounter{tocdepth}{3}							% legt Schachtelungstiefe bei Inhaltsverzeichnis fest										|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%      																														|
+%INFO:																														|
+% Mit \setcounter{secnumdepth}{tiefe} kann beeinflusst werden, bis zu welcher Schachtelungstiefe eine Nummerierung der Überschriften erfolgt.				|
+% Standardmäßig ist 2 eingestellt, d.h. Kapitel- Abschnitts- und Unterabschnittsüberschriften erhalten eine fortlaufende Nummer.							|
+% Wenn vor die { ein * gesetzt wird (\section*{Text}) erfolgt keine Nummerierung und auch kein Eintrag in das Inhaltsverzeichnis.							|
+%Mögliche Werte sind:																											|
+% -1	keine Überschrift wird nummeriert																								|
+% 0	Kapitelüberschriften (oder Abschnittsüberschriften im article.sty) werden nummeriert														|
+% 1	die beiden höchsten Ebenen werden nummeriert																					|
+% 5	alle Überschriften werden nummeriert. (Die Werte 2, 3, 4 ergeben die Zwischenwerte...)														|
+%Ein weiterer Counter in diesem Zusammenhang ist tocdepth Mit diesem wird festgelegt, bis zu welcher Schachtelungstiefe ein Eintrag in das				|
+% Inhaltsverzeichnis erfolgen soll. \setcounter{tocdepth}{tiefe} setzt diesen Zähler um. Standard ist hierbei wieder 2. Die möglichen Werte haben die gleiche	|
+% Bedeutung wie bei secnumdepth.																									|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% auch subsubsection nummerieren
+\ofoot{}
+% -------------------------------------------------------------------------------DECKBLATT EINLESEN-----------------------------------------------------------------------------------------------------
+%      																														|
+\include{Deckblatt}								% liest das Deckblatt ein																|
+%\include{dir/Abstract}								% liest das Abstract ein																|
+\ofoot{\pagemark}								% setze die Seitenzahl in der rechten Fusszeile											|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------------SEITENNUMMERIERUNG--------------------------------------------------------------------------------------------------
+%      																														|
+% Vor dem Hauptteil werden die Seiten in großen römischen Ziffern nummeriert...	 															|
+\pagenumbering{Roman}							% setze die Seitennummerierung als römische Zeichen										|
+%\maintoc																													|
+\tableofcontents								% ...beim Inhaltsverzeichnis															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% ----------------------------------------------------------------------ABKÜRZUNGSVERZEICHNIS EINLESEN---------------------------------------------------------------------------------------
+%      																														|
+%\input{dir/Abkuerzungen}							% liest das Glossar ein																|
+\printnomenclature								% fügt Abkürzungsverzeichnis ein														|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%      																														|
+%INFO:																														|
+%Durch den Befehl \printnomenclature lässt sich das Abkürzungsverzeichnis an jeder beliebigen Stelle im Hauptdokument einfügen.						|
+%(Bei wissenschaftlichen Arbeiten wird das Abkürzungsverzeichnis nach dem Inhaltsverzeichnis eingefügt.)											|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%      																														|
+\label{sec:Glossar}								% setze unsichtbare Markierung für Glossar												|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%      																														|
+%INFO:																														|
+%In LaTeX setzt man dazu eine unsichtbare Markierung mit dem Befehl '\label{NAME}', und verweist dann darauf. So wird '\pageref{NAME}' durch die			|
+%physikalische Seite des Labels ersetzt, '\ref{NAME}' durch die Abschnitts-, Bild- oder Tabellennummer, je nachdem wo die Markierung gesetzt wurde.		|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% ----------------------------------------------------------------------------------ERZEUGE VERZEICHNISSE--------------------------------------------------------------------------------------------
+%      																														|
+\listoffigures								% Erzeugt das Verzeichnis der Abbildungen (Abbildungsverzeichnis)								|
+\listoftables								% Erzeugt das Tabellenverzeichnis															|
+\renewcommand{\lstlistlistingname}{Verzeichnis der Listings}	% legt Name des Listings-Verzeichnis fest											|
+\lstlistoflistings								%  Erzeugt ein Listings-Verzeichnis															|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------------SEITENNUMMERIERUNG--------------------------------------------------------------------------------------------------
+%      																														|
+% Nach dem Hauptteil wird in arabischen Ziffern weitergefahren für die Seitennummerierung														|
+\clearpage									%Beendet eine Seite und erzwingt auf den nachfolgenden Seiten die Ausgabe aller Gleitobjekte		|
+%											    (z.B. Abbildungen), die bislang definiert, aber noch nicht ausgegeben wurden.					|
+\pagenumbering{arabic}							% setze die Seitennummerierung als arabische Zeichen										|
+%      										\alpha																				|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------------EIGENTLICHER INHALT-----------------------------------------------------------------------------------------------------
+% Hier können jetzt die einzelnen Kapitel implementiert werden. Sie müssen in den entsprechenden .TEX-Dateien vorliegen.							|
+%Die Dateinamen können natürlich angepasst werden.																					|
+%      																														|
+
+%\newcommand{\PT}{Penetration Test}
+%\newcommand{\PenTest}{PenTest}
+\input{dir/Versionierung_Aufwaende}
+\input{dir/Einleitung}
+\input{dir/Anleitung}
+\input{dir/Umsetzung}
+\input{dir/Fazit}
+
+%\input{dir/Fazit}									%																				|
+%\include{Inhalt/Kapitel1}																											|
+%\include{Inhalt/Kapitel2}																											|
+%\include{Inhalt/Kapitel3}																											|
+%\include{Inhalt/Fazit}																											|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------EIGENSTATTLICHE ERKLÄRUNG----------------------------------------------------------------------------------------------
+%      																														|
+%\include{dir/Erklaerung}							% Selbständigkeitserklärung 															|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------------------------ANHANG--------------------------------------------------------------------------------------------------------------
+%      																														|
+% Die Inhalte des Anhangs werden analog zu den Kapiteln implementiert; über die Datei Anhang.tex												|
+\begin{appendix}								%  																				|
+	\clearpage								%  																				|
+	\pagenumbering{roman}						%  																				|
+	\input{dir/Anhang/Anhang}							%  																				|
+\end{appendix}									%  																				|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% --------------------------------------------------------------------------------------------INDEX-----------------------------------------------------------------------------------------------------------------
+%      																														|
+\printindex							% Ausgabe des Indexes																|
+%      																														|
+%INFO: erzeugt ohne makeidx-Packet einen Fehler (unknown command)																	|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\nocite{*} 
+\bibliographystyle{gerplain}	% (uses file "plain.bst")
+\bibliography{bib/mybib}		% expects file "myrefs.bib"
+
+
+\end{document}

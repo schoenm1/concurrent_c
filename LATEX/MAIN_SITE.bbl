@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{Lucene_Core}
+{\em Apache Lucene - Index File Formats}.
+\newblock \url{http://lucene.apache.org/core/3_5_0/fileformats.html}, may 2014.
+
+\bibitem{Luke_Query}
+{\em Lucene Query Parser Syntax}.
+\newblock \url{http://lucene.apache.org/core/2_9_4/queryparsersyntax.html}, may
+  2014.
+
+\bibitem{Who_is_using_Lucene}
+{\em Who is using Lucene/Solr}.
+\newblock \url{http://searchhub.org/2012/01/21/who-uses-lucenesolr/}, may 2014.
+
+\bibitem{LiA-2ndEdition}
+{\sc McCandless, Michael;~Hatcher, Erik; Gospondenetic~Otis}: {\em Lucene in
+  Action - Second Edition}.
+\newblock Manning Publications Co, 2010.
+
+\end{thebibliography}

@@ -1,0 +1,356 @@
+%--------------------------------------------------------------------- INFORMATIONEN -----------------------------------------------------------------------------------------------------------------------
+%																															|
+% 	Definition von globalen Parametern, die im gesamten Dokument verwendet																|
+% 	werden können (z.B auf dem Deckblatt etc.).																						|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\usepackage{cite}								%für Literaturverzeichnis																|
+\usepackage{tocbasic}							%																				|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+%------------------------------------------------------- FORMATIERUNG KOPF- UND FUSSZEILE ----------------------------------------------------------------------------------------------------
+%																															|
+\usepackage									%																				|
+[automark,									%Automatische Kopfzeile      															|
+%headtopline,									%Linie über dem Seitenkopf      														|
+%plainheadtopline,								%Plain, Linie über dem Seitenkopf      													|
+headsepline,									%Linie zwischen Kopf und Textkörper      													|
+ilines,										% Trennlinie linksbündig ausrichten      													|
+%plainheadsepline,								%Plain, Linie zwischen Kopf und Textkörper      											|
+footsepline,									%Linie zwischen Textkörper und Fuss      													|
+plainfootsepline,   								%Plain, Linie zwischen Textkörper und Fuss      											|
+%footbotline,									%Linie unter dem Fuss      															|
+%plainfootbotline   								%Plain, Linie unter dem Fuss      														|
+]{scrpage2}									%																				|
+% 																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------- ANPASSUNG LANDESSPRACHE-------------------------------------------------------------------------------------------------------
+%																															|
+% Verwendet globale Option german siehe \documentclass																				|
+\usepackage{babel}  							%						      														|
+% 																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------------------- UMLAUTE----------------------------------------------------------------------------------------------------------------------
+%																															|
+\usepackage[latin1]{inputenc}						%Unterstützung erweiterter Zeichensätze mit  unterschiedlichen Kodierungen (z. B. ä, ö, ü usw.)		|
+\usepackage[T1]{fontenc}							%Dadurch ist auch sichergestellt, dass in einem PDF Umlaute gefunden werden.					|
+%\usepackage{ae} 								% "schöneres" ß																	|
+\usepackage{textcomp} 							% Euro-Zeichen etc.																	|
+%																															|
+% @inputenc:																													|
+% inputenc (Einbindung mit \usepackage[latin1]{inputenc}) ist für die Unterstützung erweiterter Eingabe-Zeichensätze mit ihren unterschiedlichen Kodierungen	|
+%(z. B. ä, ö, ü usw.). Es dient der Umwandlung einer beliebigen Eingabe-Zeichenkodierung in eine interne LaTeX-Standardsprache. Neben latin1 gibt es noch	|
+%weitere Codierungen, so zum Beispiel applemac (eine Kodierung, die häufig für Textdateien unter Mac OS verwendet wurde) oder utf8 für UTF-8-kodierte	|
+%Dateien. Im Austausch kann es aufgrund der unterschiedlichen Eingabe-Zeichenkodierung zu Problemen kommen.									|
+% 																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+%-------------------------------------------------------------------------EIGENE REFERENZIERUNG------------------------------------------------------------------------------------------------------
+%																															|
+\newcommand{\refTC}[1]{\ref{#1} \nameref{#1}}	% gibt aus z.B.: 1.1.3 Erwartetes Resultat (<Kapitelnummer> <Kapitelname>)							|
+%																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+%---------------------------------------------------------------------------------- GRAFIKEN---------------------------------------------------------------------------------------------------------------------
+%																															|
+\usepackage{float} 							%																					|
+%Das Paket float unterstützt bei der Positionierung von Grafiken und Tabellen (innerhalb der figure- und table-Umgebungen).							|
+%Normalerweise setzt LaTeX diese Elemente nach bestimmten Vorgaben relativ autonom, mit float ist eine exakte Angabe möglich.						|
+% @option \begin{figure}[H]: Bild ganau HERE = [H] einsetzen																			|
+% @option \includegraphics[height=\textheight, keepaspectratio=true]{gantt_chart.png}: keepascpectration = true: Ränder niche übernehmen				|
+%																															|
+\usepackage[dvips,final]{graphicx}						%Einbinden von EPS-Grafiken [draft oder final]										|
+\graphicspath{{pictures/}} 								% Hier liegen die Bilder des Dokuments												|
+
+\usepackage{wrapfig}
+%																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+\usepackage{amsmath,amsfonts}						% Befehle aus AMSTeX für mathematische Symbole z.B. \boldsymbol \mathbb ----
+
+\usepackage{multirow}								%Packages für Tabellen
+
+\usepackage{tabularx}
+
+% Weitere Zeichen z.B. \textcelsius \textordmasculine \textsurd \textonehalf 
+% \texteuro \texttimes \textdiv ... aus textcomp.sty
+% siehe >>Schnell ans Ziel mit \LaTeXe<< von Jörg Knappen
+% (Oldenbourg, München und Wien 1997, ISBN 3-486-24199-0)
+% \usepackage{tccompat}
+	
+%---------------------------------------------------------------------------- OWN COLORS---------------------------------------------------------------------------------------------------------------------
+%																															|
+\usepackage{colortbl}   								% Für eigene Color Definitionen (Definitionen siehe Meta)								|
+\definecolor{darkgrey}{rgb}{0.8,0.8,0.8}					% 																			|
+%																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\usepackage{makeidx}								% Für Index-Ausgabe; \printindex													|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------------------------- ZEILENABSTÄNDE UND SEITENRÄNDER--------------------------------------------------------------------------------
+%																															|
+
+% Einfache Definition der Zeilenabstände und Seitenränder etc. -------------
+\usepackage{setspace}								% hat zur Benützung 3 Optionen: [singlespacing, onehalfspacing, doublespacing]				|
+\usepackage{geometry}	
+
+
+% Symbolverzeichnis --------------------------------------------------------
+% 	Symbolverzeichnisse bequem erstellen, beruht auf MakeIndex.
+% 		makeindex.exe %Name%.nlo -s nomencl.ist -o %Name%.nls
+% 	erzeugt dann das Verzeichnis. Dieser Befehl kann z.B. im TeXnicCenter
+%		als Postprozessor eingetragen werden, damit er nicht ständig manuell
+%		ausgeführt werden muss.
+%		Die Definitionen sind ausgegliedert in die Datei Abkuerzungen.tex.
+% --------------------------------------------------------------------------
+\usepackage[intoc]{nomencl}
+  \let\abbrev\nomenclature
+  \renewcommand{\nomname}{Abkürzungsverzeichnis}
+  \setlength{\nomlabelwidth}{.25\hsize}
+  \renewcommand{\nomlabel}[1]{#1 \dotfill}
+  \setlength{\nomitemsep}{-\parsep}
+  
+
+%inserted november 2012 / Micha
+\usepackage[normalem]{ulem}
+  \newcommand{\markup}[1]{\uline{#1}}
+
+
+%inserted january 2013 / Micha
+%Link auf Abkürzungsverzeichnis, Abkürzung und Bedeutung ausschreiben
+%\newcommand{\abkDef}[2]{\nomenclature{#1}{#2 \\ \nomrefpage}\label{Abk.#1}{#1 (#2)} }
+\newcommand{\abkDef}[2]{\nomenclature{#1}{#2}\label{Abk.#1}{#1 (#2)} }
+
+% --- Abkürzung bei weiterer Verwendung --------------------
+\newcommand{\abk}[1]{\hyperref[Abk.#1]{#1}} 
+
+
+%--------------------------
+
+
+\usepackage{floatflt}								% Zum Umfließen von Bildern
+
+
+% Zum Einbinden von Programmcode --------------------------------------------
+\usepackage{listings}
+\usepackage{xcolor} 
+\definecolor{hellgelb}{rgb}{1,1,0.9}
+\definecolor{colKeys}{rgb}{0,0,1}
+\definecolor{colIdentifier}{rgb}{0,0,0}
+\definecolor{colComments}{rgb}{1,0,0}
+\definecolor{colString}{rgb}{0,0.5,0}
+\lstset{%
+    float=hbp,%
+    basicstyle=\texttt\small, %
+    identifierstyle=\color{colIdentifier}, %
+    keywordstyle=\color{colKeys}, %
+    stringstyle=\color{colString}, %
+    commentstyle=\color{colComments}, %
+    columns=flexible, %
+    tabsize=2, %
+    frame=single, %
+    extendedchars=true, %
+    showspaces=false, %
+    showstringspaces=false, %
+    numbers=left, %
+    numberstyle=\tiny, %
+    breaklines=true, %
+    backgroundcolor=\color{hellgelb}, %
+    breakautoindent=true, %
+%    captionpos=b%
+}
+
+% Lange URLs umbrechen etc. -------------------------------------------------
+\usepackage[hyphens]{url}		%bricht lange URL's um, ohne dass der Link defekt ist
+\usepackage{url}
+
+
+
+
+% Wichtig für korrekte Zitierweise ------------------------------------------
+%%\usepackage[square]{natbib}
+% Quellenangaben in eckige Klammern fassen ---------------------------------
+%%\bibpunct{[}{]}{;}{a}{}{,~}
+
+
+%\usepackage{jurabib}
+%\jurabibsetup{authorformat=smallcaps,% Autor in Kapitälchen              
+%              %authorformat=year,
+%              authorformat=citationreversed,% Im Zitat Vorname vorne
+%              authorformat=indexed,% Autor in Index
+%              authorformat=and,% Autoren mit "," und "und" abgetrennt
+%              authorformat=firstnotreversed,%
+%              authorformat=reducedifibidem,% Bei Verweis nur Nachname. 
+%              %superscriptedition=all,% Auflage hochgestellt
+%              %citefull=first,% Erstzitat voll
+%              titleformat=italic,              
+%              titleformat=all,
+%              titleformat=colonsep,% Doppelpunkt zwischen Aut. u. Titel
+%              ibidem=strict,% Ebenda pro Doppelseite
+%              see,% Das zweite Argument ist optional für "Vgl." etc.
+%              commabeforerest,% Komma vor Seitenzahl
+%              %howcited=compare,%
+%              %bibformat=ibidem,% Strich bei widerholtem Autor in BIB.
+%              commabeforerest,
+%              bibformat=compress,
+%              pages=always,
+%              %pages=format,% S. wird vorweggesetzt
+%              crossref=long,% Querverweise in voller Länge
+%              square,% eckige Klammern bei Zitaten
+%              %oxford,
+%              %chicago,
+%}
+%
+%\AddTo\bibsgerman{% 
+%\jblookforgender%
+%\renewcommand*{\ibidemname}{Ebenda}%
+%\renewcommand*{\ibidemmidname}{ebenda}% 
+%\renewcommand*{\bibjtsep}{In: }% Vor Zeitschriften 
+%\renewcommand*{\bibbtsep}{In: }% Vor Buchtitel
+%\renewcommand*{\incollinname}{In: }%Nicht so ganz sauber. 
+%\renewcommand*{\bibatsep}{.}% Nach Titel
+%\renewcommand*{\bibbdsep}{}%Vor Datum 
+%\renewcommand*{\jbaensep}{.}%
+%\renewcommand*{\bibprdelim}{)}% Klammer bei Zeitschriftjahr rechts
+%\renewcommand*{\bibpldelim}{(}% Klammer bei Zeitschriftjahr links
+%\renewcommand*{\biblnfont}{\textsc}% Nachamen Autor im BIB
+%\renewcommand*{\bibelnfont}{\textsc}% Nachamen Hg. im BIB
+%\renewcommand*{\bibfnfont}{\textsc}% Vorn. Autor im BIB
+%\renewcommand*{\bibefnfont}{\textsc}% Vorn. Hg. im BIB
+%\renewcommand*{\jbcitationyearformat}[1]{#1}% Komma zwischen Autor und Jahr entfernen
+%\def\herename{hier: }%
+%\jbfirstcitepageranges% Format: S. x--z, hier y.  
+%\renewcommand\bibidemSfname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidemsfname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidemPfname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidempfname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidemSmname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidemsmname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidemPmname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\bibidempmname{\raisebox{.2em}{\rule{2.em}{.2pt}}~}%
+%\renewcommand\idemSfname{Dies.}%
+%\renewcommand\idemsfname{dies.}%
+%\renewcommand\idemPfname{Dies.}%
+%\renewcommand\idempfname{dies.}%
+%\renewcommand\idemSmname{Ders.}%
+%\renewcommand\idemsmname{ders.}%
+%\renewcommand\idemPmname{Dies.}%
+%\renewcommand\idempmname{dies.}%
+%\renewcommand{\jbannoteformat}[1]{{\footnotesize\begin{quote}#1\end{quote}}}
+%}%
+
+
+% --------------------------------------------------------------------------------------PDF OPTIONEN----------------------------------------------------------------------------------------------------------
+% 																															|									
+\usepackage[									%																				|
+bookmarks,									%																				|
+bookmarksopen=true,							%																				|
+pdftitle={\titel},									%																				|
+pdfauthor={\autorFirst},							%																				|
+pdfcreator={\autorFirst},							%																				|
+pdfsubject={\titel},								%																				|
+pdfkeywords={\titel},								%																				|
+colorlinks=true,									%																				|
+linkcolor=red, 									% einfache interne Verknüpfungen														|
+anchorcolor=black,								% Ankertext																		|
+citecolor=blue, 									% Verweise auf Literaturverzeichniseinträge im Text										|
+filecolor=magenta, 								% Verknüpfungen, die lokale Dateien öffnen												|
+menucolor=red, 								% Acrobat-Menüpunkte																|
+urlcolor=cyan, 									%																				|
+%linkcolor=black, 								% einffdrtext																		|
+%citecolor=black, 								% Verweise auf Literaturverzeichniseinträge im Text										|
+%filecolor=black, 								% Verknüpfungen, die lokale Dateien öffnen												|
+%menucolor=black,								 % Acrobat-Menüpunkte																|
+%urlcolor=black, 								%																				|
+backref,										%																				|
+%pagebackref,									%																				|
+plainpages=false,								% zur korrekten Erstellung der Bookmarks												|
+pdfpagelabels,									% zur korrekten Erstellung der Bookmarks												|
+hypertexnames=true,							% zur korrekten Erstellung der Bookmarks												|
+linktocpage 									% Seitenzahlen anstatt Text im Inhaltsverzeichnis verlinken									|
+]{hyperref}										%																				|
+% 																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+%INFO: changed 07.01.2013 / Micha
+%hypertexnames=true, [vorher = false]
+
+
+% Zum fortlaufenden Durchnummerieren der Fußnoten ---------------------------
+\usepackage{chngcntr}
+
+
+% Aliase für Zitate
+% \defcitealias{WPProzess}{Wikipedia:~Prozess}
+
+%\usepackage{minitoc}
+
+% für lange Tabellen
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{lscape}
+
+%Spaltendefinition rechtsbündig mit definierter Breite
+\newcolumntype{w}[1]{>{\raggedleft\hspace{0pt}}p{#1}}
+
+% Formatierung von Listen ändern
+\usepackage{paralist}
+% \setdefaultleftmargin{2.5em}{2.2em}{1.87em}{1.7em}{1em}{1em}
+
+
+
+% Anhangsverzeichnis
+%\makeatletter% --> De-TeX-FAQ
+%\newcommand*{\maintoc}{% Hauptinhaltsverzeichnis
+%\begingroup
+%\@fileswfalse% kein neues Verzeichnis öffnen
+%\renewcommand*{\appendixattoc}{% Trennanweisung im Inhaltsverzeichnis
+%\value{tocdepth}=-10000 % lokal tocdepth auf sehr kleinen Wert setzen
+%}%
+%\tableofcontents% Verzeichnis ausgeben
+%\endgroup
+%}
+%\newcommand*{\appendixtoc}{% Anhangsinhaltsverzeichnis
+%\begingroup
+%\edef\@alltocdepth{\the\value{tocdepth}}% tocdepth merken
+%\setcounter{tocdepth}{-10000}% Keine Verzeichniseinträge
+%\renewcommand*{\contentsname}{% Verzeichnisname ändern
+%Verzeichnis der Anh\"ange}%
+%\renewcommand*{\appendixattoc}{% Trennanweisung im Inhaltsverzeichnis
+%\setcounter{tocdepth}{\@alltocdepth}% tocdepth wiederherstellen
+%}%
+%\tableofcontents% Verzeichnis ausgeben
+%\setcounter{tocdepth}{\@alltocdepth}% tocdepth wiederherstellen
+%\endgroup
+%}
+%\newcommand*{\appendixattoc}{% Trennanweisung im Inhaltsverzeichnis
+%}
+%\g@addto@macro\appendix{% \appendix erweitern
+%\if@openright\cleardoublepage\else\clearpage\fi% Neue Seite
+%\addcontentsline{toc}{chapter}{\appendixname}% Eintrag ins Hauptverzeichnis
+%\addtocontents{toc}{\protect\appendixattoc}% Trennanweisung in die toc-Datei
+%}
+%\makeatother
+\usepackage{subcaption}
+
+
+
+

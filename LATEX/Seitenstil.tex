@@ -1,0 +1,77 @@
+
+
+
+% ------------------------------------------------------------------------------------ZEILENABSTAND---------------------------------------------------------------------------------------------------------
+%      																														|
+\onehalfspacing								% setzte den Zeilenabstand / Möglichkeiten: singlespacing, onehalfspacing, doublespacing		
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+			
+% -------------------------------------------------------------------------------------SEITENRÄNDER---------------------------------------------------------------------------------------------------------
+%      																														|
+\geometry{									% definiert Papierformat und die Ränder													|
+paper=a4paper,left=35mm,right=25mm,top=10mm, bottom=48mm		%																				|
+}											%																				|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% ------------------------------------------------------------------------------------KOPF- UND FUSSZEILE------------------------------------------------------------------------------------------------
+%      																														|
+\pagestyle{scrheadings}							%																				|
+\renewcommand*{\chapterpagestyle}{scrheadings}		% Kopf- und Fußzeile auch auf Kapitelanfangsseiten 										|
+%      																														|
+%      																														|			
+\renewcommand{\headfont}{\normalfont}				% definiert die Schriftart für die Kopfzeile (z.B: auch möglich: \sffamily)							|
+%      																														|
+% Kopfzeile ----------------------------------------------------------------
+%\ihead{\large{\textsc{\titel}}\\[1ex] \textit{\headmark}}
+\ihead{\textit{\headmark}}
+\chead{\qquad \qquad \qquad \qquad \qquad \qquad \qquad \quad \qquad \qquad \qquad \qquad \qquad \qquad \qquad   \includegraphics[scale=0.08]{ZHAW_logo.png}}%\ohead{\includegraphics[scale=0.08]{ZHAW_logo.png}} % setze Aussenseite der Kopfzeile														|
+\setlength{\headheight}{30mm} 					% Höhe der Kopfzeile																|
+\setheadwidth[0pt]{textwithmarginpar} 				% Kopfzeile über den Text hinaus verbreitern												|
+\setheadsepline[text]{0.4pt} 						% Trennlinie unter Kopfzeile      														|
+%      																														|
+\ifoot{\autorFirst 
+%\autorSecond
+}					%setze Innenseite der Fusszeile														|
+\cfoot{}										%setze Center-Fusszeile																|
+\ofoot{\pagemark}								%setze Aussenseite Fusszeile															|
+\setfootsepline[text]{0.4pt} 						% Trennlinie über Fusszeile
+
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%  INFO:																														|
+%      																														|
+%  @\pagemark								% Kapitelname   																	|
+%  @ihead									% Mit dieser Angabe wird die Innenseite ("i" = "inside") des Seitenkopfs definiert					|
+%  @chead									% Mit dieser Angabe wird die Mitte ("c" = "center") des Seitenkopfs definiert						|
+%  @ohead									% Mit dieser Angabe wird die Außenseite ("o" = "outside") des Seitenkopfs definiert					|
+%  @ifoot										% Mit dieser Angabe wird die Innenseite des Fusszeile definiert								|
+%  @cfoot										% Mit dieser Angabe wird die Mitte des Fusszeile definiert									|
+%  @ofoot										% Mit dieser Angabe wird die Aussenseite des Fusszeile definiert  								|
+%      																														|
+% siehe auch: http://www.jochen-lipps.de/latex/kopfzeile.php																				|
+% siehe auch: http://www2.informatik.hu-berlin.de/~piefel/LaTeX-PS/Archive-2004/V07-footnote.pdf												|	
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+% ------------------------------------------------------------------SCHUSTERJUNGEN UND HURENKINDER----------------------------------------------------------------------------------------
+%      																														|
+\clubpenalty = 10000							% Disable single lines at the start of a paragraph (Schusterjungen)								|
+\widowpenalty = 10000 							% Disable single lines at the end of a paragraph (Hurenkinder)								|
+\displaywidowpenalty = 10000						% Disable single lines at the end of a paragraph (Hurenkinder)								|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% ----------------------------------------------------------------------AUSGABE QUELLCODE FORMATIEREN---------------------------------------------------------------------------------------
+%      																														|
+\lstset{numbers=left, numberstyle=\tiny, numbersep=5pt, breaklines=true}	%																|
+\lstset{emph={square}, emphstyle=\color{red}, emph={[2]root,base}, emphstyle={[2]\color{blue}}}	%												|
+%      																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\frenchspacing										% erzeugt ein wenig mehr Platz hinter einem Punkt
+\counterwithout{footnote}{chapter}						% Fußnoten fortlaufend durchnummerieren 
+

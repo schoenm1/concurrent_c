@@ -1,0 +1,193 @@
+% This file was created with JabRef 2.9.2.
+% Encoding: Cp1252
+
+@OTHER{MIB_Tree,
+  date-added = {2014-02-25 12:00:00 +0000},
+  howpublished = {\url{http://www.pulsewan.com/data101/images/24187.gif}},
+  lastchecked = {2014-02-25},
+  month = {february},
+  title = {MIB Tree - Overview},
+  year = {2014}
+}
+
+@OTHER{nectar_systemoverview,
+  date-added = {2014-02-15 12:00:00 +0000},
+  howpublished = {\url{http://www.nectarcorp.com/wp-content/gallery/dashboards/avaya-monitoring.png}},
+  lastchecked = {2014-02-15},
+  month = {february},
+  owner = {micha},
+  title = {Nectar - Avaya System Overview},
+  year = {2014}
+}
+
+@OTHER{nectar_voicequality,
+  date-added = {2014-02-15 12:00:00 +0000},
+  howpublished = {\url{http://www.nectarcorp.com/wp-content/gallery/dashboards/vqm.png}},
+  lastchecked = {2014-02-15},
+  month = {february},
+  title = {Nectar - Voice Quality},
+  year = {2014}
+}
+
+@OTHER{Paessler_Full_Manual,
+  date-added = {2014-01-13 12:00:00 +0000},
+  date-modified = {2014-01-13 12:00:00 +0000},
+  howpublished = {\url{http://download.paessler.com/download/prtgmanual.pdf}},
+  lastchecked = {2014-01-13},
+  month = {january},
+  timestamp = {2014.01.13},
+  title = {Paessler - Full PRTG Manual EN},
+  urldate = {2014-01-13},
+  year = {2014}
+}
+
+@OTHER{Paessler_Grenzen_WMI,
+  date-added = {2014-01-11 12:23:00 +0000},
+  date-modified = {2014-01-11 12:23:00 +0000},
+  howpublished = {\url{http://www.paessler.com/manuals/prtg7_de/wmi_sensors}},
+  lastchecked = {2014-01-11},
+  month = {january},
+  timestamp = {2014.01.11},
+  title = {Paessler - Windows-Systeme (WMI) Sensoren},
+  urldate = {2014-01-11},
+  year = {2014}
+}
+
+@OTHER{Paessler_HTTP,
+  date-added = {2014-01-13 12:00:00 +0000},
+  date-modified = {2014-01-13 12:00:00 +0000},
+  howpublished = {\url{http://www.paessler.com/manuals/prtg7/http_sensors}},
+  lastchecked = {2014-01-13},
+  month = {january},
+  timestamp = {2014.01.13},
+  title = {Paessler - HTTP Sensor},
+  urldate = {2014-01-13},
+  year = {2014}
+}
+
+@OTHER{Paessler_object_hierarchy,
+  date-added = {2014-02-09 12:50:00 +0000},
+  date-modified = {2014-02-09 12:50:00 +0000},
+  howpublished = {\url{https://prtg.paessler.com/help/object_hierarchy.htm}},
+  lastchecked = {2014-02-09},
+  month = {february},
+  timestamp = {2014.02.09},
+  title = {Paessler - Object Hierarchy},
+  urldate = {2014-02-09},
+  year = {2014}
+}
+
+@OTHER{Paessler_SNMP,
+  date-added = {2014-01-11 12:23:00 +0000},
+  date-modified = {2014-01-11 12:23:00 +0000},
+  howpublished = {\url{http://www.paessler.com/manuals/prtg7_de/snmp_sensors}},
+  lastchecked = {2014-01-11},
+  month = {january},
+  timestamp = {2014.01.11},
+  title = {Paessler - SNMP Sensoren},
+  urldate = {2014-01-11},
+  year = {2014}
+}
+
+@OTHER{PRTG_User_Groups,
+  date-added = {2014-02-25 12:00:00 +0000},
+  howpublished = {\url{http://www.paessler.com/manuals/prtg7_de/system_administration___edit_user_accounts_and_user_groups}},
+  lastchecked = {2014-02-25},
+  month = {february},
+  owner = {micha},
+  timestamp = {2014.02.25},
+  title = {PRTG - Benutzerkonten und Benutzergruppen},
+  year = {2014}
+}
+
+@OTHER{Services_Microsoft,
+  howpublished = {\url{http://http://msdn.microsoft.com/en-us/library/aa394582(v=vs.85).aspx}},
+  lastchecked = {2014-02-25},
+  month = {february},
+  title = {Microsoft - Windows Management Instrumentation},
+  urldate = {2014-02-25},
+  year = {2014}
+}
+
+@OTHER{SNMP_fh-brs-de,
+  date-added = {2013-12-17 14:20:00 +0000},
+  date-modified = {2013-12-17 14:20:00 +0000},
+  howpublished = {\url{http://leischner.inf.fh-brs.de/lehre/alt/09ss/nmgt/Praesentation-SNMPv3.pdf}},
+  lastchecked = {2013-12-17},
+  month = {dezember},
+  timestamp = {2013.12.17},
+  title = {FH BRS - SNMP - Präsentation SNMPv3},
+  urldate = {2013-12-17},
+  year = {2013}
+}
+
+@OTHER{SNMP_Paessler,
+  date-added = {2013-12-17 11:10:00 +0000},
+  date-modified = {2013-12-17 11:10:00 +0000},
+  howpublished = {\url{http://www.paessler.com/manuals/prtg_traffic_grapher_de/wasistsnmp}},
+  lastchecked = {2013-12-17},
+  month = {dezember},
+  timestamp = {2013.12.17},
+  title = {Paessler - Was ist SNMP},
+  urldate = {2013-12-17},
+  year = {2013}
+}
+
+@OTHER{SNMP_tu_cottbus,
+  date-added = {2013-12-17 14:20:00 +0000},
+  date-modified = {2013-12-17 14:20:00 +0000},
+  howpublished = {\url{https://www-rnks.informatik.tu-cottbus.de/content/unrestricted/teachings/2005/SS/ProseminarInternet/Ausarbeitungen/SNMP.pdf}},
+  lastchecked = {2013-12-17},
+  month = {dezember},
+  timestamp = {2013.12.17},
+  title = {BTU Cottbus - SNMP Netzwerkmanagement (PDF)},
+  urldate = {2013-12-17},
+  year = {2013}
+}
+
+@OTHER{SNMP_Wikipedia,
+  date-added = {2013-12-17 11:10:00 +0000},
+  date-modified = {2013-12-17 11:10:00 +0000},
+  howpublished = {\url{http://de.wikipedia.org/wiki/Snmp}},
+  lastchecked = {2013-12-17},
+  month = {dezember},
+  timestamp = {2013.12.17},
+  title = {Wikipedia - Simple Network Management Protocol},
+  urldate = {2013-12-17},
+  year = {2013}
+}
+
+@OTHER{WinServer2012,
+  date-added = {2013-11-17 12:20:00 +0000},
+  date-modified = {2013-11-17 12:20:00 +0000},
+  howpublished = {Microsoft Windows Server 2012 / Betriebssystem},
+  lastchecked = {2013-11-17},
+  month = {november},
+  title = {Microsoft Windows Server 2012},
+  year = {2013}
+}
+
+@OTHER{WMI_Microsoft,
+  date-added = {2013-12-17 11:10:00 +0000},
+  date-modified = {2013-12-17 11:10:00 +0000},
+  howpublished = {\url{http://http://msdn.microsoft.com/en-us/library/aa394582(v=vs.85).aspx}},
+  lastchecked = {2013-12-17},
+  month = {dezember},
+  timestamp = {2013.12.17},
+  title = {Microsoft - Windows Management Instrumentation},
+  urldate = {2013-12-17},
+  year = {2013}
+}
+
+@OTHER{WMI_Wikipedia,
+  date-added = {2013-12-17 11:10:00 +0000},
+  date-modified = {2013-12-17 11:10:00 +0000},
+  howpublished = {\url{http://en.wikipedia.org/wiki/Windows_Management_Instrumentation}},
+  lastchecked = {2013-12-17},
+  month = {dezember},
+  timestamp = {2013.12.17},
+  title = {Wikipedia - Windows Management Instrumentation},
+  urldate = {2013-12-17},
+  year = {2013}
+}
+

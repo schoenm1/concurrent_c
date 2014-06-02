@@ -1,0 +1,53 @@
+
+
+% -------------------------------------------------------------------------------------SEITENLAYOUT----------------------------------------------------------------------------------------------------------
+% 																															|
+% Informationen über das Dokument, wie z.B. Titel, Autor, Matrikelnr. etc werden in der Datei _Meta.tex definiert und können danach global	verwendet werden.   |    								
+% 																															|
+\thispagestyle{plain}								%setze Seitenlayout																	|
+% @ param \thispagestyle: plain, empty, headings, myheadings.   																			|
+% 																															|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%INFO: 																														|
+%Legt die Art des Seitenformats für eine einzelne Seite fest. Die Voreinstellung plain steht für eine zentrierte Seitennummer am Seitenfuss.					|
+%Durch empty erreicht man Seiten, die keinerlei Kopf oder Fuß enthalten. headings erzeugt eine Kopfzeile aus der Seitennummer und der Überschrift des		|
+%laufenden Abschnitts. myheadings schließlich erlaubt es, den Seitenkopf selbst mit den \markright- und \markboth-Befehlen zu definieren.					|
+%	 																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% --------------------------------------------------------------------------------------SETZE TITELBLATT----------------------------------------------------------------------------------------------------
+%	 																														|
+\begin{titlepage}								%																				|
+%	 																														|
+\begin{center} 									%setze die Formatierung auf Center														|
+\includegraphics[height=5cm]{zhaw_logo_soe.jpg}\\[10ex]	%binde die Grafik ein																|
+\LARGE{\textbf{\textsc{\titel}}}\\[5ex]					%setze eine Huge-Schrift ein (hier der Titel \titel)											|
+\large{\textbf{\untertitel}}\\[4ex]					%setze Large-Schrift (mit Untertitel)														|
+\large{\textbf{\art}}\\[12ex]						% setze Large Schrift mit der Art der Arbeit												|
+%\Large{im Fachgebiet \fachgebiet}\\[6ex]			% setze Large Schrift mit dem Fachgebiet												|
+\normalsize									%setze zurück auf Normalschrift														|	
+%	 																														|
+\begin{tabular}{w{3cm}p{6cm}}\\					%mach eine Tabelle mit den Studenten....												|
+ Student:	 & \quad \autorFirst\\[1.2ex]			%...																				|
+ %	 & \quad \autorSecond\\[6ex]					%...																				|
+ %Studienbereich: & \quad \studienbereich\\[1.2ex]		%...																				|
+ %Matrikelnummer: & \quad \matrikelnr\\[1.2ex]			%...																				|
+ Dozent:         & \quad \erstgutachter\\[1.0ex]			%...																				|
+ %Zweitgutachter:         & \quad \zweitgutachter\\[3ex]	%...																				|
+\end{tabular}									%...																				|
+\\[4ex]										%dies ist der Abstand....																|
+\copyright\ \jahr\\[4ex]							%...																				|
+\end{center}									%Ende der Tabelle																	|
+%	 																														|
+\singlespacing									%einfacher Zeilenabstand															|
+\small										%setze kleine Schrift																|
+\noindent										% Sorgt am Anfang eines Absatzes dafür, daß die erste Zeile nicht eingerückt wird.					|
+\\
+\\
+\\
+\\
+%Dieses Werk einschliesslich seiner Teile ist \textbf{urheberrechtlich geschützt}. Jede Verwertung ausserhalb der engen Grenzen des Urheberrechtgesetzes ist ohne Zustimmung der %Autoren unzulässig und strafbar. Das gilt insbesondere für Vervielfältigungen, Übersetzungen, Mikroverfilmungen sowie die Einspeicherung und Verarbeitung in elektronischen %Systemen.
+%	 																														|
+\end{titlepage}									%																				|
+%	 																														|
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
