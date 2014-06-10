@@ -184,6 +184,7 @@ int main(int argc, char *argv[]) {
 	/* if no arguments is chosen, output the usage of the Server */
 	if (argc == 1) {
 		usage();
+		exit(1);
 	}
 	/* if arguments are chosen, validate the arguments */
 	else {
@@ -195,7 +196,6 @@ int main(int argc, char *argv[]) {
 		printf("There was no argument for the Server-Port. It will no be set to default = 7000\n");
 		ServerPort = 7000;
 		validArguments[1].isSet = 1;
-
 	}
 
 	retcode = setTCPServer();
@@ -209,7 +209,6 @@ int main(int argc, char *argv[]) {
 int setTCPServer() {
 	int retcode;
 	printf("Set up TCP-Server settings ...\n");
-	//printf("LOGLEVEL_DEBUG = %i",LOGLEVEL_DEBUG);
 
 	/* Create socket for incoming connections */
 	servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -228,13 +227,13 @@ int setTCPServer() {
 	/* Mark the socket so it will listen for incoming connections */
 	retcode = listen(servSock, MAXPENDING);
 	handle_error(retcode, "listen() failed", PROCESS_EXIT);
-
 	return 1;
 }
 
 void ServerListen() {
-	LOG_TRACE(LOG_INFORMATIONAL, "Server is now going to Listening Mode for Clients.");
-	LOG_TRACE(LOG_INFORMATIONAL, "Client can connect to Server on Port %i", ServerPort);
+	LOG_TRACE(LOG_ALERT, "Server is now going to Listening Mode for Clients.");
+	LOG_TRACE(LOG_ALERT, "Client can connect to Server on Port %i", ServerPort);
+
 	pthread_t _myPThread;
 	int threadcounter = 0;
 
@@ -318,10 +317,10 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to UPDATE the file \"%i\"", recMessage[2]);
 		int retcode;
 		retcode = checkifexists(shm_ctr, recMessage[2]);
-		 /* if file does not exist, send message to Client */
+		/* if file does not exist, send message to Client */
 		if (!retcode) {
 			sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
-		  	send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+			send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
 		}
 		/* if file exist, delete it and create it new */
 		else {

@@ -116,10 +116,23 @@ void initValidServerArguments(int argc, char *argv[]) {
 		printf("Value = %s\t", argv[i]);
 
 		/* if "-l" is Arg, then set Log-Level */
+		/* if "-l" is Arg, then set Log-Level */
 		if (strcmp(argv[i], _logLevel_arg) == 0) {
 			printf("-> Hit for Loglevel\n\n");
 			int _mylogLevel = (int) atoi(argv[i + 1]);
-			if (validArguments[0].isSet == 0) {
+
+			/* if entry for Loglevel is not valid, choos default log level */
+			if (_mylogLevel < 1 || _mylogLevel > 8) {
+				printf("LogLevel not valid [1-8]. Will set Log-Level to 5   ");
+				retcode = setLogLevel(5);
+				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
+				validArguments[0].isSet = 1;
+				printf("... Done\n");
+
+			}
+
+			else if (validArguments[0].isSet == 0 && _mylogLevel >=1 && _mylogLevel <=8) {
+			printf("Try to set Loglevel to %i\n", _mylogLevel);
 				retcode = setLogLevel(_mylogLevel);
 				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
 				validArguments[0].isSet = 1;
@@ -138,6 +151,7 @@ void initValidServerArguments(int argc, char *argv[]) {
 				printf("Set up now Server Port to %i ... ", _myServerPort);
 				retcode = setServerPort(_myServerPort);
 				handle_error(retcode, "Server-Port could not be set.\n", PROCESS_EXIT);
+				validArguments[1].isSet = 1;
 				printf("   ... Done\n");
 			} else {
 				printf("ServerPort was already set. New argument will be ignored.\n");
