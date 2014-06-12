@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #define BUFSIZE 65535   /* Size of receive buffer */
+#define SENDBUFFER 8192  /* Size of receive buffer */
 int sock; /* Socket descriptor */
 struct sockaddr_in server_address; /* Square server address */
 unsigned short server_port; /* Square server port */
@@ -39,9 +40,18 @@ char *server_ip; /* Server IP address (dotted quad) */
 
 unsigned short int send_length;
 
-/* function predefines */
+/* forward declarations of functions */
+void usage(const char *argv0, const char *msg);
+void my_handler(int signo);
+void clearBuffers(char sendbuffer[BUFSIZE], char recbuffer[BUFSIZE]);
+void calcMsgToSend(char sendbuffer[BUFSIZE], char tmpsquare_buffer[BUFSIZE]);
 void closeSocket();
 
+/*
+ * BEGIN OF Client.c
+ */
+
+/* shows the usage of the Client to connect to the Server */
 void usage(const char *argv0, const char *msg) {
 	if (msg != NULL && strlen(msg) > 0) {
 		printf("%s\n\n", msg);
@@ -51,18 +61,19 @@ void usage(const char *argv0, const char *msg) {
 	exit(1);
 }
 
+/* Handles the Signals which are received by the Client */
 void my_handler(int signo) {
 	if (signo == SIGTERM) {
-		printf("SIGTERM erhalten und ignoriert\n");
+		printf("Received and ignored SIGTERM.\n");
 	} else if (signo == SIGINT) {
-		printf("Ctrl-C erhalten.\nSchicke nun dem Server den Befehl zum Beenden.\n");
+		printf("Received Ctrl-C. Send now Command to Server that Client exit.\n");
 		char sendbuffer[BUFSIZE];
 		calcMsgToSend(sendbuffer, "EXIT");
 		send(sock, sendbuffer, strlen(sendbuffer), 0);
 		usleep(100);
 		exit(1);
 	} else {
-		printf("unbekanntes Signal %d ignoriert\n", signo);
+		printf("unknow Signal %d will be ignored\n", signo);
 	}
 }
 
@@ -115,19 +126,23 @@ int main(int argc, char *argv[]) {
 		clearBuffers(sendbuffer, recbuffer);
 		calcMsgToSend(sendbuffer, tmpsquare_buffer);
 
-		if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {
-			fprintf(stderr, "Failure Sending Message\n");
+		if (strlen(sendbuffer) >= SENDBUFFER - 20) {
+			printf("The message to send is to long. Use a shorter text!\n");
 
 		} else {
-			printf("# Message being sent: %s\n", sendbuffer);
-			recbuffer[0] = '\0';
-			recv(sock, recbuffer, sizeof(recbuffer), 0);
+			if ((send(sock, sendbuffer, strlen(sendbuffer), 0)) == -1) {
+				fprintf(stderr, "Failure Sending Message\n");
 
-			printf("# Message from Server: %s\n", recbuffer);
+			} else {
+				printf("# Message being sent: %s\n", sendbuffer);
+				recbuffer[0] = '\0';
+				recv(sock, recbuffer, sizeof(recbuffer), 0);
+
+				printf("# Message from Server: %s\n", recbuffer);
+			}
 		}
 	}
 	closeSocket();
-
 }
 
 /* clear the recbuffer and the sendbuffer */

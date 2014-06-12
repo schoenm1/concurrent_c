@@ -1,5 +1,5 @@
 /*
- * File:   		shm_control.c
+ * File: 		shm_control.c
  * Author: 		Micha Schšnenberger
  * Modul:		Concurrent Programming in C
  *
@@ -12,23 +12,16 @@
  * http://www.fh-zwickau.de/golubski/bildungsportal/buddyalgorithmus/buddyalgorithmus.htm
  * */
 
-/* forward declarations of functions */
-extern void LOG_TRACE(int lvl, char *msg, ...);
-int devide(struct shm_ctr_struct *shm_ctr, int untilSize);
-int combine(struct shm_ctr_struct *shm_ctr);
+/* forward function definition */
+void print_all_shm_blocks();
+void LOG_TRACE(int lvl, char *msg, ...);
 
-/*
- * BEGIN OF shm_control.c
- */
-
-/* return the place of the shm_ctr_struct which is perfect for the file.
- * If no place was found, return -1 as pointer*/
 struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesize) {
 	struct shm_ctr_struct *ret_struct = FALSE;
 
 	LOG_TRACE(LOG_DEBUG, "Size of shm Place is %i. IsFree = %i", shm_ctr->shm_size, shm_ctr->isfree);
-	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 
+	/* check if place size is bigger than filesize, but not bigger than 2 times filesize and if place is free (filename != NULL) */
 	if ((shm_ctr->shm_size > filesize) && (shm_ctr->shm_size < (2 * filesize)) && (shm_ctr->isfree == TRUE)) {
 		/* good place for new file */
 		ret_struct = shm_ctr;
@@ -42,6 +35,7 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesi
 	/* if no place were found, call recursive function with next shm_ctl */
 	struct shm_ctr_struct *nextone = shm_ctr->next;
 	ret_struct = find_shm_place(nextone, filesize);
+
 	/* if a good place for the file was found, return the pointer of the address, otherwise the return is FALSE */
 	return ret_struct;
 }
@@ -93,16 +87,12 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 		}
 		/* if the size is the size which should be, return TRUE */
 		if (newsize == untilSize) {
-			LOG_TRACE(LOG_INFORMATIONAL, "PT: After deviding I have a good block size.");
+			LOG_TRACE(LOG_INFORMATIONAL, "After deviding I have a good block size.");
 			retrcode = TRUE;
 			return retrcode;
 			/* if the size is not good, call recursive the function and split it, until the size is good */
 		} else {
-			if (newsize <= 2)
-				return FALSE;
-
-			LOG_TRACE(LOG_NOTICE, "PT: Recursive call in deviding because block size is to big (at moment = %i / should be: %i) ...",
-					newsize, untilSize);
+			LOG_TRACE(LOG_NOTICE, "Recursive call in deviding because block size is to big (at moment = %i) ...", newsize);
 			retrcode = devide(shm_ctr, untilSize);
 		}
 	}
@@ -128,29 +118,30 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
  *  not free |      free     |Ênot free | ...
  */
 int combine(struct shm_ctr_struct *shm_ctr) {
-	//print_single_shm_blocks(shm_ctr); //for manual debugging
-	LOG_TRACE(LOG_DEBUG, "PT: In function combine()");
+	LOG_TRACE(LOG_DEBUG, "In function combine()");
 	int retcode = FALSE;
 
 	/* if block is not free, leave size of block an go further */
 	if (shm_ctr->isfree == FALSE) {
-		printf("shm is NOT free\n");
-		LOG_TRACE(LOG_DEBUG, "PT: Block is not free. Jump two times the blocksize\n");
-
+		LOG_TRACE(LOG_DEBUG, "Block is not free. Jump two times the blocksize\n");
+		//print_all_shm_blocks(shm_ctr);
 		retcode = combine((shm_ctr->next)->next);
 	}
 
 	/* if at end of shm return FALSE */
 	else if (shm_ctr->isLast == TRUE) {
-		LOG_TRACE(LOG_DEBUG, "PT: At end of SHM. Return FALSE\n");
+		LOG_TRACE(LOG_DEBUG, "At end of SHM. Return FALSE\n");
+		print_all_shm_blocks(shm_ctr);
 		return retcode;
 	}
 
 	/* if shm block is free and next is free */
 	else if ((shm_ctr->isfree) == TRUE && (shm_ctr->next)->isfree == TRUE && (shm_ctr->shm_size) == (shm_ctr->next)->shm_size) {
-		LOG_TRACE(LOG_DEBUG, "PT: Found two blocks with same size and both free");
+		LOG_TRACE(LOG_DEBUG, "Found two blocks with same size and both free\n");
 		struct shm_ctr_struct *tmpnext = shm_ctr->next;
+
 		shm_ctr->shm_size = 2 * (shm_ctr->shm_size);
+
 		/* if next was last, point next now to myself */
 		if ((shm_ctr->next)->isLast == TRUE) {
 			shm_ctr->isLast = TRUE; //FALSE
@@ -163,9 +154,8 @@ int combine(struct shm_ctr_struct *shm_ctr) {
 
 	/* otherwhise, go to next block */
 	else {
-		LOG_TRACE(LOG_DEBUG, "PT: Nothing to to. Go to next block.\n");
+		LOG_TRACE(LOG_DEBUG, "Nothing to to. Go to next block.\n");
 		retcode = combine(shm_ctr->next);
 	}
-
 	return retcode;
 }

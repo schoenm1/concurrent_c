@@ -10,7 +10,7 @@ Da der Student kein Programmierer ist und nur schulische Kenntnisse von der Prog
 \section{Libraries}
 Im Unterricht des Modules \flqq Systemsoftware\frqq\ wurden verschiedene Libraries durch den Dozenten zur Verfügung gestellt.\\
 Diese sollen, da sie einige Grundfunktionen wir das Error-Handling bereits beinhalten, in diesem Projekt ebenfalls genutzt werden. Die so genutzten Dateien werden nicht explizit als Quelle erwähnt. Sie besitzen jedoch im Kopf die Daten des Dozenten und sind als externe Datei erkennbar.
-Als Beispiel zeigt die Abbildung \ref{fig:itskylib} die Anbindung einer externen Datei.
+Als Beispiel zeigt das Listing \ref{itskylib.c} die Anbindung einer externen Datei.
 
 
 \lstset{language=c, mathescape=true}
@@ -22,7 +22,6 @@ Als Beispiel zeigt die Abbildung \ref{fig:itskylib} die Anbindung einer externen
 Programmiert wird auf einem MAC OS-X 10.9 (Mavericks). Die eingesetzte Software ist das Eclipse mit dem integrierten \flqq Eclipse C/C++ Development Tools\frqq\. Eclipse ist bereits aus der Java-Programmierung im Grundstudium bekannt und eingerichtet. So musste nur noch die \flqq Eclipse C/C++ Development Tools\frqq\ installiert werden.
 Der grosse Vorteil gegenüber eines Texteditors ist das Auto-Complete und die automatische Formatierung des Codes.\\
 Für das Kompilieren und Ausführen des Codes wird eine Ubuntu genutzt. Dieses ist als virtuelle Maschine über Parallels installiert. Zugegriffen auf das Ubuntu wird mittels SSH von MAC OS-X. Der Grund, Ubuntu zu nutzen liegt in den anderen Bibliotheken, welche teils in MAC OS-X nicht genutzt werden können oder anders implementiert sind. Ebenfalls aufgefallen im Unterricht war, dass Ubuntu 32-bit und Ubuntu 64-bit nicht immer gleich implementiert sind.
-
 
 Eckdaten Ubuntu:
 \begin{itemize}
@@ -67,7 +66,6 @@ Die Suche im Internet nach einer vorhandenen Library für die Speicherverwaltung 
 Dabei wurden sehr viele Fragen aufgeworfen, welche Schrittweise erarbeitet wurden
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
-\newpage
 \subsection{Wie wird das komplette System gemanagt?}
 \label{subsec:completeSystem}
 Für das Management des shared Memory wurde ein Struct erstellt (siehe Listing \ref{shmctrstruct}, welches das Shared Memory kontrollieren soll.
@@ -75,6 +73,7 @@ Für das Management des shared Memory wurde ein Struct erstellt (siehe Listing \r
 \lstset{language=c, mathescape=true}
 \lstinputlisting[label=shmctrstruct,captionpos=b, caption=shm\_ctr\_struct]{dir/listings/shm_ctr_struct.txt}
 
+\newpage
 Folgende Tabelle soll aufzeigen, welches Attribut im Struct welche Funktion übernehmen soll. Das Ziel des Structs ist eine verkette Liste. Das erste Struct ist im Main global bekannt, das letzte wird gefunden, da isLast auf TRUE gesetzt ist.
 \begin{table}[h!]
 \begin{tabular}[t]{|l|l|} \hline
@@ -86,6 +85,8 @@ int isLast &  TRUE wenn es der letzte Block ist, sonst FALSE\\ \cline{1-2}
 int isfree & TRUE wenn Block frei ist, FALSE wenn Block besetzt ist\\ \cline{1-2}
 \multirow{2}{5cm}{struct shm\_ctr\_struct *next} & Pointer auf den nächsten Block\\ 
 & (zeigt auf sich selber, wenn es der letzte Block ist)\\ \cline{1-2}
+\multirow{2}{5cm}{struct shm\_ctr\_struct *prev} & Pointer auf den vorherigen Block\\ 
+& (implementiert, aber nicht benutzt)\\ \cline{1-2}
 \multirow{2}{5cm}{char *filename} & Pointer auf den Dateinamen, der im Block gespeichert ist\\ 
 & (NULL wenn kein File gespeichert ist)\\ \cline{1-2}
 \multirow{2}{5cm}{char *filedata}  &  Dies ist der einzige Pointer auf das Shared-Memory.\\
@@ -112,30 +113,41 @@ Diese Funktion beginnt beim ersten Eintrag des Structs shm\_ctr\_struct (siehe L
 \subsection{Gibt es nur zu grosse Blöcke, wie werden die geteilt?}
 Das Buddy-System gibt vor, dass die Blockgrössen aus 2er Potenzen gebildet werden. Also 2, 4, 8, 16, 32 \dots \\
 Beispiel Buddy-System:\\
+
 \begin{table}[h!]
-\begin{tabularx}{\textwidth}{ |X|X|X|X| }
+\begin{tabular}{
+   |p{\dimexpr\linewidth-2\tabcolsep-1.3333\arrayrulewidth}|% column 3
+  }
   \hline
- \multirow{2}{*}{Shared Memory -- SIZE = 65535} \\  
-   \\ \hline
-\end{tabularx}
+\multirow{2}{\linewidth}{\centering Shared Memory -- SIZE = 65535}\\ 
+ \\ \hline
+ \end{tabular}
 \caption{Shared Memory - 1}
 \label{tab:shm-1}
 \end{table}
+
+
+
+
 
 Ist die Dateigrösse = 14547, gibt es keinen optimalen Block. Der optimale Block wäre hier $2^{14} (=16384)$. Der kleiner Block $2^{13} (=8192)$ wäre hier zu klein.
 Zuerst muss müssen nun die Blöcke aufgeteilt werden, so dass folgende Blöcke entstehen:
 
 
+
 \begin{table}[h!]
-\begin{tabularx}{1\textwidth}{ |c|c|c|c| }
- \hline
-Block 1 & Block 2 & \multicolumn{2}{|c|}{Block 3} \\ 
-SIZE = 16384 & SIZE = 16384 & \multicolumn{2}{|c|}{SIZE = 32768} \\ \hline
-\end{tabularx}
+\begin{tabular}{
+  |p{\dimexpr.25\linewidth-2\tabcolsep-1.3333\arrayrulewidth}% column 1
+  |p{\dimexpr.25\linewidth-2\tabcolsep-1.3333\arrayrulewidth}% column 2
+  |p{\dimexpr.5\linewidth-2\tabcolsep-1.3333\arrayrulewidth}|% column 3
+  }
+  \hline
+  \centering Block 1     & \centering Block 2     & \centering\arraybackslash Block 3     \\
+ \centering SIZE = 16384 & \centering SIZE = 16384 & \centering\arraybackslash SIZE = 32768 \\ \hline
+ \end{tabular}
 \caption{Shared Memory - 2}
 \label{tab:shm-2}
 \end{table}
-
 
 Für die Aufteilung wurde die Funktion devide(\dots) implementiert.\\
 Diese beginnt beim ersten Block und arbeitet sich (über den next-Pointer) nach hinten. Beim ersten gefundenen freien Block, wird nun die Block-Size halbiert.
@@ -148,15 +160,25 @@ Ein Screenshot der Funktion devide() ist im Anhang \ref{fig:shm-2} zu finden. Eb
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
 \section{Locks}
-Wie im Kapitel \ref{sec:Das Projekt} erwähnt, ist ein global Lock nicht erlaubt.\\Für die Umsetzung des Locks wurde schlussendlich kein mutex gewählt, wie anfangs gedacht war. Das Problem beim mutex ist, dass ein lesender Client das ganze File ebenfalls sperrt für weitere Lesezugriffe. Dies soll jedoch nicht der Fall sein.\\Aus diesem Grund wurde wurde auf \flqq pthread\_rwlock\_t\frqq\ zurückgegriffen.Die Impelementation des Locks wurde gemäss Tabelle im Kapitel \ref{subsec:completeSystem} vorgenommen.\\Da das Kontroll-Strukt für das Shared-Memory bereits vorhanden war, konnte \flqq pthread\_rwlock\_t\frqq\ ohne Probleme eingefügt werden.\\Soll nun ein ein File gelockt werden, kann das elegant gelöst werden:
+
+Wie im Kapitel \ref{sec:Das Projekt} erwähnt, ist ein global Lock nicht erlaubt.\\
+Für die Umsetzung des Locks wurde schlussendlich kein mutex gewählt, wie anfangs gedacht war. Das Problem beim mutex ist, dass ein lesender Client das ganze File ebenfalls sperrt für weitere Lesezugriffe. Dies soll jedoch nicht der Fall sein.\\
+Aus diesem Grund wurde wurde auf \flqq pthread\_rwlock\_t\frqq\ zurückgegriffen.
+
+Die Impelementation des Locks wurde gemäss Tabelle im Kapitel \ref{subsec:completeSystem} vorgenommen.\\
+Da das Kontroll-Strukt für das Shared-Memory bereits vorhanden war, konnte \flqq pthread\_rwlock\_t\frqq\ ohne Probleme eingefügt werden.\\
+Soll nun ein ein File gelockt werden, kann das elegant gelöst werden:
 \begin{itemize}
-\item Wenn das File gelesen werden möchte, muss zwingend die Adresse des enstprechenden Strukt bereits vorhanden sein = struct shm\_ctr\_struct *shm\_ctr\item Nun kann ein ReadLock über pthread\_rwlock\_rdlock(\&(shm\_ctr->rwlockFile)); gemacht werden.
+\item Wenn das File gelesen werden möchte, muss zwingend die Adresse des enstprechenden Strukt bereits vorhanden sein = struct shm\_ctr\_struct *shm\_ctr
+\item Nun kann ein ReadLock über pthread\_rwlock\_rdlock(\&(shm\_ctr->rwlockFile)); gemacht werden.
 \end{itemize}
 
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
-\section{Files und deren Funktionen}Um die auf den ersten Blick nicht ganz klare Strukturen aufzeigen zu können, soll sich dieses Kapitel mit den einzelnen Files geschäftigen, die für den Server und den Client notwendig sind. Jede Funktion jedes Files soll kurz und bündig erläutert werden.
+\section{Files und deren Funktionen}
+\label{sec:Files und deren Funktionen}
+Um die auf den ersten Blick nicht ganz klare Strukturen aufzeigen zu können, soll sich dieses Kapitel mit den einzelnen Files geschäftigen, die für den Server und den Client notwendig sind. Jede Funktion jedes Files soll kurz und bündig erläutert werden.
 
 \begin{table}[h!]
 \begin{tabular}{|p{\textwidth}|}
@@ -164,7 +186,15 @@ Ein Screenshot der Funktion devide() ist im Anhang \ref{fig:shm-2} zu finden. Eb
 \multicolumn{1}{c}{\cellcolor{darkgrey} \textbf{myfunctions.c }}\\ 
 \multicolumn{1}{c}{\cellcolor{darkgrey} beinhaltet eigene definierte Funktionen} \\ \hline
 \textbf{getFixCharLen(char *mychar, int mylength)}\\
-füllt einen CharPointer bis zur gewählten Länge auf. Wird benötigt für schöne Darstellung im LOG\\\textbf{void print\_all\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\Gibt auf der Konsole alle Blöcke des SHM aus. Wird zu DEBUG-Zwecken benötigt\\\textbf{char * get\_all\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\Gibt alle Blöcke des SHM als char Pointer zurück. Wird benötigt, um Client das SHM zu übermitteln\\\textbf{void print\_single\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\Gibt auf der Konsole einen Block des SHM aus. Wird zu DEBUG-Zwecken benötigt\\\textbf{char * getSingleString(char *msg, \dots)}\\Gibt einen Char Pointer als Return Wert. Diese Funktion erlaubt es, einen ?String? mit Argumenten (z.B. \%i, \%s) zu übergeben. Diese werden zur Laufzeit interpretiert und als neuen Char Pointer zurückgegeben\\ \hline
+füllt einen CharPointer bis zur gewählten Länge auf. Wird benötigt für schöne Darstellung im LOG\\
+\textbf{void print\_all\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\
+Gibt auf der Konsole alle Blöcke des SHM aus. Wird zu DEBUG-Zwecken benötigt\\
+\textbf{char * get\_all\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\
+Gibt alle Blöcke des SHM als char Pointer zurück. Wird benötigt, um Client das SHM zu übermitteln\\
+\textbf{void print\_single\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\
+Gibt auf der Konsole einen Block des SHM aus. Wird zu DEBUG-Zwecken benötigt\\
+\textbf{char * getSingleString(char *msg, \dots)}\\
+Gibt einen Char Pointer als Return Wert. Diese Funktion erlaubt es, einen ?String? mit Argumenten (z.B. \%i, \%s) zu übergeben. Diese werden zur Laufzeit interpretiert und als neuen Char Pointer zurückgegeben\\ \hline
 \end{tabular}
 \captionof{table}{bar}
 \caption{myfunctions.c}

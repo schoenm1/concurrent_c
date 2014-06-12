@@ -34,17 +34,7 @@
 
 const char *REF_FILE = "./shm_sem_ref.dat";
 #define PERM 0600
-
-/* forward declarations of functions */
-
-int create_shm(key_t key, const char *txt, const char *etxt, int flags);
-void cleanup(int shmid);
-struct shm_ctr_struct* getNext(struct shm_ctr_struct *_shm_ctr);
-int getSizeshmPos(struct shm_ctr_struct *_shm_ctr);
-
-/*
- * BEGIN OF shm.c
- */
+#define ALPHA_SIZE 256
 
 /* creates the shared memory */
 int create_shm(key_t key, const char *txt, const char *etxt, int flags) {
@@ -58,6 +48,25 @@ void cleanup(int shmid) {
 	int retcode;
 	retcode = shmctl(shmid, IPC_RMID, NULL);
 	handle_error(retcode, "Removing of shm failed", NO_EXIT);
+}
+
+/* round up an input integer to the next 2^x int. e.g. input = 102, output will be 128 */
+int round_up_int(int input) {
+	int output = FALSE;
+	int until = log(TOT_SHM_SIZE) / log(2);
+	if (input > TOT_SHM_SIZE) {
+		return output;
+	}
+	int i;
+	for (i = 2; i < until; i++) {
+		if (input < power(2, i)) {
+			output = power(2, i);
+			LOG_TRACE(LOG_INFORMATIONAL, "i = %i \t Output now set to = %i and return it.", i, output);
+			return output;
+			break;
+		}
+	}
+	return output;
 }
 
 /* get next shm in linked list*/

@@ -1,4 +1,82 @@
 \chapter{Anleitung zur Nutzung des Servers und des Clients}
 \label{chapter:Anleitung}
 
-\textcolor{red}{FEHLT NOCH}
+Dieses Kapitel widmet sich mit dem Umgangs des Servers und der dazugehörigen Clients. Angefügte Screenshots sollen einen Einblick geben, wie die Software funktioniert, auch wenn kein Computer zum Austesten vorhanden ist.
+%============== N E W  ==== S E C T I O N  ======== 
+\section{Starten des Server}
+\label{sec:Starting-Server}
+
+Der Server ist das Herzstück der Applikation. Er ist so ausgelegt, dass er mit gültigen Argumenten erweitert werden kann.\\
+Momentan gibt es zwei implementierte Argumente, welche beim Start mitgegeben werden können:
+\begin{itemize}
+\item \flqq -l\frqq\ -- Loglevel\\
+Für das Loglevel gültige Eingaben sind Integer mit Werten von 0-7.\\
+Wird ein ungültiger Wert grösser als 8 eingegeben, wird der Fehler abgefangen und das Loglevel wird auf den default-Wert = 5 gesetzt.
+
+\item \flqq -p\frqq\ -- Serverport
+Für den Server-Port gültige Eingaben sind: 1024 - 65535. Die well-known Ports von 1 - 1023 wurden bewusst nicht erlaubt, da es konflikte geben könnte mit anderen Applikationen.\\
+Wird ein ungültiger Wert eingegeben, wird der Server automatisch mit dem default-Port = 7000 starten.
+\end{itemize}
+
+Beispiele für gültiges Starten des Servers:\\
+./Server -p 4637 -l 7\\
+./Server -l 6 -p 5479\\
+./Server -p 7788\\
+./Server -l 8\\
+
+Die Abbildung \ref{fig:Starting_Server} zeigt einen gültigen Serverstart. Bei der Abbildung \ref{fig:Starting_Server2} ist zu sehen, wie das Loglevel 8 nicht gesetzt werden kann und wie die nachträglichen Argumente (Duplikate) des Serverports und des Loglevels ignoriert werden.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{Starting_Server.png} 
+\caption[Starten des Servers]{Starten des Servers\\Quelle: eigener Screenshot}
+\label{fig:Starting_Server}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{Starting_Server2.png} 
+\caption[Starten des Servers mit doppelten Argumenten]{Starten des Servers mit doppelten Argumenten\\Quelle: eigener Screenshot}
+\label{fig:Starting_Server2}
+\end{figure}
+
+Anmerkung:\\
+Die Reihenfolge der Argumente ist egal. Wird ein Argument zwei mal eingegeben (z.B. ./Server -p 7524 -l 6 -l 8), wird nur das erste Argument berücktsichtigt. Alle weiteren Argumente werden ignoriert.\\
+./Server -p 5432 -l 5 -l 8 wird somit den TCP Port 5432 und das Loglevel 5 setzen.\\
+./Server -p 2066 -p 5432 -l 4 -l 8 wird somit den TCP Port 2066 und das Loglevel 4 setzen.
+%============== N E W  ==== S E C T I O N  ======== 
+\newpage
+\section{Starten der Clients}
+\label{sec:Starting-Clients}
+
+Der Client selber besitzt im Gegensatz zum Server eine sehr eingeschänkte Logik. Seine Aufgabe besteht hauptsächlich darin, sich über einen TCP-Socket mit dem Server zu verbinden. \\
+Beim Client ist es notwendig, die Argumente in der richtigen Reihenfolge einzugeben. So ist nur folgender Aufruf gültig:\\
+./Client <IP Adresse von Server>\\
+oder\\
+./Client <IP Adresse von Server> <TCP Port Server>\\
+Wird die Variante ohne den Port gewählt, versucht sich der Client über den default Port = 7000 mit dem Server zu verbinden.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.5\textwidth]{Starting_Client.png} 
+\caption[Starten des Clients]{Starten des Clients\\Quelle: eigener Screenshot}
+\label{fig:Starting_Client}
+\end{figure}
+
+Beispiele für gültiges Starten des Clients:\\
+./Client 10.211.55.12\\
+./Client 10.211.55.12 5542
+
+
+%============== N E W  ==== S E C T I O N  ======== 
+\newpage
+\section{Benutzen der Clients}
+\label{sec:Using-Clients}
+
+Um die Funktionalitäten des Servers nutzen zu können, müssen die Befehle vom Client zum Server gesendet werden. Direkte Eingaben im Server sind nicht zulässig.
+
+
+
+
+
+
