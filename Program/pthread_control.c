@@ -7,83 +7,39 @@
  * Project:		https://github.com/schoenm1/concurrent_c.git
  */
 
-/* forward function definitions */
-int pthread_join(pthread_t, void **);
-void printallPThreads(struct pthread_struct *pthread_struct);
-
-struct client_ctl_struct* getClient(struct client_ctl_struct *pthread_struct, int id) {
-	//int phtread_id = id;
-	return NULL;
-}
+/* forward declarations of functions */
+int joiningAllPThreads(struct pthread_struct *myPThreadList);
+int addPThread(struct pthread_struct *_pthreadStruct, pthread_t pThread, int counter);
 
 /*
+ * BEGIN OF pthread_control.c
+ */
 
- int deletePThrad(struct pthread_struct *pthread_struct) {
- int retcode = FALSE;
- struct pthread_struct *tmpThread = pthread_struct;
-
- int pthread_tryjoin_np(pthread_t thread, void **retval);
-
- int pthread_timedjoin_np(pthread_t thread, void **retval, const struct timespec *abstime);
-
- return retcode;
-
- }
-
-
- /* join all PThreads - if PThread is not ended, this function blocks the MainThread of the Server*/
+/* join all PThreads - if PThread is not ended, this function blocks the MainThread of the Server
+ * This function should just be called, if the server wants to shutdown
+ */
 int joiningAllPThreads(struct pthread_struct *myPThreadList) {
 	unsigned long pThread_ID;
 	struct pthread_struct *_myPThread = myPThreadList;
 	struct pthread_struct *_nextPThread = _myPThread->nextClient;
 	int retcode = FALSE;
-	LOG_TRACE(LOG_DEBUG, "PT: In Joining PThreads()");
-	printallPThreads(myPThreadList);
+	LOG_TRACE(LOG_INFORMATIONAL, "PT: In Joining PThreads()");
 
 	/* joining all PThread except the last one */
 	while (!_myPThread->isLast) {
 		pThread_ID = _myPThread->thread;
 		pthread_join(_myPThread->thread, NULL);
-		LOG_TRACE(LOG_DEBUG, "PT: Successfully joined PThread %lu", pThread_ID);
+		LOG_TRACE(LOG_INFORMATIONAL, "PT: Successfully joined PThread %lu", pThread_ID);
 		_myPThread = _nextPThread;
 		_nextPThread = _nextPThread->nextClient;
 	}
 
 	/* joining the last PThread*/
 	retcode = pthread_join(_myPThread->thread, NULL);
-	LOG_TRACE(LOG_DEBUG, "PT: Successfully joined PThread %lu", pThread_ID);
+	LOG_TRACE(LOG_INFORMATIONAL, "PT: Successfully joined PThread %lu", pThread_ID);
 	handle_error(retcode, "PT: Failing to join PThread", NO_EXIT);
 	return retcode;
 }
-
-/* try to join possible PThreads */
-/*int tryJoiningPThread(struct pthread_struct *_thisPThread) {
- int retcode;
- struct timespec ts;
- int s;
- if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
- // Handle error 	}
-
- ts.tv_sec += 1;
-
- s = pthread_timedjoin_np(_thisPThread, NULL, &ts);
- if (s != 0) {
- // Handle error
- }
-
- while (!_thisPThread->isLast) {
- pthread_tryjoin_np(_thisPThread);
- //		pthread_join(_thisPThread, NULL);
- //_thisPThread = _thisPThread->nextClient;
- }
-
- printf("4-Now in function joinPthread\n");
- _thisPThread = _thisPThread->nextClient;
-
- pthread_join(_thisPThread, NULL);
-
- return TRUE;
- }*/
 
 /* add the PThread to the PThread Client list, if a new Client is connecting  */
 int addPThread(struct pthread_struct *_pthreadStruct, pthread_t pThread, int counter) {
@@ -110,17 +66,5 @@ int addPThread(struct pthread_struct *_pthreadStruct, pthread_t pThread, int cou
 		}
 	}
 	return retcode;
-}
-
-/* not really implemented yet */
-void printallPThreads(struct pthread_struct *pthread_struct) {
-	int count = 0;
-	while (!pthread_struct->isLast) {
-		//printf("PT: PThread %i = %i\n", count, (int) pthread_struct->thread);
-		pthread_struct = pthread_struct->nextClient;
-		count++;
-	}
-	printf("PT: PThread %i = %i\n", count, (int) pthread_struct->thread);
-
 }
 

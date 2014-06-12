@@ -1,28 +1,39 @@
+/*
+ * File:   		valid-args.h
+ * Author: 		Micha Schšnenberger
+ * Modul:		Concurrent Programming in C
+ *
+ * Created:     20.04.2014
+ * Project:		https://github.com/schoenm1/concurrent_c.git
+ */
+
 /* returns the content of the file, which is included in the char-array */
 char * getFileContent(char *recMessage[]) {
-	LOG_TRACE(LOG_DEBUG, "1 - In getFileContent");
-	int i;
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
-	LOG_TRACE(LOG_DEBUG, "2 - In getFileContent");
 	memset(retchar, '\0', sizeof(retchar)); //clear String
-	LOG_TRACE(LOG_DEBUG, "3 - In getFileContent");
+
+	int i;
 	strcat(retchar, recMessage[3]);
-	LOG_TRACE(LOG_DEBUG, "4 - In getFileContent. Size of recMessage =%i", sizeof(recMessage));
-
 	int j = 0;
-	for (j = 0; j < sizeof(recMessage); j++) {
+
+	/*just for manual debugging */
+	for (j = 0; j < MAX_FILE_LENGTH; j++) {
+		if (recMessage[j] == NULL)
+			break;
 		printf("recMessage[%i] = %s\n", j, recMessage[j]);
-
 	}
-
-	for (i = 4; i < sizeof(recMessage) - 1; i++) {
-		LOG_TRACE(LOG_DEBUG, "In i=%i - In getFileContent", i);
+	for (i = 4; i < j ; i++) {
 		strcat(retchar, " ");
-		LOG_TRACE(LOG_DEBUG, "In i=%i - retchar = %s", i, retchar);
 		strcat(retchar, recMessage[i]);
-		LOG_TRACE(LOG_DEBUG, "In i=%i - retchar = %s", i, retchar);
 	}
-	LOG_TRACE(LOG_DEBUG, "5 - In getFileContent");
+
+	/*if content is empty or less than 2 signs, return NULL as content */
+	if (strlen(retchar) <= 2) {
+		LOG_TRACE(LOG_DEBUG, "Content of File was empty or less than four signs. Now it is \"NULL...\"");
+		memset(retchar, '\0', sizeof(retchar)); //clear String
+		strcat(retchar, "NULL...");
+	}
+
 	return retchar;
 }
 
@@ -44,11 +55,10 @@ int getValidServerCommand(char *command) {
 	return FALSE;
 }
 
-/* LOG_TRACE(log level, format, args ) */
+/* will create a log entry */
 void LOG_TRACE(int lvl, char *msg, ...) {
 	char buf[1024];
 	char *buff = (char *) malloc(sizeof(char) * 1024);
-	//char *L_LEVEL = (char *) malloc(sizeof(char) * 48);
 	if (LOGLEVEL >= lvl) {
 		char *L_LEVEL = "NULL";
 		L_LEVEL = getLogLevel(lvl, L_LEVEL);
@@ -59,7 +69,6 @@ void LOG_TRACE(int lvl, char *msg, ...) {
 		sprintf(buff, "%s\t%s\n", L_LEVEL, buf);
 		printf("%s", buff);
 		va_end(va);
-		//	free(L_LEVEL);
 	}
 	free(buff);
 }
@@ -107,11 +116,23 @@ void initValidServerArguments(int argc, char *argv[]) {
 		printf("Value = %s\t", argv[i]);
 
 		/* if "-l" is Arg, then set Log-Level */
+		/* if "-l" is Arg, then set Log-Level */
 		if (strcmp(argv[i], _logLevel_arg) == 0) {
 			printf("-> Hit for Loglevel\n\n");
 			int _mylogLevel = (int) atoi(argv[i + 1]);
-			//printf("********* arg = %i",validArguments[0].isSet);
-			if (validArguments[0].isSet == 0) {
+
+			/* if entry for Loglevel is not valid, choos default log level */
+			if (_mylogLevel < 1 || _mylogLevel > 8) {
+				printf("LogLevel not valid [1-8]. Will set Log-Level to 5   ");
+				retcode = setLogLevel(5);
+				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
+				validArguments[0].isSet = 1;
+				printf("... Done\n");
+
+			}
+
+			else if (validArguments[0].isSet == 0 && _mylogLevel >=1 && _mylogLevel <=8) {
+			printf("Try to set Loglevel to %i\n", _mylogLevel);
 				retcode = setLogLevel(_mylogLevel);
 				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
 				validArguments[0].isSet = 1;
@@ -130,6 +151,7 @@ void initValidServerArguments(int argc, char *argv[]) {
 				printf("Set up now Server Port to %i ... ", _myServerPort);
 				retcode = setServerPort(_myServerPort);
 				handle_error(retcode, "Server-Port could not be set.\n", PROCESS_EXIT);
+				validArguments[1].isSet = 1;
 				printf("   ... Done\n");
 			} else {
 				printf("ServerPort was already set. New argument will be ignored.\n");
