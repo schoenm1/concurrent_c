@@ -110,7 +110,7 @@ Diese Funktion beginnt beim ersten Eintrag des Structs shm\_ctr\_struct (siehe L
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
-\subsection{Gibt es nur zu grosse Blöcke, wie werden die geteilt?}
+\subsection{Gibt es nur zu grosse Blöcke, wie werden die aufgetrennt?}
 Das Buddy-System gibt vor, dass die Blockgrössen aus 2er Potenzen gebildet werden. Also 2, 4, 8, 16, 32 \dots \\
 Beispiel Buddy-System:\\
 
@@ -165,39 +165,169 @@ Wie im Kapitel \ref{sec:Das Projekt} erwähnt, ist ein global Lock nicht erlaubt.
 Für die Umsetzung des Locks wurde schlussendlich kein mutex gewählt, wie anfangs gedacht war. Das Problem beim mutex ist, dass ein lesender Client das ganze File ebenfalls sperrt für weitere Lesezugriffe. Dies soll jedoch nicht der Fall sein.\\
 Aus diesem Grund wurde wurde auf \flqq pthread\_rwlock\_t\frqq\ zurückgegriffen.
 
-Die Impelementation des Locks wurde gemäss Tabelle im Kapitel \ref{subsec:completeSystem} vorgenommen.\\
-Da das Kontroll-Strukt für das Shared-Memory bereits vorhanden war, konnte \flqq pthread\_rwlock\_t\frqq\ ohne Probleme eingefügt werden.\\
+Die Implementation des Locks wurde gemäss Tabelle im Kapitel \ref{subsec:completeSystem} vorgenommen.\\
+Da das Kontroll-Strukt für das Shared-Memory bereits vorhanden war, konnte\\
+ \flqq pthread\_rwlock\_t\frqq\ ohne Probleme eingefügt werden.\\
 Soll nun ein ein File gelockt werden, kann das elegant gelöst werden:
 \begin{itemize}
 \item Wenn das File gelesen werden möchte, muss zwingend die Adresse des enstprechenden Strukt bereits vorhanden sein = struct shm\_ctr\_struct *shm\_ctr
 \item Nun kann ein ReadLock über pthread\_rwlock\_rdlock(\&(shm\_ctr->rwlockFile)); gemacht werden.
 \end{itemize}
 
+Eine kurze Übersicht über die Impelementation des Locks gibt das Kapitel \ref{Server-Befehle}, welches die einzelnen Befehle aufführt.
+
+
+
+%============== N E W  ==== S E C T I O N  ======== 
+\newpage
+\section{Server-Befehle}
+\label{sec:Server-Befehle}
+
+Die gültigen Server-Befehle sind nach CRUD aufgebaut. CRUD ist ein Akronym in der Programmiersprache und soll die grundlegenden Befehle \textbf{C}reate, \textbf{R}ead, \textbf{U}pdate und \textbf{D}elete umfassen. Zusätzlich zu den vier Grundbefehlen kommt ein weiterer hinzu: \flqq LIST \frqq. Dieser zeigt dem Client das momentane Shared Memory an.
+
+Grundätzlich werden alle Befehle in der Funktion runClientCommand(\dots) abgefangen. Auf den effektiven Programmcode wird nicht detailliert eingegangen.
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\newpage
+\section{CREATE}
+\label{subsec:CREATE}
+
+Das vereinfachte Vorgehen beim CREATE ist folgendermassen:
+\begin{enumerate}
+\item Überprüfe, ob Filename und Filecontent mitgegeben wurde. Fehlt das eine oder andere, sende dem Client direkt zurück, dass File nicht erstellt werden kann.
+\item Wurde Filename und Fileconente mitgegeben, überprüfe ob das File bereits existiert. Wenn ja: return \flqq File already exist\frqq. Wenn nein, nächster Schritt
+\item Suche einen guten Platz im Shared Memory. Aufgrund der Implementierung eines Buddy-Systems muss der SHM-Block grösser sein als das einzufügende File, aber kleiner als das doppelte. Diese Überprüfung wird von der Funktion \flqq find\_shm\_place(\dots)\frqq\ übernommen.
+\item Wenn kein Platz vorhanden: return -1, wenn Platz vorhanden: nächster Punkt
+\item setze Flag für den gefunden SHM-Block = not free
+\item initialisiere den RW Lock im Strukt shm\_ctr\_struct
+\item setze den Write-Lock
+\item schreibe Filename und Fileinhalt
+\item gib den Write Lock wieder frei
+\item return: \flqq File xyz sucessfully created\frqq
+\end{enumerate}
+\textbf{Beispiel für gültige Eingaben von CREATE:}\\
+--CREATE test.java Dies ist der Inhalt vom test.java file
+
+\textbf{Beispiele für ungültige Eingaben von CREATE:}\\
+--CREATE
+
+Wenn kein Filename und kein File content mitgegeben wird, sendet der Server folgende Nachricht an den Client:\\
+Can not create a new file. Filename is missing
+
+--CREATE filename.txt
+
+Wenn ein Filename eingegen wird, aber kein content mitgegen wird, sender der Server folgende Nachricht an den Client: \flqq No file content set. File not created\frqq
+
+Der Programmcode für das Handling von CREATE ist im Listing \ref{listing:CREATE} in Anhang zu finden.
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
-\section{Files und deren Funktionen}
-\label{sec:Files und deren Funktionen}
-Um die auf den ersten Blick nicht ganz klare Strukturen aufzeigen zu können, soll sich dieses Kapitel mit den einzelnen Files geschäftigen, die für den Server und den Client notwendig sind. Jede Funktion jedes Files soll kurz und bündig erläutert werden.
+\section{READ}
+\label{subsec:READ}
 
-\begin{table}[h!]
-\begin{tabular}{|p{\textwidth}|}
-\hline
-\multicolumn{1}{c}{\cellcolor{darkgrey} \textbf{myfunctions.c }}\\ 
-\multicolumn{1}{c}{\cellcolor{darkgrey} beinhaltet eigene definierte Funktionen} \\ \hline
-\textbf{getFixCharLen(char *mychar, int mylength)}\\
-füllt einen CharPointer bis zur gewählten Länge auf. Wird benötigt für schöne Darstellung im LOG\\
-\textbf{void print\_all\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\
-Gibt auf der Konsole alle Blöcke des SHM aus. Wird zu DEBUG-Zwecken benötigt\\
-\textbf{char * get\_all\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\
-Gibt alle Blöcke des SHM als char Pointer zurück. Wird benötigt, um Client das SHM zu übermitteln\\
-\textbf{void print\_single\_shm\_blocks(struct shm\_ctr\_struct *shm\_ctr)}\\
-Gibt auf der Konsole einen Block des SHM aus. Wird zu DEBUG-Zwecken benötigt\\
-\textbf{char * getSingleString(char *msg, \dots)}\\
-Gibt einen Char Pointer als Return Wert. Diese Funktion erlaubt es, einen ?String? mit Argumenten (z.B. \%i, \%s) zu übergeben. Diese werden zur Laufzeit interpretiert und als neuen Char Pointer zurückgegeben\\ \hline
-\end{tabular}
-\captionof{table}{bar}
-\caption{myfunctions.c}
-\label{tab:myfunctions.c}
-\end{table}
+Das Vorgehen bei einem READ Befehl ist folgendermassen:
+\begin{enumerate}
+\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass nicht nach einem leeren Filenamen gesucht werden kann. 
+\item Überprüfe im ersten SHM-Block, ob der Filename mit dem gesuchten Name übereinstimmt.
+\item Gibt es einen Treffer:
+\begin{itemize}
+\item setze den Read-Lock
+\item kopieren den Fileinhalt in einen temporären Char Pointer
+\item gib den Read-Lock wieder frei
+\item Gib als return Wert den content des Files
+\end{itemize}
+\item Wenn der Filename nicht übereinstimmt, gehe zum nächsten Block im SHM.
+\item Wiederhole Punkt 4 so lange, bis ein Treffer vorhanden ist oder bis das Ende des SHM erreicht ist. Ist ein Treffer vorhanden, gehe zu Punkt 3.
+\item Wurde das Ende des SHM erreicht und Wurde keine Übereinstimmung gefunden, sende \flqq File not found\frqq\ an den Client
+\end{enumerate}
+
+
+\textbf{Beispiel für gültige Eingaben von READ:}\\
+--READ filename.txt
+
+Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File not found\frqq\ oder der Inhalt des Files wird übermittelt.
+
+\textbf{Beispiele für ungültige Eingaben von READ:}\\
+--READ\\
+Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot read an empty filename\frqq.
+
+Der Programmcode für das Handling von READ ist im Listing \ref{listing:READ} in Anhang zu finden.
+
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\newpage
+\section{UPDATE}
+\label{subsec:UPDATE}
+
+Die Funktion für ein UPDATE eines Files wurde in zwei Teilschritten implementiert. Der erste Teil löscht das komplette File, der zweite erstellt es mit dem neuen Content wieder. Das Problem beim direkten Update eine Files könnte sein, dass der Content grösser wird als der SHM-Block eigentlich ist. Anstelle dies zu überprüfen, wurde global ein löschen und neu erstellen implementiert.
+\begin{enumerate}
+\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass ein File ohne Namen nicht geänder werden kann.
+\item Überprüfe ob ein neuer Filecontent mitgegeben wurde. Wenn nicht, sende an den Client, dass der Content nicht leer sein darf.
+\item Überprüfe, ob das File exisiert. Wenn nicht, sende an den Client, dass es nicht existiert.
+\item Überprüfe im ersten SHM-Block, ob der Filename mit dem gesuchten Name übereinstimmt.
+\item Gibt es einen Treffer:
+\begin{itemize}
+\item rufe Funktion deleteFile(\dots) auf - siehe \ref{subsec:DELETE}
+\item rufe Funktion createNewfile(\dots) auf - siehe  \ref{subsec:CREATE}
+\end{itemize}
+\item Gibt es keinen Treffer, gehe zum nächsten SHM-Block und überprüfe, ob der Namen übereinstimmt. Wiederhole so lange, bis der Filename gefunden wurde
+\end{enumerate}
+
+\textbf{Beispiel für gültige Eingaben von UPDATE:}\\
+--UPDATE test.txt dies ist der neue content
+
+Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File with the name xyz does not exist!\frqq \ oder \flqq File with name xyz was successfully udpated.\frqq
+
+\textbf{Beispiele für ungültige Eingaben von UPDATE:}\\
+--UPDATE\\
+--UPDATE test.txt
+
+Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot delete a file without a name\frqq.
+
+Der Programmcode für das Handling von UPDATE ist im Listing \ref{listing:UPDATE} in Anhang zu finden.
+
+
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\newpage
+\section{DELETE}
+\label{subsec:DELETE}
+Das vereinfachte Vorgehen beim DELETE ist folgendermassen:
+\begin{enumerate}
+\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass ein File ohne Namen nicht gelöscht werden kann.
+\item Überprüfe im ersten SHM-Block, ob der Filename mit dem gesuchten Name übereinstimmt. Wenn ein Treffer vorhanden ist:
+\begin{itemize}
+\item setze den Write-Lock
+\item setze den Filenamen = NULL
+\item setzte den Filecontent = \grqq \textbackslash 0\grqq
+\item setzte Flag im SHM-Block is free = TRUE
+\item gib den Write-Lock wieder frei
+\item destroy den rwlock mit pthread\_rwlock\_destroy(\dots)
+\end{itemize}
+\item Ist kein Treffer vorhanden, gehe zum nächsten Block und wiederhole dies so lange, bis ein Treffer vorhanden ist
+\item Ist bis zum letzten SHM-Block kein Treffer vorhanden, sende dem Client, dass der Filename nicht gefunden wurde und somit nicht gelöscht werden kann.
+\end{enumerate}
+
+
+
+\textbf{Beispiel für gültige Eingaben von DELETE:}\\
+--DELETE filename.txt
+
+Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File with the name xyz does not exist \frqq\ oder\flqq File with name xyz was successfully deleted.\frqq .
+
+\textbf{Beispiele für ungültige Eingaben von READ:}\\
+--DELETE
+
+Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot delete a file without a name\frqq.
+
+Der Programmcode für das Handling von DELETE ist im Listing \ref{listing:DELETE} in Anhang zu finden.
+
+
+
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\newpage
+\section{LIST}
+\label{subsec:LIST}
+
+
+
+
+
 

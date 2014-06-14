@@ -9,20 +9,38 @@
 
 /* returns the content of the file, which is included in the char-array */
 char * getFileContent(char *recMessage[]) {
+	//printf("$$$ ### 0- TTTEEEEEESSST\n");
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	memset(retchar, '\0', sizeof(retchar)); //clear String
+	int arrayElements = sizeof(recMessage);
+	/*if recMessage[3] is not available, there are less arguments */
+	printf("$$$ ### recMessage[0] = %s\n", recMessage[0]);
+	printf("$$$ ### recMessage[1] = %s\n", recMessage[1]);
+	printf("$$$ ### recMessage[2] = %s\n", recMessage[2]);
+	printf("$$$ ### recMessage[3] = %s\n", recMessage[3]);
 
+	/* if there was no filename chosen */
+	if (recMessage[2] == NULL) {
+		retchar = "-1";
+		return retchar;
+	}
+
+	printf("$$$ ### 1- TTTEEEEEESSST\n");
 	int i;
+	if (recMessage[3] == NULL)
+		return "-1";
+	printf("$$$ ### 2- TTTEEEEEESSST\n");
 	strcat(retchar, recMessage[3]);
+	printf("$$$ ### 3- TTTEEEEEESSST\n");
 	int j = 0;
 
 	/*just for manual debugging */
 	for (j = 0; j < MAX_FILE_LENGTH; j++) {
 		if (recMessage[j] == NULL)
 			break;
-		printf("recMessage[%i] = %s\n", j, recMessage[j]);
+		//printf("recMessage[%i] = %s\n", j, recMessage[j]);
 	}
-	for (i = 4; i < j ; i++) {
+	for (i = 4; i < j; i++) {
 		strcat(retchar, " ");
 		strcat(retchar, recMessage[i]);
 	}
@@ -116,14 +134,13 @@ void initValidServerArguments(int argc, char *argv[]) {
 		printf("Value = %s\t", argv[i]);
 
 		/* if "-l" is Arg, then set Log-Level */
-		/* if "-l" is Arg, then set Log-Level */
 		if (strcmp(argv[i], _logLevel_arg) == 0) {
 			printf("-> Hit for Loglevel\n\n");
 			int _mylogLevel = (int) atoi(argv[i + 1]);
 
 			/* if entry for Loglevel is not valid, choos default log level */
-			if (_mylogLevel < 1 || _mylogLevel > 8) {
-				printf("LogLevel not valid [1-8]. Will set Log-Level to 5   ");
+			if (_mylogLevel < 0 || _mylogLevel > 7) {
+				printf("LogLevel not valid [0-7]. Will set Log-Level to 5   ");
 				retcode = setLogLevel(5);
 				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
 				validArguments[0].isSet = 1;
@@ -131,8 +148,8 @@ void initValidServerArguments(int argc, char *argv[]) {
 
 			}
 
-			else if (validArguments[0].isSet == 0 && _mylogLevel >=1 && _mylogLevel <=8) {
-			printf("Try to set Loglevel to %i\n", _mylogLevel);
+			else if (validArguments[0].isSet == 0 && _mylogLevel >= 0 && _mylogLevel <= 7) {
+				printf("Try to set Loglevel to %i\n", _mylogLevel);
 				retcode = setLogLevel(_mylogLevel);
 				handle_error(retcode, "LogLevel could not be set.\n", PROCESS_EXIT);
 				validArguments[0].isSet = 1;

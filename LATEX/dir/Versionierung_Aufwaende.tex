@@ -26,14 +26,16 @@ V1.3 &03.05.2014 & Loglevel und eigenes TCP-Protokoll\\ \cline{1-3}
 V1.3b & 04.05.2014 &  CREATE und Log Verbesserungen\\  \cline{1-3}
 V1.3c & 05.05.2014 &   LIST shm / Fehlersuche CREATE \\ \cline{1-3}
 V1.4 & 06.05.2014 & dynamisches TRACE\_LOG\\ \cline{1-3}
-V1.5 & 26.05.2014 & \\   \cline{1-3}
-V1.5b & 27.05.2014 & \\   \cline{1-3}
-V1.5c & 28.05.2014 & \\   \cline{1-3}
-V1.6 & 31.05.2014 & \\   \cline{1-3}
-V1.6b & 01.06.2014 & \\   \cline{1-3}
-V1.7 & 02.06.2014 & \\   \cline{1-3}
-V1.8 & 10.06.2014 & \\   \cline{1-3}
-
+V1.5 & 26.05.2014 & Erstellen PThread für Clients\\  \cline{1-3}
+V1.5b & 27.05.2014 & ReadWriteLock beim READ\\ \cline{1-3}
+V1.5c & 28.05.2014 & Dokumentation\\   \cline{1-3}
+V1.6 & 31.05.2014 & Fehlerbehandung PThreadList. Client Commands\\   \cline{1-3}
+V1.6b & 01.06.2014 & Joining PThreads. Fehlersuche delete letzes File\\   \cline{1-3}
+V1.7 & 02.06.2014 & Fehlerbehebung Übermittlung grössere Files\\   \cline{1-3}
+V1.8 & 10.06.2014 & Optimierung Serverparameter (-l, -p)\\   \cline{1-3}
+V1.8b & 11.06.2014 &  Fehlerbehandlung Code, testen Server\\  \cline{1-3}
+V1.8b & 12.06.2014 &  Fehlerbehandlung Code, testen Server\\  \cline{1-3}
+V1.8b & 14.06.2014 &  Fehlerbehandlung Code, testen Server\\  \cline{1-3}
 
 
 \end{tabular}
@@ -151,7 +153,7 @@ V1.8 & 10.06.2014 & \\   \cline{1-3}
 
  \multirow{3}{1cm}{28.05.2014} &  \multirow{3}{1cm}{2h} & -Update Dokumentation\\
  & & -Anpassen Version Github/Dokumentation\\
- & & -Kapitel \ref{sec:Files und deren Funktionen} beginnen\\ \cline{1-3}
+ & & -Dokumentation ergänzen\\ \cline{1-3}
 
 
  \multirow{3}{1cm}{31.05.2014} &  \multirow{3}{1cm}{4.5h} & -Fehlerbehebung PThreadList\\
@@ -169,11 +171,23 @@ V1.8 & 10.06.2014 & \\   \cline{1-3}
 & & -Code kommentieren\\
 & & -Dokumentation erweitern\\ \cline{1-3}
 
-
-\multirow{3}{1cm}{10.06.2014} &  \multirow{3}{1cm}{99h} & -Dokumentation anpassen und erweitern\\
+\multirow{3}{1cm}{10.06.2014} &  \multirow{3}{1cm}{3.75h} & -Dokumentation anpassen und erweitern\\
 & & -Server Parameter optimieren (-p, -l)\\
 & & -Dokumentation Kapitel \ref{chapter:Anleitung}\\ \cline{1-3}
 
+\multirow{4}{1cm}{11.06.2014} &  \multirow{4}{1cm}{1h} & -Ferhlebehandlung Server: letztes Wort beim Erstellen eines\\
+& & \ Files wurde nie gespeichert\\
+& & -Diverse kleinere Fehlerbehandlungen im Code\\
+& & -Dokumentation ergänzen\\ \cline{1-3}
+
+\multirow{3}{1cm}{12.06.2014} &  \multirow{3}{1cm}{4h} & -Ferhlebehandlung Server: bei CREATE ohne weitere Angaben\\
+& & \ stürzte der Server mit segmentation fault ab\\
+& & -Dokumentation ergänzen \ref{sec:Server-Befehle}\\ \cline{1-3}
+
+
+\multirow{3}{1cm}{12.06.2014} &  \multirow{3}{1cm}{2.5h} & -Ferhlebehandlung Server: bei DELTET/READ/UPDATE ohne\\
+& & \  weitere Angaben stürzte der Server mit segmentation fault ab\\
+& & -Dokumentation ergänzen \ref{sec:Server-Befehle}\\ \cline{1-3}
 
 
 \caption{Aufwände Seminararbeit}

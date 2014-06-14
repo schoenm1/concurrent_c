@@ -73,7 +73,41 @@ Beispiele für gültiges Starten des Clients:\\
 \section{Benutzen der Clients}
 \label{sec:Using-Clients}
 
-Um die Funktionalitäten des Servers nutzen zu können, müssen die Befehle vom Client zum Server gesendet werden. Direkte Eingaben im Server sind nicht zulässig.
+Um die Funktionalitäten des Servers nutzen zu können, müssen die Befehle vom Client zum Server gesendet werden. Direkte Eingaben im Server sind nicht zulässig.\\
+Die gültigen Server-Befehle werden hier nicht erläutert, sondern nur wie die Befehle genutzt werden können. Einen Einblick in die Implementierung der CRUD-Befehle gibt das Kapitel \ref{sec:Server-Befehle}.
+
+\begin{itemize}
+\item CREATE
+
+
+
+\item READ
+
+
+\item UPDATE
+
+
+\item DELETE
+
+\item LIST shm 
+Der SHOW Befehl ist ein zusätzlicher Befehl, welcher nicht zwingend vorausgesetzt wurde.\\
+Er zeigt das momentan vorhandene Shared-Memory an, wobei zu beachten gilt, dass hier kein Locking-Verfahren eingesetzt wurde. Das heisst, das Memory könnte bereits bei der Ausgabe auf der Konsole beim Client bereits wieder verändert worden sein.
+
+\textbf{Eingabe beim Client:}\\
+\# LIST shm
+
+
+Beispiel Ausgabe beim Client:
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.5\textwidth]{Starting_Client.png} 
+\caption[Starten des Clients]{Starten des Clients\\Quelle: eigener Screenshot}
+\label{fig:Starting_Client}
+\end{figure}
+
+
+\end{itemize}
 
 
 

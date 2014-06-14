@@ -9,7 +9,7 @@
 
 /* forward declarations of functions */
 char * readFile(struct shm_ctr_struct *shm_ctr, char *filename);
-char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize);
+char * createNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize);
 int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename);
 int checkifexists(struct shm_ctr_struct *shm_ctr, char *filename);
 extern int round_up_int(int input);
@@ -57,7 +57,7 @@ char * readFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 /* write a new file with its content to the shared memory.
  * @return: Pointer to the shm control struct where the pointer of the filename and filecontent is
  */
-char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
+char * createNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filecontent, int filesize) {
 	LOG_TRACE(LOG_DEBUG, "Now in Function writeNewFile()");
 	int retcode;
 	char *returnchar = malloc(sizeof(char) * 64);
@@ -67,7 +67,7 @@ char * writeNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *fileco
 	retcode = checkifexists(shm_ctr, filename);
 	/* if extist, return "File already exist */
 	if (retcode == TRUE) {
-		LOG_TRACE(LOG_INFORMATIONAL, "File \"%s\" already exists", filename);
+		LOG_TRACE(LOG_INFORMATIONAL, "File \"%s\" already exist", filename);
 		return "File already exist\n";
 	}
 	/* if file does not exists, create a new file */
@@ -118,29 +118,27 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 	int retcode = FALSE;
 	/* if hit, make settings */
 	if (strcmp(filename, (shm_ctr->filename)) == 0) {
+		LOG_TRACE(LOG_DEBUG, "Filename \"%s\" found...", filename);
 
 		/* lock the file now */
 		retcode = pthread_rwlock_wrlock(&(shm_ctr->rwlockFile));
-				if (retcode == 0)
-					LOG_TRACE(LOG_NOTICE, "Locked RWLock for Writing new filename \"%s\"", filename);
-				LOG_TRACE(LOG_NOTICE, "File \"%s\" successfully created in RWLock", place->filename);
-				/*unlock the file */
-				pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
-				if (retcode == 0)
-					LOG_TRACE(LOG_NOTICE, "Unlocked RWLock for Writing filename \"%s\"", shm_ctr->filename);
+		if (retcode == 0)
+			LOG_TRACE(LOG_NOTICE, "Locked RWLock for deleting filename \"%s\"", filename);
 
-
-
-				pthread_rwlock_destroy(3THR);
-				LOG_TRACE(LOG_NOTICE, "RWLock now destroyed after deleting file");
-
-
-		LOG_TRACE(LOG_DEBUG, "Filename \"%s\" found...", filename);
-
+		/* deleting file content, filename.... */
 		shm_ctr->filename = "NULL";
 		LOG_TRACE(LOG_DEBUG, "Filedata was until now: %s\n", shm_ctr->filedata);
 		memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
 		shm_ctr->isfree = TRUE;
+
+		/*unlock the file */
+		pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
+		if (retcode == 0)
+			LOG_TRACE(LOG_NOTICE, "Unlocked RWLock for deleting filename \"%s\"", shm_ctr->filename);
+
+		pthread_rwlock_destroy(&(shm_ctr->rwlockFile));
+		LOG_TRACE(LOG_NOTICE, "RWLock now destroyed after deleting file");
+
 		return TRUE;
 	}
 	/* if at end of SHM and no hit, return FALSE */

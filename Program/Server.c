@@ -265,7 +265,6 @@ void ServerListen() {
 }
 
 void runClientCommand(char *recMessage[], char *command, int clntSocket, int thread_count) {
-	//LOG_TRACE(LOG_INFORMATIONAL, "Command from Client was: %s", command);
 	char *sendtoClient = (char *) malloc(MAX_FILE_LENGTH);
 	memset(sendtoClient, '\0', sizeof(sendtoClient));
 
@@ -274,38 +273,60 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 		LOG_TRACE(LOG_INFORMATIONAL, "Received EXIT from a Client");
 		LOG_TRACE(LOG_INFORMATIONAL, "T%i: PThread is now going to exit", thread_count);
 		pthread_exit(NULL);
-
 	}
 
 	/* CREATE command */
 	if (strcmp(command, "CREATE") == 0) {
-
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to create a new file...");
-		//printf("rec Message = %s\n", *recMessage);
-
-		char *tmpcontent = (char *) malloc(MAX_FILE_LENGTH);
-		tmpcontent = getFileContent(recMessage);
-		char *filecontent = strdup(tmpcontent);
-		free(tmpcontent);
-
-		char *filename = strdup(recMessage[2]);
-		LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
-
 		char *returnvalue = malloc(sizeof(char) * MAX_FILE_LENGTH);
-		returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
-		if (returnvalue > 0) {
-			LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
+
+		/* check if filename was set */
+		if (recMessage[2] == NULL) {
+			LOG_TRACE(LOG_INFORMATIONAL, "Can not create a new file. Filename is missing");
+			returnvalue = "Can not create a new file. Filename is missing";
 			send(clntSocket, returnvalue, strlen(returnvalue), 0);
 		}
-		free(returnvalue);
+
+		/* check if file content is set */
+		else if (recMessage[3] == NULL) {
+			LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: No file content set. File not created.");
+			returnvalue = "No file content set. File not created";
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+		}
+
+		/* if file name and file content is set */
+		else {
+			printf("1 - in else.\n");
+			char *filecontent = getFileContent(recMessage);
+
+			char *filename = strdup(recMessage[2]);
+			LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
+
+			returnvalue = createNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
+			if (returnvalue > 0) {
+				LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
+				send(clntSocket, returnvalue, strlen(returnvalue), 0);
+				free(returnvalue);
+			}
+		}
 	}
 
 	/* Reading File */
 	else if (strcmp(command, "READ") == 0) {
 
-		char * returnvalue = readFile(shm_ctr, recMessage[2]);
-		LOG_TRACE(LOG_INFORMATIONAL, "READ Command: Sending message to Client: %s", returnvalue);
-		send(clntSocket, returnvalue, strlen(returnvalue), 0);
+		/* if no filename was given, return this to the client */
+		if (recMessage[2] == NULL) {
+			char * returnvalue = "Cannot read an empty filename";
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+
+		}
+
+		/* do it, if filename was given */
+		else {
+			char * returnvalue = readFile(shm_ctr, recMessage[2]);
+			LOG_TRACE(LOG_INFORMATIONAL, "READ Command: Sending message to Client: %s", returnvalue);
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+		}
 	}
 
 	else if (strcmp(command, "LIST") == 0) {
@@ -314,86 +335,122 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 	}
 
 	else if (strcmp(command, "UPDATE") == 0) {
+		char *returnvalue = malloc(sizeof(char) * MAX_FILE_LENGTH);
 		LOG_TRACE(LOG_INFORMATIONAL, "Will no try to UPDATE the file \"%i\"", recMessage[2]);
 		int retcode;
-		retcode = checkifexists(shm_ctr, recMessage[2]);
-		/* if file does not exist, send message to Client */
-		if (!retcode) {
-			sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
-			send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+
+		/* check if filename was given */
+		if (recMessage[2] == NULL) {
+			LOG_TRACE(LOG_INFORMATIONAL, "Can not update a file without a name");
+			returnvalue = "Can not update a file without a name";
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
 		}
-		/* if file exist, delete it and create it new */
+
+		/* check if new content was given*/
+		else if (recMessage[3] == NULL) {
+			LOG_TRACE(LOG_INFORMATIONAL, "Can not update a file without any content");
+			returnvalue = "Can not update a file without any content";
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+		}
+
 		else {
-			retcode = deleteFile(shm_ctr, recMessage[2]);
-			/* if deleting was successful, call runClientCommand and */
-			if (retcode) {
 
-				/* combine now the free blocks */
-				retcode = combine(shm_ctr);
-				/* repeat until there is no more deviding option */
-				while (retcode == TRUE) {
-					retcode = combine(shm_ctr);
-				}
+			retcode = checkifexists(shm_ctr, recMessage[2]);
 
-				/* create the new file with the content */
-				char *tmpcontent = (char *) malloc(MAX_FILE_LENGTH);
-				tmpcontent = getFileContent(recMessage);
-				char *filecontent = strdup(tmpcontent);
-				free(tmpcontent);
-
-				char *filename = strdup(recMessage[2]);
-				LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
-
-				char *returnvalue = malloc(sizeof(char) * 256);
-				returnvalue = writeNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
-				if (returnvalue > 0) {
-					LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
-					send(clntSocket, returnvalue, strlen(returnvalue), 0);
-				}
-				free(returnvalue);
-
-			}
-
-			/*if deleting was not successful */
-			else {
-				LOG_TRACE(LOG_INFORMATIONAL, "Updating file \"%s\" was not successful", recMessage[2]);
-				sendtoClient = getSingleString("Updating file \"%s\" was not successful", recMessage[2]);
+			/* if file does not exist, send message to Client */
+			if (!retcode) {
+				sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
 				send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
 			}
 
-		}
+			/* if file exist, delete it and create it new */
+			else {
+				retcode = deleteFile(shm_ctr, recMessage[2]);
+				/* if deleting was successful, call runClientCommand and */
+				if (retcode) {
 
+					/* combine now the free blocks */
+					retcode = combine(shm_ctr);
+					/* repeat until there is no more deviding option */
+					while (retcode == TRUE) {
+						retcode = combine(shm_ctr);
+					}
+
+					/* create the new file with the content */
+					char *tmpcontent = (char *) malloc(MAX_FILE_LENGTH);
+					tmpcontent = getFileContent(recMessage);
+					char *filecontent = strdup(tmpcontent);
+					free(tmpcontent);
+
+					char *filename = strdup(recMessage[2]);
+					LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
+
+					char *returnvalue = malloc(sizeof(char) * 256);
+					returnvalue = createNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
+					if (returnvalue > 0) {
+						returnvalue = getSingleString("File \"%s\" was successfully updated", filename);
+						LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
+						send(clntSocket, returnvalue, strlen(returnvalue), 0);
+					}
+					free(returnvalue);
+
+				}
+
+				/*if deleting was not successful */
+				else {
+					LOG_TRACE(LOG_INFORMATIONAL, "Updating file \"%s\" was not successful", recMessage[2]);
+					sendtoClient = getSingleString("Updating file \"%s\" was not successful", recMessage[2]);
+					send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+				}
+
+			}
+
+		}
 	}
 
 	/* DELETE <filename>: DELETE Filename from memory */
 	else if (strcmp(command, "DELETE") == 0) {
 		printf("Client wants to DELETE a file.\n");
 		int retcode;
-		retcode = checkifexists(shm_ctr, recMessage[2]);
 
-		/* if file does not exist, send message to Client */
-		if (!retcode) {
-			sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
-			send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+		/* if no filename is chosen, return mesage to client */
+		if (recMessage[2] == NULL) {
+			LOG_TRACE(LOG_INFORMATIONAL, "Cannot delete a file without a name");
+			char * returnvalue = "Cannot delete a file without a name";
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
 		}
-		/* else delete the file */
-		else {
-			retcode = deleteFile(shm_ctr, recMessage[2]);
 
-			/* if deleting was successful */
-			if (retcode) {
-				sendtoClient = getSingleString("File with name \"%s\" was successfully deleted.", recMessage[2]);
+		/* if filename was given, go on ...*/
+		else {
+			retcode = checkifexists(shm_ctr, recMessage[2]);
+
+			/* if file does not exist, send message to Client */
+			if (!retcode) {
+				LOG_TRACE(LOG_INFORMATIONAL, "File with the name \"%s\" does not exist!\n", recMessage[2]);
+				sendtoClient = getSingleString("File with the name \"%s\" does not exist!\n", recMessage[2]);
 				send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
-				printf("After deleting: SHM Block is now:\n");
-				printf(get_all_shm_blocks(shm_ctr));
 			}
-			LOG_TRACE(LOG_INFORMATIONAL, "Will now try to combine free blocks...");
-			retcode = combine(shm_ctr);
-			/* repeat until there is no more deviding option */
-			while (retcode == TRUE) {
-				printf("\n\n\n", retcode);
+
+			/* else delete the file */
+			else {
+				retcode = deleteFile(shm_ctr, recMessage[2]);
+
+				/* if deleting was successful */
+				if (retcode) {
+					LOG_TRACE(LOG_INFORMATIONAL, "File with name \"%s\" was successfully deleted.", recMessage[2]);
+					sendtoClient = getSingleString("File with name \"%s\" was successfully deleted.", recMessage[2]);
+					send(clntSocket, sendtoClient, strlen(sendtoClient), 0);
+					printf("After deleting: SHM Block is now:\n");
+					printf(get_all_shm_blocks(shm_ctr));
+				}
+				LOG_TRACE(LOG_INFORMATIONAL, "Will now try to combine free blocks...");
 				retcode = combine(shm_ctr);
-				printf(get_all_shm_blocks(shm_ctr));
+				/* repeat until there is no more deviding option */
+				while (retcode == TRUE) {
+					printf("\n\n\n", retcode);
+					retcode = combine(shm_ctr);
+					printf(get_all_shm_blocks(shm_ctr));
+				}
 			}
 		}
 	}
@@ -430,16 +487,11 @@ void handle_tcp_client(void* parameters) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for reveicing message from Client.");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
 
-
 		/*replace last sign of string with a Space */
-		char* p = strchr(recBuffer,'\n');
-		    if (p) {
-		    printf("last sign is a newlinge !!!!!!!!!!!!!!!!!!!!!!!!!\n");
-		    *p = '\0';
-		    }
-
-
-
+		char* p = strchr(recBuffer, '\n');
+		if (p) {
+			*p = '\0';
+		}
 
 		handle_error(recvMsgSize, "recv() failed", NO_EXIT);
 		if (recvMsgSize == 0) {
