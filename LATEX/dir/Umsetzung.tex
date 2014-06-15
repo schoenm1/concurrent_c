@@ -265,8 +265,8 @@ Die Funktion für ein UPDATE eines Files wurde in zwei Teilschritten implementier
 \item Überprüfe im ersten SHM-Block, ob der Filename mit dem gesuchten Name übereinstimmt.
 \item Gibt es einen Treffer:
 \begin{itemize}
-\item rufe Funktion deleteFile(\dots) auf - siehe \ref{subsec:DELETE}
-\item rufe Funktion createNewfile(\dots) auf - siehe  \ref{subsec:CREATE}
+\item rufe Funktion deleteFile(\dots) auf - siehe Kapitel \ref{subsec:DELETE}
+\item rufe Funktion createNewfile(\dots) auf - siehe  Kapitel \ref{subsec:CREATE}
 \end{itemize}
 \item Gibt es keinen Treffer, gehe zum nächsten SHM-Block und überprüfe, ob der Namen übereinstimmt. Wiederhole so lange, bis der Filename gefunden wurde
 \end{enumerate}
@@ -326,8 +326,21 @@ Der Programmcode für das Handling von DELETE ist im Listing \ref{listing:DELETE}
 \section{LIST}
 \label{subsec:LIST}
 
+Der Befehl für LIST, welche gemäss Dozent für den Server vorhanden sein sollte, wurde nicht so implementiert wie vorgeschlagen.\\
+Gemäss Vorschlag soll der Client ein \flqq LIST \frqq\ schicken, worauf der Server mit der Anzahl Files und den einzelnen Filenamen anwortet.\\
+Die implementierte Antwort von LIST des Server ist gemäss Abbildung \ref{fig:LIST} zu sehen.\\
+In der Antwort enthalten ist die Block Nummer des SHM-Blockes, dessen Adresse auf dem Speicher, Grösse und ob es der letzte Block im SHM ist. Zusätzlich ist zu sehen, ob der Block mit einem File belegt ist oder nicht. Ist ein File vorhanden, steht der entsprechende Filename, sonst NULL. Ist ein File vorhanden, ist dessen Grösse zu sehen. Ganz am Ende werden die ersten 16 Zeichen des entsprechenden Fileinhaltes angezeigt.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{OutputLIST.png} 
+\caption[Server-Befehl LIST]{Server-Befehl LIST\\Quelle: eigener Screenshot}
+\label{fig:LIST}
+\end{figure}
 
 
+\textbf{Beispiel für gültige Eingaben von LIST:}\\
+Es gibt nur einen einzigen gültigen Befehl für LIST:
+--LIST
 
-
-
+Werden nach LIST noch weitere Argumente mitgegeben, werden diese ignoriert.
