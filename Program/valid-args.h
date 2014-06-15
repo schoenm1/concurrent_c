@@ -9,15 +9,10 @@
 
 /* returns the content of the file, which is included in the char-array */
 char * getFileContent(char *recMessage[]) {
-	//printf("$$$ ### 0- TTTEEEEEESSST\n");
 	char * retchar = malloc(sizeof(char) * MAX_FILE_LENGTH);
 	memset(retchar, '\0', sizeof(retchar)); //clear String
 	int arrayElements = sizeof(recMessage);
 	/*if recMessage[3] is not available, there are less arguments */
-	printf("$$$ ### recMessage[0] = %s\n", recMessage[0]);
-	printf("$$$ ### recMessage[1] = %s\n", recMessage[1]);
-	printf("$$$ ### recMessage[2] = %s\n", recMessage[2]);
-	printf("$$$ ### recMessage[3] = %s\n", recMessage[3]);
 
 	/* if there was no filename chosen */
 	if (recMessage[2] == NULL) {
@@ -25,13 +20,10 @@ char * getFileContent(char *recMessage[]) {
 		return retchar;
 	}
 
-	printf("$$$ ### 1- TTTEEEEEESSST\n");
 	int i;
 	if (recMessage[3] == NULL)
 		return "-1";
-	printf("$$$ ### 2- TTTEEEEEESSST\n");
 	strcat(retchar, recMessage[3]);
-	printf("$$$ ### 3- TTTEEEEEESSST\n");
 	int j = 0;
 
 	/*just for manual debugging */

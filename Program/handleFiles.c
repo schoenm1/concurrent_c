@@ -70,43 +70,46 @@ char * createNewFile(struct shm_ctr_struct *shm_ctr, char *filename, char *filec
 		LOG_TRACE(LOG_INFORMATIONAL, "File \"%s\" already exist", filename);
 		return "File already exist\n";
 	}
-	/* if file does not exists, create a new file */
-	LOG_TRACE(LOG_INFORMATIONAL, "File with name %s does not exists. I will create it.", filename);
 
-	LOG_TRACE(LOG_DEBUG, "Address of shm Place to check is %p", shm_ctr);
-	struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
-	LOG_TRACE(LOG_DEBUG, "Checked a good address is:  %p", place);
+	else {
+		/* if file does not exists, create a new file */
+		LOG_TRACE(LOG_INFORMATIONAL, "File with name %s does not exists. I will create it.", filename);
 
-	if (place == FALSE) {
-		LOG_TRACE(LOG_DEBUG,
-				"0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...");
+		LOG_TRACE(LOG_DEBUG, "Address of shm Place to check is %p", shm_ctr);
+		struct shm_ctr_struct *place = find_shm_place(shm_ctr, filesize);
+		LOG_TRACE(LOG_DEBUG, "Checked a good address is:  %p", place);
 
-		int block_size_needed = round_up_int(filesize);
-		retcode = devide(shm_ctr, block_size_needed);
-		if (!retcode) {
-			return "There was no place in the shared memory for creating the file!";
+		if (place == FALSE) {
+			LOG_TRACE(LOG_DEBUG,
+					"0 is not valid. So there is no good place to write the file into... Trying no to devide the Shared Memory...");
+
+			int block_size_needed = round_up_int(filesize);
+			retcode = devide(shm_ctr, block_size_needed);
+			if (!retcode) {
+				return "There was no place in the shared memory for creating the file!";
+			}
+			place = find_shm_place(shm_ctr, filesize);
 		}
-		place = find_shm_place(shm_ctr, filesize);
-	}
 
-	/* if a good place was found */
-	if (place != FALSE) {
-		place->isfree = FALSE;
-		/* init the read write lock for this file */
-		pthread_rwlock_init(&(place->rwlockFile), NULL);/* Default initialization */
-		/* lock the file */
-		retcode = pthread_rwlock_wrlock(&(shm_ctr->rwlockFile));
-		if (retcode == 0)
-			LOG_TRACE(LOG_NOTICE, "Locked RWLock for Writing new filename \"%s\"", filename);
-		place->filename = strdup(filename);
-		place->filedata = strdup(filecontent);
-		LOG_TRACE(LOG_NOTICE, "File \"%s\" successfully created in RWLock", place->filename);
-		/*unlock the file */
-		pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
-		if (retcode == 0)
-			LOG_TRACE(LOG_NOTICE, "Unlocked RWLock for Writing filename \"%s\"", shm_ctr->filename);
+		/* if a good place was found */
+		if (place != FALSE) {
+			place->isfree = FALSE;
+			/* init the read write lock for this file */
+			pthread_rwlock_init(&(place->rwlockFile), NULL);/* Default initialization */
+			/* lock the file */
+			retcode = pthread_rwlock_wrlock(&(shm_ctr->rwlockFile));
+			if (retcode == 0)
+				LOG_TRACE(LOG_NOTICE, "Locked RWLock for Writing new filename \"%s\"", filename);
+			place->filename = strdup(filename);
+			place->filedata = strdup(filecontent);
+			LOG_TRACE(LOG_NOTICE, "File \"%s\" successfully created in RWLock", place->filename);
+			/*unlock the file */
+			pthread_rwlock_unlock(&(shm_ctr->rwlockFile));
+			if (retcode == 0)
+				LOG_TRACE(LOG_NOTICE, "Unlocked RWLock for Writing filename \"%s\"", shm_ctr->filename);
 
-		return getSingleString("File \"%s\" successfully created.", (place->filename));
+			return getSingleString("File \"%s\" successfully created.", (place->filename));
+		}
 	}
 	return -1;
 }
@@ -128,7 +131,8 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 		/* deleting file content, filename.... */
 		shm_ctr->filename = "NULL";
 		LOG_TRACE(LOG_DEBUG, "Filedata was until now: %s\n", shm_ctr->filedata);
-		memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
+		//memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
+		memset((shm_ctr->filedata), '\0', sizeof(shm_ctr->filedata));
 		shm_ctr->isfree = TRUE;
 
 		/*unlock the file */

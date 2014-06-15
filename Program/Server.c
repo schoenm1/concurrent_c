@@ -303,11 +303,9 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 			LOG_TRACE(LOG_INFORMATIONAL, "Filesize = %i \t Content = %s", (int) strlen(filecontent), filecontent);
 
 			returnvalue = createNewFile(shm_ctr, filename, filecontent, strlen(filecontent));
-			if (returnvalue > 0) {
-				LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
-				send(clntSocket, returnvalue, strlen(returnvalue), 0);
-				free(returnvalue);
-			}
+
+			LOG_TRACE(LOG_INFORMATIONAL, "Sending message to Client: %s", returnvalue);
+			send(clntSocket, returnvalue, strlen(returnvalue), 0);
 		}
 	}
 
@@ -367,7 +365,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 			else {
 				retcode = deleteFile(shm_ctr, recMessage[2]);
 				/* if deleting was successful, call runClientCommand and */
-				if (retcode) {
+			   	if (retcode) {
 
 					/* combine now the free blocks */
 					retcode = combine(shm_ctr);
