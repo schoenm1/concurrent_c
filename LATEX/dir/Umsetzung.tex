@@ -4,7 +4,7 @@
 %============== N E W  ==== S E C T I O N  ======== 
 \section{Voraussetzungen}
 
-Da der Student kein Programmierer ist und nur schulische Kenntnisse von der Programmiersprache Java besitzt, wird dieses Projekt eine grosse Herausforderung. Deshalb soll das Grundkonzept als Stütze dienen, so dass sich der Programmierer nicht in den Details verlieren soll.
+Da der Student kein Programmierer ist und nur schulische Kenntnisse von der Programmiersprache Java besitzt, war dieses Projekt eine grosse Herausforderung.
 
 %============== N E W  ==== S E C T I O N  ======== 
 \section{Libraries}
@@ -18,10 +18,11 @@ Als Beispiel zeigt das Listing \ref{itskylib.c} die Anbindung einer externen Dat
 
 
 %============== N E W  ==== S E C T I O N  ======== 
+\newpage
 \section{Programmierumgebung}
-Programmiert wird auf einem MAC OS-X 10.9 (Mavericks). Die eingesetzte Software ist das Eclipse mit dem integrierten \flqq Eclipse C/C++ Development Tools\frqq\. Eclipse ist bereits aus der Java-Programmierung im Grundstudium bekannt und eingerichtet. So musste nur noch die \flqq Eclipse C/C++ Development Tools\frqq\ installiert werden.
+Programmiert wurde auf einer Mac OS-X 10.9 (Mavericks) Umgebung. Die eingesetzte Software ist das Eclipse mit dem integrierten \flqq Eclipse C/C++ Development Tools\frqq. Eclipse war bereits aus der Java-Programmierung im Grundstudium bekannt und eingerichtet. So mussten lediglich noch die \flqq Eclipse C/C++ Development Tools\frqq\ installiert werden.
 Der grosse Vorteil gegenüber eines Texteditors ist das Auto-Complete und die automatische Formatierung des Codes.\\
-Für das Kompilieren und Ausführen des Codes wird eine Ubuntu genutzt. Dieses ist als virtuelle Maschine über Parallels installiert. Zugegriffen auf das Ubuntu wird mittels SSH von MAC OS-X. Der Grund, Ubuntu zu nutzen liegt in den anderen Bibliotheken, welche teils in MAC OS-X nicht genutzt werden können oder anders implementiert sind. Ebenfalls aufgefallen im Unterricht war, dass Ubuntu 32-bit und Ubuntu 64-bit nicht immer gleich implementiert sind.
+Für das Kompilieren und Ausführen des Codes wurde ein Ubuntu 12.04 genutzt. Dieses ist als virtuelle Maschine über Parallels installiert. Zugegriffen auf das Ubuntu wird mittels SSH von Mac OS-X. Der Grund Ubuntu zu nutzen liegt in den anderen Bibliotheken, welche teils in Mac OS-X nicht genutzt werden können oder anders implementiert sind. Ebenfalls aufgefallen im Unterricht war, dass Ubuntu 32-bit und Ubuntu 64-bit nicht immer gleich implementiert sind.
 
 Eckdaten Ubuntu:
 \begin{itemize}
@@ -35,7 +36,7 @@ Eckdaten Ubuntu:
 
 %============== N E W  ==== S E C T I O N  ======== 
 \section{LOG/DEBUG}
-Die Implementierung des LOG soll als Erstes geschehen. So soll sichergestellt werden, dass während der Programmierung das LOG-Level geändert werden kann und allfällige Fehler schneller gesehen werden können.\\
+Die Implementierung des LOG wurde als eine der ersten Aufgaben in Angriff genommen. So sollte sichergestellt werden, dass während der Programmierung das LOG-Level geändert werden kann und allfällige Fehler schneller gesehen werden können.\\
 Die Definition der LOG-Levels wird anlog zu den syslog LOG-Level erstellt:
 
 \begin{table}[h!]
@@ -61,9 +62,11 @@ Die Definition der LOG-Levels wird anlog zu den syslog LOG-Level erstellt:
 %============== N E W  ==== S E C T I O N  ======== 
 \section{Speicherverwaltung -- Buddy System}
 Für die Verwaltung des Shared Memory (shm) bedarf es einer Logik, um die verschiedenen Adressen im Shared Memory richtig ansprechen zu können. Zusätzlich muss sichergestellt werden, dass kein File in das shm geschrieben wird, dass länger ist als der freie Speicherplatz, bevor das nächste File kommt.\\
-Es gibt viele Dokumentierte Speicherverwaltungen. Nach längerer Recherche wurde entschieden, dass der Speicher mit dem Buddy-System verwaltet werden soll.
-Die Suche im Internet nach einer vorhandenen Library für die Speicherverwaltung mit dem Buddy-System blieb leider erfolglos. Also blieb nichts anderes übrig, als das Buddy-System von grund auf selber zu gestalten und zu implementieren.\\
-Dabei wurden sehr viele Fragen aufgeworfen, welche Schrittweise erarbeitet wurden
+Es gibt viele dokumentierte Speicherverwaltungen. Nach längerer Recherche wurde entschieden, dass der Speicher mit dem Buddy-System verwaltet werden soll.
+Die Suche im Internet nach einer vorhandenen Library für die Speicherverwaltung mit dem Buddy-System blieb leider erfolglos. Also blieb nichts anderes übrig, als das Buddy-System von Grund auf selber zu gestalten und zu implementieren.\\
+Dabei wurden sehr viele Fragen aufgeworfen, welche Schrittweise erarbeitet wurden.
+
+Die nächsten Unterkapitel zeigen einige aufgeworfene Fragen, welche gelöst werden mussten.
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \subsection{Wie wird das komplette System gemanagt?}
@@ -74,7 +77,7 @@ Für das Management des shared Memory wurde ein Struct erstellt (siehe Listing \r
 \lstinputlisting[label=shmctrstruct,captionpos=b, caption=shm\_ctr\_struct]{dir/listings/shm_ctr_struct.txt}
 
 \newpage
-Folgende Tabelle soll aufzeigen, welches Attribut im Struct welche Funktion übernehmen soll. Das Ziel des Structs ist eine verkette Liste. Das erste Struct ist im Main global bekannt, das letzte wird gefunden, da isLast auf TRUE gesetzt ist.
+Folgende Tabelle soll aufzeigen, welches Attribut im Struct welche Funktion übernehmen soll. Der Grundgedanke beim Erstellen dieses Struktes war, eine verkettete Liste zu erstellen, die man von Anfang bis zum Ende durchlaufen kann. So gibt es keine Einschränkung wir bei einem Array, bei welchem von Begin her die Anzahl Elemente bekannt sein müssen. Das erste Struct ist im Main global bekannt, das letzte wird gefunden, da isLast auf TRUE gesetzt ist.
 \begin{table}[h!]
 \begin{tabular}[t]{|l|l|} \hline
  \cellcolor{darkgrey} &  \cellcolor{darkgrey}  \\ 
@@ -104,19 +107,49 @@ int isfree & TRUE wenn Block frei ist, FALSE wenn Block besetzt ist\\ \cline{1-2
 \subsection{Wie wird der optimale Block für ein neues File im Shared Memory gefunden?}
 
 Hierzu wurde die Funktion find\_shm\_place(\dots) erstellt.\\
-Diese Funktion beginnt beim ersten Eintrag des Structs shm\_ctr\_struct (siehe Listing \ref{shmctrstruct}) und sucht über alle vorhanden Blöcke (über den next-Pointer) einen optimalen Block. Optimal bedeutet, dass er grösser oder gleich der Grösse der neu zu erstellenden Dokumentes  sein muss, aber nicht grösser als das doppelte . Wäre er grösser als das Doppelte, wäre das Speicherplatzverschwendnung. Zusätzlich muss er frei sein (isfree = TRUE).
+Diese Funktion beginnt beim ersten Eintrag des Structs shm\_ctr\_struct (siehe Listing \ref{shmctrstruct}) und sucht über alle vorhanden Blöcke (über den next-Pointer) einen optimalen Block. Optimal bedeutet, dass er grösser oder gleich der Grösse der neu zu erstellenden Dokumentes  sein muss, aber nicht grösser als das Doppelte. Wäre er grösser als das Doppelte, wäre dies Speicherplatzverschwendnung. Zusätzlich muss der Block frei sein (isfree = TRUE).
 
 
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
-\newpage
 \subsection{Gibt es nur zu grosse Blöcke, wie werden die aufgetrennt?}
+
+Für die Aufteilung der Blöcke wurde die Funktion devide(\dots) implementiert.\\
+Diese beginnt beim ersten Block und arbeitet sich (über den next-Pointer) nach hinten. Beim ersten gefundenen freien Block, wird nun die Block-Size halbiert.
+Es wird ein neuer Block erzeugt und die Verlinkungen (next, previous, Pointer auf Filename und Filedata sowie isFree und size) werden dem bestehenden und neuen Block gesetzt, so dass die Linked-List wieder komplett vorhanden ist.\\
+Ist die Blockgrösse die gewünschte Grösse, findet ein return = TRUE statt. Ansonsten wird die Funktion  rekursiv aufgerufen, bis die Blockgrösse genügend klein ist. Dann erfolgt der return = TRUE.\\
+Ein Screenshot der Funktion devide() ist im Anhang \ref{fig:shm-2} zu finden. Ebenfalls im Anhang \ref{fig:shm-1} und \ref{fig:shm-3} ist das Shared Memory vor und nach dem Einfügen eines neuen Files zu sehen.
+
+
+
 Das Buddy-System gibt vor, dass die Blockgrössen aus 2er Potenzen gebildet werden. Also 2, 4, 8, 16, 32 \dots \\
-Beispiel Buddy-System:\\
+
+\newpage
+Das Vorgehen beim Aufteilen der Blöcke ist folgendermassen:
+\begin{enumerate}
+\item Durch den Aufruf der Funktion wird die gewünschte Grösse des Blockes mitgegeben. Da diese Funktion nur aufgerufen wird, wenn der Block noch nicht existiert, muss nicht mehr geprüft werden, ob es bereits einen optimalen Block gibt.\\
+Dessen Grösse ist in 2er Potenzen (in unserem Beispiel unten 16384)
+\item Beginne beim 1. SHM-Block. Ist dieser grösser als 16384 und frei? Wenn ja, gehe zu Punkt 3, sonst wiederhole diesen Punkt bis Bedingung erfüllt ist.
+\item Wurde ein Block zum Teilen gefunden, setzte die neuen Parameter (hier nur Auszugsweise dargestellt).\\
+Der Quellcode ist im Listing \ref{listing:devide} im Anhang zu finden.
+\begin{itemize}
+\item erstelle eine neue Instanz des Struktes shm\_ctr\_struct
+\item Halbiere die Grösse des momentanen Blockes mit\\
+ shm\_ctr->shm\_size = (shm\_ctr->shm\_size) / 2;
+\item setzte next des aktuellen Struktes auf das neu Erstellte
+\item setze den Vorgänger des neuen Struktes auf das akutelle Strukt mit\\
+nextsshm->prev=shm\_ctr
+\item ... (für die komplette Implementierung siehe \ref{listing:devide} im Anhang)
+\end{itemize}
+\end{enumerate}
+
+
+\newpage
+Das folgende Beispiel des Buddy-System soll dessen Funktion beim Auftrennen von Blöcken aufzeigen:\\
 
 \begin{table}[h!]
 \begin{tabular}{
-   |p{\dimexpr\linewidth-2\tabcolsep-1.3333\arrayrulewidth}|% column 3
+   |p{\dimexpr\linewidth-2\tabcolsep-1.3333\arrayrulewidth}|
   }
   \hline
 \multirow{2}{\linewidth}{\centering Shared Memory -- SIZE = 65535}\\ 
@@ -126,13 +159,25 @@ Beispiel Buddy-System:\\
 \label{tab:shm-1}
 \end{table}
 
-
-
-
-
-Ist die Dateigrösse = 14547, gibt es keinen optimalen Block. Der optimale Block wäre hier $2^{14} (=16384)$. Der kleiner Block $2^{13} (=8192)$ wäre hier zu klein.
+Ist die Dateigrösse = 14547, gibt es keinen optimalen Block. Der optimale Block wäre hier $2^{14} (=16384)$.
 Zuerst muss müssen nun die Blöcke aufgeteilt werden, so dass folgende Blöcke entstehen:
 
+Im ersten Schritt wird nun der einzige Block (=65535) geteilt.
+
+
+\begin{table}[h!]
+\begin{tabular}{
+  |p{\dimexpr.5\linewidth-2\tabcolsep-1.3333\arrayrulewidth}% column 1
+  |p{\dimexpr.5\linewidth-2\tabcolsep-1.3333\arrayrulewidth}% column 2
+   |}
+  \hline
+  \centering Block 1     &  \centering\arraybackslash Block 2        \\
+ \centering SIZE = 32768 &  \centering\arraybackslash SIZE = 32768  \\  \hline
+ \end{tabular}
+\caption{Shared Memory - 2}
+\label{tab:shm-2}
+\end{table}
+Nun wird überprüft, ob ein optimaler Block vorhanden ist. Da dies hier nicht der Fall ist, werden die Blöcke weiter geteilt. Begonnen wird immer an Anfang des SHM. Das heisst, im nächsten Schritt wird der Block 1 (=32768) in zwei Blöcke mit je 16384 aufgeteilt, wie in der Tabelle \ref{tab:shm-3} zu sehen ist.
 
 
 \begin{table}[h!]
@@ -145,15 +190,13 @@ Zuerst muss müssen nun die Blöcke aufgeteilt werden, so dass folgende Blöcke ent
   \centering Block 1     & \centering Block 2     & \centering\arraybackslash Block 3     \\
  \centering SIZE = 16384 & \centering SIZE = 16384 & \centering\arraybackslash SIZE = 32768 \\ \hline
  \end{tabular}
-\caption{Shared Memory - 2}
-\label{tab:shm-2}
+\caption{Shared Memory - 3}
+\label{tab:shm-3}
 \end{table}
 
-Für die Aufteilung wurde die Funktion devide(\dots) implementiert.\\
-Diese beginnt beim ersten Block und arbeitet sich (über den next-Pointer) nach hinten. Beim ersten gefundenen freien Block, wird nun die Block-Size halbiert.
-Es wird ein neuer Block erzeugt und die Verlinkungen (next, previous, Pointer auf Filename und Filedata sowie isFree und size) werden dem bestehenden und neuen Block gesetzt, so dass die Linked-List wieder komplett vorhanden ist.\\
-Ist die Blockgrösse die gewünschte Grösse, findet ein return = TRUE statt. Ansonsten wird die Funktion selber rekursiv aufgerufen, bis die Blockgrösse genügend klein ist. Dann erfolgt der return = TRUE.
-Ein Screenshot der Funktion devide() ist im Anhang \ref{fig:shm-2} zu finden. Ebenfalls im Anhang \ref{fig:shm-1} und \ref{fig:shm-3} ist das Shared Memory vor und nach dem Einfügen eines neuen Files zu sehen.
+
+Nach der zweiten Aufteilung ist ein optimaler Block vorhanden. Die Funktion devide(\dots) gibt nun den Pointer auf den ersten optimalen Block zurück (es nach einer Aufteilung immer zwei Blöcke: hier Block 1 und Block 2).
+
 
 
 
@@ -162,7 +205,7 @@ Ein Screenshot der Funktion devide() ist im Anhang \ref{fig:shm-2} zu finden. Eb
 \section{Locks}
 
 Wie im Kapitel \ref{sec:Das Projekt} erwähnt, ist ein global Lock nicht erlaubt.\\
-Für die Umsetzung des Locks wurde schlussendlich kein mutex gewählt, wie anfangs gedacht war. Das Problem beim mutex ist, dass ein lesender Client das ganze File ebenfalls sperrt für weitere Lesezugriffe. Dies soll jedoch nicht der Fall sein.\\
+Für die Umsetzung des Locks wurde schlussendlich kein mutex gewählt wie anfangs angedacht war. Das Problem beim mutex ist, dass ein lesender Client das ganze File ebenfalls sperrt für weitere Lesezugriffe. Dies soll jedoch nicht der Fall sein.\\
 Aus diesem Grund wurde wurde auf \flqq pthread\_rwlock\_t\frqq\ zurückgegriffen.
 
 Die Implementation des Locks wurde gemäss Tabelle im Kapitel \ref{subsec:completeSystem} vorgenommen.\\
@@ -174,7 +217,7 @@ Soll nun ein ein File gelockt werden, kann das elegant gelöst werden:
 \item Nun kann ein ReadLock über pthread\_rwlock\_rdlock(\&(shm\_ctr->rwlockFile)); gemacht werden.
 \end{itemize}
 
-Eine kurze Übersicht über die Impelementation des Locks gibt das Kapitel \ref{Server-Befehle}, welches die einzelnen Befehle aufführt.
+Eine kurze Übersicht über die Impelementation des Locks gibt das Kapitel \ref{sec:Server-Befehle}, welches die einzelnen CRUD Befehle aufführt.
 
 
 
@@ -183,9 +226,9 @@ Eine kurze Übersicht über die Impelementation des Locks gibt das Kapitel \ref{Se
 \section{Server-Befehle}
 \label{sec:Server-Befehle}
 
-Die gültigen Server-Befehle sind nach CRUD aufgebaut. CRUD ist ein Akronym in der Programmiersprache und soll die grundlegenden Befehle \textbf{C}reate, \textbf{R}ead, \textbf{U}pdate und \textbf{D}elete umfassen. Zusätzlich zu den vier Grundbefehlen kommt ein weiterer hinzu: \flqq LIST \frqq. Dieser zeigt dem Client das momentane Shared Memory an.
+Die gültigen Server-Befehle sind nach CRUD aufgebaut. CRUD ist ein Akronym in der Programmiersprache und soll die grundlegenden Befehle \textbf{C}reate, \textbf{R}ead, \textbf{U}pdate und \textbf{D}elete umfassen. Zusätzlich zu den vier Grundbefehlen kommt ein weiterer hinzu: \flqq LIST\frqq. Dieser zeigt dem Client das momentan vorhandene Shared Memory an.
 
-Grundätzlich werden alle Befehle in der Funktion runClientCommand(\dots) abgefangen. Auf den effektiven Programmcode wird nicht detailliert eingegangen.
+Grundätzlich werden alle Befehle in der Funktion runClientCommand(\dots) abgefangen. Auf den effektiven Programmcode wird hier nicht detailliert eingegangen.
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
 \section{CREATE}
@@ -194,9 +237,9 @@ Grundätzlich werden alle Befehle in der Funktion runClientCommand(\dots) abgefan
 Das vereinfachte Vorgehen beim CREATE ist folgendermassen:
 \begin{enumerate}
 \item Überprüfe, ob Filename und Filecontent mitgegeben wurde. Fehlt das eine oder andere, sende dem Client direkt zurück, dass File nicht erstellt werden kann.
-\item Wurde Filename und Fileconente mitgegeben, überprüfe ob das File bereits existiert. Wenn ja: return \flqq File already exist\frqq. Wenn nein, nächster Schritt
+\item Wurde Filename und Fileconent mitgegeben, überprüfe ob das File bereits existiert. Wenn ja: return \flqq File already exist\frqq. Wenn nein, Schritt 3
 \item Suche einen guten Platz im Shared Memory. Aufgrund der Implementierung eines Buddy-Systems muss der SHM-Block grösser sein als das einzufügende File, aber kleiner als das doppelte. Diese Überprüfung wird von der Funktion \flqq find\_shm\_place(\dots)\frqq\ übernommen.
-\item Wenn kein Platz vorhanden: return -1, wenn Platz vorhanden: nächster Punkt
+\item Wenn kein Platz gefunden: return -1, wenn Platz vorhanden: weiter mit Schritt 5
 \item setze Flag für den gefunden SHM-Block = not free
 \item initialisiere den RW Lock im Strukt shm\_ctr\_struct
 \item setze den Write-Lock
@@ -210,14 +253,14 @@ Das vereinfachte Vorgehen beim CREATE ist folgendermassen:
 \textbf{Beispiele für ungültige Eingaben von CREATE:}\\
 --CREATE
 
-Wenn kein Filename und kein File content mitgegeben wird, sendet der Server folgende Nachricht an den Client:\\
-Can not create a new file. Filename is missing
+Wenn kein Filename mitgegeben wird, sendet der Server folgende Nachricht an den Client:\\
+\flqq Can not create a new file. Filename is missing.\frqq
 
 --CREATE filename.txt
 
-Wenn ein Filename eingegen wird, aber kein content mitgegen wird, sender der Server folgende Nachricht an den Client: \flqq No file content set. File not created\frqq
+Wenn ein Filename, aber kein content mitgegeben wurde, sendet der Server folgende Nachricht an den Client: \flqq No file content set. File not created\frqq
 
-Der Programmcode für das Handling von CREATE ist im Listing \ref{listing:CREATE} in Anhang zu finden.
+Der Programmcode für das Handling von CREATE ist im Listing \ref{listing:CREATE} in Anhang \ref{Asubsec:CREATE} zu finden.
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
@@ -226,7 +269,7 @@ Der Programmcode für das Handling von CREATE ist im Listing \ref{listing:CREATE}
 
 Das Vorgehen bei einem READ Befehl ist folgendermassen:
 \begin{enumerate}
-\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass nicht nach einem leeren Filenamen gesucht werden kann. 
+\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass nicht nach einem leeren Filenamen gesucht werden kann. Ist der Filename vorhanden, gehe zum nächsten Schritt.
 \item Überprüfe im ersten SHM-Block, ob der Filename mit dem gesuchten Name übereinstimmt.
 \item Gibt es einen Treffer:
 \begin{itemize}
@@ -237,7 +280,7 @@ Das Vorgehen bei einem READ Befehl ist folgendermassen:
 \end{itemize}
 \item Wenn der Filename nicht übereinstimmt, gehe zum nächsten Block im SHM.
 \item Wiederhole Punkt 4 so lange, bis ein Treffer vorhanden ist oder bis das Ende des SHM erreicht ist. Ist ein Treffer vorhanden, gehe zu Punkt 3.
-\item Wurde das Ende des SHM erreicht und Wurde keine Übereinstimmung gefunden, sende \flqq File not found\frqq\ an den Client
+\item Wurde das Ende des SHM erreicht und keine Übereinstimmung gefunden, sende \flqq File not found\frqq\ an den Client
 \end{enumerate}
 
 
@@ -250,16 +293,16 @@ Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File not found\fr
 --READ\\
 Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot read an empty filename\frqq.
 
-Der Programmcode für das Handling von READ ist im Listing \ref{listing:READ} in Anhang zu finden.
+Der Programmcode für das Handling von READ ist im Listing \ref{listing:READ} in Anhang \ref{Asubsec:READ} zu finden.
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
 \newpage
 \section{UPDATE}
 \label{subsec:UPDATE}
 
-Die Funktion für ein UPDATE eines Files wurde in zwei Teilschritten implementiert. Der erste Teil löscht das komplette File, der zweite erstellt es mit dem neuen Content wieder. Das Problem beim direkten Update eine Files könnte sein, dass der Content grösser wird als der SHM-Block eigentlich ist. Anstelle dies zu überprüfen, wurde global ein löschen und neu erstellen implementiert.
+Die Funktion für ein UPDATE eines Files wurde in zwei Teilschritten implementiert. Der erste Teil löscht das komplette File, der Zweite erstellt es mit dem neuen content wieder. Das Problem beim direkten Update eine Files könnte sein, dass der content grösser wird als der SHM-Block ist. Anstelle dies zu überprüfen, wurde global ein DELETE und CREATE implementiert.
 \begin{enumerate}
-\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass ein File ohne Namen nicht geänder werden kann.
+\item Überprüfe ob ein Filename mitgegeben ist. Wenn nicht, sende an Client, dass ein File ohne Namen nicht geändert werden kann.
 \item Überprüfe ob ein neuer Filecontent mitgegeben wurde. Wenn nicht, sende an den Client, dass der Content nicht leer sein darf.
 \item Überprüfe, ob das File exisiert. Wenn nicht, sende an den Client, dass es nicht existiert.
 \item Überprüfe im ersten SHM-Block, ob der Filename mit dem gesuchten Name übereinstimmt.
@@ -267,8 +310,9 @@ Die Funktion für ein UPDATE eines Files wurde in zwei Teilschritten implementier
 \begin{itemize}
 \item rufe Funktion deleteFile(\dots) auf - siehe Kapitel \ref{subsec:DELETE}
 \item rufe Funktion createNewfile(\dots) auf - siehe  Kapitel \ref{subsec:CREATE}
+\item sende dem Client die Nachricht, dass das File aktualisiert wurde.
 \end{itemize}
-\item Gibt es keinen Treffer, gehe zum nächsten SHM-Block und überprüfe, ob der Namen übereinstimmt. Wiederhole so lange, bis der Filename gefunden wurde
+\item Gibt es keinen Treffer, gehe zum nächsten SHM-Block und überprüfe, ob der Namen übereinstimmt. Wiederhole so lange, bis der Filename gefunden wurde. Bei einem Treffer, gehe zu Schritt 5
 \end{enumerate}
 
 \textbf{Beispiel für gültige Eingaben von UPDATE:}\\
@@ -280,9 +324,9 @@ Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File with the nam
 --UPDATE\\
 --UPDATE test.txt
 
-Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot delete a file without a name\frqq.
+Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot update a file without a name\frqq.
 
-Der Programmcode für das Handling von UPDATE ist im Listing \ref{listing:UPDATE} in Anhang zu finden.
+Der Programmcode für das Handling von UPDATE ist im Listing \ref{listing:UPDATE} in Anhang \ref{Asubsec:UPDATE} zu finden.
 
 
 %============== N E W  ==== S U B - S E C T I O N  ======== 
@@ -300,8 +344,9 @@ Das vereinfachte Vorgehen beim DELETE ist folgendermassen:
 \item setzte Flag im SHM-Block is free = TRUE
 \item gib den Write-Lock wieder frei
 \item destroy den rwlock mit pthread\_rwlock\_destroy(\dots)
+\item sende dem Client die Nachricht, dass die Datei erfolreich gelöscht wurde.
 \end{itemize}
-\item Ist kein Treffer vorhanden, gehe zum nächsten Block und wiederhole dies so lange, bis ein Treffer vorhanden ist
+\item Ist kein Treffer vorhanden, gehe zum nächsten Block und wiederhole dies so lange, bis ein Treffer vorhanden ist. Bei einem Treffer gehe zu Punkt 2
 \item Ist bis zum letzten SHM-Block kein Treffer vorhanden, sende dem Client, dass der Filename nicht gefunden wurde und somit nicht gelöscht werden kann.
 \end{enumerate}
 
@@ -310,14 +355,14 @@ Das vereinfachte Vorgehen beim DELETE ist folgendermassen:
 \textbf{Beispiel für gültige Eingaben von DELETE:}\\
 --DELETE filename.txt
 
-Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File with the name xyz does not exist \frqq\ oder\flqq File with name xyz was successfully deleted.\frqq .
+Als Antwort des Servers gibt es zwei Varianten. Entweder \flqq File with the name xyz does not exist\frqq\ oder \flqq File with name xyz was successfully deleted.\frqq .
 
 \textbf{Beispiele für ungültige Eingaben von READ:}\\
 --DELETE
 
 Wenn kein Filename mitgegeben wird, antwortet der Server mit der Mitteilung: \flqq Cannot delete a file without a name\frqq.
 
-Der Programmcode für das Handling von DELETE ist im Listing \ref{listing:DELETE} in Anhang zu finden.
+Der Programmcode für das Handling von DELETE ist im Listing \ref{listing:DELETE} in Anhang \ref{Asubsec:DELETE} zu finden.
 
 
 
@@ -326,8 +371,8 @@ Der Programmcode für das Handling von DELETE ist im Listing \ref{listing:DELETE}
 \section{LIST}
 \label{subsec:LIST}
 
-Der Befehl für LIST, welche gemäss Dozent für den Server vorhanden sein sollte, wurde nicht so implementiert wie vorgeschlagen.\\
-Gemäss Vorschlag soll der Client ein \flqq LIST \frqq\ schicken, worauf der Server mit der Anzahl Files und den einzelnen Filenamen anwortet.\\
+Der Befehl für LIST, welcher gemäss Dozent für den Server vorhanden sein sollte, wurde nicht so implementiert wie vorgeschlagen.\\
+Gemäss Vorschlag soll der Client ein \flqq LIST\frqq\ schicken, worauf der Server mit der Anzahl Files und den einzelnen Filenamen anwortet.\\
 Die implementierte Antwort von LIST des Server ist gemäss Abbildung \ref{fig:LIST} zu sehen.\\
 In der Antwort enthalten ist die Block Nummer des SHM-Blockes, dessen Adresse auf dem Speicher, Grösse und ob es der letzte Block im SHM ist. Zusätzlich ist zu sehen, ob der Block mit einem File belegt ist oder nicht. Ist ein File vorhanden, steht der entsprechende Filename, sonst NULL. Ist ein File vorhanden, ist dessen Grösse zu sehen. Ganz am Ende werden die ersten 16 Zeichen des entsprechenden Fileinhaltes angezeigt.
 
@@ -340,7 +385,7 @@ In der Antwort enthalten ist die Block Nummer des SHM-Blockes, dessen Adresse au
 
 
 \textbf{Beispiel für gültige Eingaben von LIST:}\\
-Es gibt nur einen einzigen gültigen Befehl für LIST:
+Es gibt nur einen einzigen gültigen Befehl für LIST:\\
 --LIST
 
 Werden nach LIST noch weitere Argumente mitgegeben, werden diese ignoriert.

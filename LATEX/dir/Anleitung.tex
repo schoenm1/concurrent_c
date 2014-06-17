@@ -1,7 +1,7 @@
 \chapter{Anleitung zur Nutzung des Servers und des Clients}
 \label{chapter:Anleitung}
 
-Dieses Kapitel widmet sich mit dem Umgangs des Servers und der dazugehörigen Clients. Angefügte Screenshots sollen einen Einblick geben, wie die Software funktioniert, auch wenn kein Computer zum Austesten vorhanden ist.
+Dieses Kapitel widmet sich mit dem Umgang des Servers und der dazugehörigen Clients. Angefügte Screenshots sollen einen Einblick geben, wie die Software funktioniert, auch wenn kein Computer zum Austesten der Applikation vorhanden ist.
 %============== N E W  ==== S E C T I O N  ======== 
 \section{Starten des Server}
 \label{sec:Starting-Server}
@@ -11,10 +11,10 @@ Momentan gibt es zwei implementierte Argumente, welche beim Start mitgegeben wer
 \begin{itemize}
 \item \flqq -l\frqq\ -- Loglevel\\
 Für das Loglevel gültige Eingaben sind Integer mit Werten von 0-7.\\
-Wird ein ungültiger Wert grösser als 8 eingegeben, wird der Fehler abgefangen und das Loglevel wird auf den default-Wert = 5 gesetzt.
+Wird ein ungültiger Wert grösser als 7 eingegeben, wird der Fehler abgefangen und das Loglevel wird auf den default-Wert = 5 gesetzt.
 
-\item \flqq -p\frqq\ -- Serverport
-Für den Server-Port gültige Eingaben sind: 1024 - 65535. Die well-known Ports von 1 - 1023 wurden bewusst nicht erlaubt, da es konflikte geben könnte mit anderen Applikationen.\\
+\item \flqq -p\frqq\ -- Serverport\\
+Für den Server-Port gültige Eingaben sind: 1024 - 65535. Die well-known Ports von 1 - 1023 wurden bewusst nicht erlaubt, da es Konflikte geben könnte mit anderen Applikationen.\\
 Wird ein ungültiger Wert eingegeben, wird der Server automatisch mit dem default-Port = 7000 starten.
 \end{itemize}
 
@@ -26,6 +26,7 @@ Beispiele für gültiges Starten des Servers:\\
 
 Die Abbildung \ref{fig:Starting_Server} zeigt einen gültigen Serverstart. Bei der Abbildung \ref{fig:Starting_Server2} ist zu sehen, wie das Loglevel 8 nicht gesetzt werden kann und wie die nachträglichen Argumente (Duplikate) des Serverports und des Loglevels ignoriert werden.
 
+\newpage
 \begin{figure}[h!]
 \centering
 \includegraphics[width=1\textwidth]{Starting_Server.png} 
@@ -40,7 +41,7 @@ Die Abbildung \ref{fig:Starting_Server} zeigt einen gültigen Serverstart. Bei de
 \label{fig:Starting_Server2}
 \end{figure}
 
-Anmerkung:\\
+\textbf{Anmerkung:}\\
 Die Reihenfolge der Argumente ist egal. Wird ein Argument zwei mal eingegeben (z.B. ./Server -p 7524 -l 6 -l 8), wird nur das erste Argument berücktsichtigt. Alle weiteren Argumente werden ignoriert.\\
 ./Server -p 5432 -l 5 -l 8 wird somit den TCP Port 5432 und das Loglevel 5 setzen.\\
 ./Server -p 2066 -p 5432 -l 4 -l 8 wird somit den TCP Port 2066 und das Loglevel 4 setzen.
@@ -49,7 +50,7 @@ Die Reihenfolge der Argumente ist egal. Wird ein Argument zwei mal eingegeben (z
 \section{Starten der Clients}
 \label{sec:Starting-Clients}
 
-Der Client selber besitzt im Gegensatz zum Server eine sehr eingeschänkte Logik. Seine Aufgabe besteht hauptsächlich darin, sich über einen TCP-Socket mit dem Server zu verbinden. \\
+Der Client besitzt im Gegensatz zum Server eine sehr eingeschänkte Logik. Seine Aufgabe besteht hauptsächlich darin, sich über einen TCP-Socket mit dem Server zu verbinden. \\
 Beim Client ist es notwendig, die Argumente in der richtigen Reihenfolge einzugeben. So ist nur folgender Aufruf gültig:\\
 ./Client <IP Adresse von Server>\\
 oder\\
@@ -69,7 +70,7 @@ Beispiele für gültiges Starten des Clients:\\
 
 
 %============== N E W  ==== S E C T I O N  ======== 
-\newpage
+
 \section{Benutzen der Clients}
 \label{sec:Using-Clients}
 
@@ -78,35 +79,11 @@ Die gültigen Server-Befehle werden hier nicht erläutert, sondern nur wie die Bef
 
 \begin{itemize}
 \item CREATE
-
-
-
 \item READ
-
-
 \item UPDATE
-
-
 \item DELETE
-
 \item LIST shm 
-Der SHOW Befehl ist ein zusätzlicher Befehl, welcher nicht zwingend vorausgesetzt wurde.\\
-Er zeigt das momentan vorhandene Shared-Memory an, wobei zu beachten gilt, dass hier kein Locking-Verfahren eingesetzt wurde. Das heisst, das Memory könnte bereits bei der Ausgabe auf der Konsole beim Client bereits wieder verändert worden sein.
-
-\textbf{Eingabe beim Client:}\\
-\# LIST shm
-
-
-Beispiel Ausgabe beim Client:
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.5\textwidth]{Starting_Client.png} 
-\caption[Starten des Clients]{Starten des Clients\\Quelle: eigener Screenshot}
-\label{fig:Starting_Client}
-\end{figure}
-
-
+Der LIST zeigt das momentan vorhandene Shared-Memory an, wobei zu beachten gilt, dass hier kein Locking-Verfahren eingesetzt wurde. Das heisst, das Memory könnte bereits bei der Ausgabe auf der Konsole beim Client bereits wieder verändert worden sein.
 \end{itemize}
 
 

@@ -18,16 +18,16 @@
 \contentsline {chapter}{\numberline {4}Anleitung zur Nutzung des Servers und des Clients}{9}{chapter.4}
 \contentsline {section}{\numberline {4.1}Starten des Server}{9}{section.4.1}
 \contentsline {section}{\numberline {4.2}Starten der Clients}{11}{section.4.2}
-\contentsline {section}{\numberline {4.3}Benutzen der Clients}{12}{section.4.3}
-\contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{13}{chapter.5}
-\contentsline {section}{\numberline {5.1}Voraussetzungen}{13}{section.5.1}
-\contentsline {section}{\numberline {5.2}Libraries}{13}{section.5.2}
-\contentsline {section}{\numberline {5.3}Programmierumgebung}{14}{section.5.3}
-\contentsline {section}{\numberline {5.4}LOG/DEBUG}{14}{section.5.4}
-\contentsline {section}{\numberline {5.5}Speicherverwaltung -- Buddy System}{15}{section.5.5}
-\contentsline {subsection}{\numberline {5.5.1}Wie wird das komplette System gemanagt?}{15}{subsection.5.5.1}
-\contentsline {subsection}{\numberline {5.5.2}Wie wird der optimale Block f\"ur ein neues File im Shared Memory gefunden?}{17}{subsection.5.5.2}
-\contentsline {subsection}{\numberline {5.5.3}Gibt es nur zu grosse Bl\"ocke, wie werden die aufgetrennt?}{18}{subsection.5.5.3}
+\contentsline {section}{\numberline {4.3}Benutzen der Clients}{11}{section.4.3}
+\contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{12}{chapter.5}
+\contentsline {section}{\numberline {5.1}Voraussetzungen}{12}{section.5.1}
+\contentsline {section}{\numberline {5.2}Libraries}{12}{section.5.2}
+\contentsline {section}{\numberline {5.3}Programmierumgebung}{13}{section.5.3}
+\contentsline {section}{\numberline {5.4}LOG/DEBUG}{13}{section.5.4}
+\contentsline {section}{\numberline {5.5}Speicherverwaltung -- Buddy System}{14}{section.5.5}
+\contentsline {subsection}{\numberline {5.5.1}Wie wird das komplette System gemanagt?}{14}{subsection.5.5.1}
+\contentsline {subsection}{\numberline {5.5.2}Wie wird der optimale Block f\"ur ein neues File im Shared Memory gefunden?}{16}{subsection.5.5.2}
+\contentsline {subsection}{\numberline {5.5.3}Gibt es nur zu grosse Bl\"ocke, wie werden die aufgetrennt?}{16}{subsection.5.5.3}
 \contentsline {section}{\numberline {5.6}Locks}{19}{section.5.6}
 \contentsline {section}{\numberline {5.7}Server-Befehle}{20}{section.5.7}
 \contentsline {section}{\numberline {5.8}CREATE}{21}{section.5.8}
@@ -42,8 +42,9 @@
 \contentsline {subsection}{\numberline {A.1.2}Aufteilen des Shared Memory in der Funktion devide()}{ii}{subsection.A.1.2}
 \contentsline {subsection}{\numberline {A.1.3}Shared Memory nach dem Einf\"ugen eines neuen Files}{iii}{subsection.A.1.3}
 \contentsline {section}{\numberline {A.2}Programm-Code}{iv}{section.A.2}
-\contentsline {subsection}{\numberline {A.2.1}CREATE}{iv}{subsection.A.2.1}
-\contentsline {subsection}{\numberline {A.2.2}READ}{vi}{subsection.A.2.2}
-\contentsline {subsection}{\numberline {A.2.3}UPDATE}{vii}{subsection.A.2.3}
-\contentsline {subsection}{\numberline {A.2.4}DELETE}{x}{subsection.A.2.4}
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{xii}{appendix*.19}
+\contentsline {subsection}{\numberline {A.2.1}Aufteilen des Shared Memory in der Funktion devide()}{v}{subsection.A.2.1}
+\contentsline {subsection}{\numberline {A.2.2}CREATE}{vi}{subsection.A.2.2}
+\contentsline {subsection}{\numberline {A.2.3}READ}{ix}{subsection.A.2.3}
+\contentsline {subsection}{\numberline {A.2.4}UPDATE}{x}{subsection.A.2.4}
+\contentsline {subsection}{\numberline {A.2.5}DELETE}{xiii}{subsection.A.2.5}
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{xv}{appendix*.19}

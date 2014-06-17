@@ -18,7 +18,7 @@ V0.5 & 13.04.2014 &Erweitern Server (Argument-Überprüfung) \\   \cline{1-3}
 V0.6 & 01.05.2014 & Speicherverwaltung mit Buddy \\   \cline{1-3}
 V0.7 & 02.05.2014 & Client Connection to Server \\   \cline{1-3}
 V0.8 & 02.05.2014 & TCP Connection Protocol, Loglevel \\   \cline{1-3}
-V0.9 & 02.05.2014 & CREATE, LIST, LOG, Fehlebehebungen \\   \cline{1-3}
+V0.9 & 02.05.2014 & CREATE, LIST,  Fehlebehebungen \\   \cline{1-3}
 V1.0 & 02.05.2014 & One Thread per Client, Refactoring, Commenting Code \\   \cline{1-3}
 V1.1 & 02.05.2014 & Client Connection to Server \\   \cline{1-3}
 V1.2 & 02.05.2014 &Implementing RWLock for Creating File \\   \cline{1-3}
@@ -30,13 +30,14 @@ V1.5 & 26.05.2014 & Erstellen PThread für Clients\\  \cline{1-3}
 V1.5b & 27.05.2014 & ReadWriteLock beim READ\\ \cline{1-3}
 V1.5c & 28.05.2014 & Dokumentation\\   \cline{1-3}
 V1.6 & 31.05.2014 & Fehlerbehandung PThreadList. Client Commands\\   \cline{1-3}
-V1.6b & 01.06.2014 & Joining PThreads. Fehlersuche delete letzes File\\   \cline{1-3}
+V1.6b & 01.06.2014 & Joining PThreads. Fehlersuche DELETE letzes File\\   \cline{1-3}
 V1.7 & 02.06.2014 & Fehlerbehebung Übermittlung grössere Files\\   \cline{1-3}
 V1.8 & 10.06.2014 & Optimierung Serverparameter (-l, -p)\\   \cline{1-3}
 V1.8b & 11.06.2014 &  Fehlerbehandlung Code, testen Server\\  \cline{1-3}
 V1.8b & 12.06.2014 &  Fehlerbehandlung Code, testen Server\\  \cline{1-3}
 V1.8b & 14.06.2014 &  Fehlerbehandlung Code, testen Server\\  \cline{1-3}
 V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
+V1.8c & 17.06.2014 &  \_\_TIME\_\_, Dokumentation überarbeiten\\  \cline{1-3}
 
 
 \end{tabular}
@@ -76,27 +77,27 @@ V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
  \multirow{2}{1cm}{08.04.2014} &  \multirow{2}{1cm}{3h} & -Parsing Argumente bei Programmstart\\
  & & -Log-Level Implementierung\\ \cline{1-3}
 
- \multirow{8}{1cm}{13.04.2014} &  \multirow{8}{1cm}{1.75h} & -Auslagern Funktionen in externe .h Dateien\\
+ \multirow{8}{1cm}{13.04.2014} &  \multirow{8}{1cm}{1.75h} & -Auslagern Funktionen in externe *.h Dateien\\
 & & -Anpassen Argument-Validierung: wenn Argument mehr als\\
 & & \ 1mal vorkommt, wird es ignoriert\\
 & & -bei nicht setzen des LogLevel wird default LogLevel initialisiert\\
-&  & -Erstinitialisierung TCP-Server: wartet auf Verbindung\\
-& & \  von Client\\
+&  & -Erstinitialisierung TCP-Server:\\
+& & \   wartet auf Verbindungvon Client\\
 & & -Probleme: \#define von LOG LEVELS in log-Level.h\\
 & & \ sind nicht sichtbar in \grqq server.h\grqq.\\ \cline{1-3}
 
 15.04.2014 &1h& -Installieren von e-UML -> funktioniert nur mit Java ;-(\\  \cline{1-3}
 
  \multirow{17}{1cm}{01.05.2014} &  \multirow{17}{1cm}{9h} & -Degub mit \#define funktioniert nicht.\\
-& & -> Einlesen in andere Möglichkeiten\\
+& & \ -> Einlesen in andere Möglichkeiten für Log-Levels\\
 & & -gemäss Rücksprache mit anderen Studenten sollte nicht ein File\\
 & & \ wirklich eingelesen werden (von HDD geöffnet und Stream \\
 & &  \ übermittelt), sondern lediglich mit dem Filenamen und\\
 & & \ Grösse angelegt werden im Shared Memory\\
-& & -	Versuch, Control Shared Memory zu lösen mit einem\\
+& & -Versuch, Control Shared Memory zu lösen mit einem\\
 & & \ \ Buddy System\\
 & & \textbf{Fazit Arbeiten}:\\
-& & -	Server startet ohne Fehler\\
+& & -Server startet ohne Fehler\\
 & & -Loglevel gelöscht (da nicht funktionstüchtig)\\
 & & -Port kann mit Argument \grqq-p\grqq\ mitgegeben werden\\
 & & -bei starten des Servers ohne Argumente kommt die Hilfeseite\\
@@ -106,8 +107,8 @@ V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
 & & \ (wieder vereinen ist noch nicht implementiert)\\ \cline{1-3}
 
  \multirow{8}{1cm}{02.05.2014} &  \multirow{8}{1cm}{2.25h} & -Client TCP Connection zu Server aufbauen\\
-& & -Client kann Verbindung aufbauen,\\
-& & \ Message senden und Message erhalten.\\
+& & -Client kann Verbindung aufbauen, Message senden und\\
+& & \ Message erhalten.\\
 & & \ Es fehlt jedoch ein Protokoll, dass die Übertragung sicherstellt.\\
 & & -Teils werden noch zusätzlich Zeichen angezeigt\\
 & & \ (z.B. 25\$?d anstelle von 25)\\
@@ -117,10 +118,10 @@ V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
  \multirow{5}{1cm}{03.05.2014} &  \multirow{5}{1cm}{6h} & -Log-Level implementiert mit verschiedenen Stufen.\\
  & & \ Output momentan nur möglich auf CLI, jedoch mit Datum\\
  & & \ (z.B. May  3 2014 15:37:15: WARNING Test Log Warning)\\
-& & - Implementierung von kleinem TCP Protokoll\\
-& & \ (funktioniert nur beim Senden Client)\\     \cline{1-3}
+& & -Implementierung von kleinem TCP Protokoll\\
+& & \ (funktioniert nur beim Senden von Client zu Server)\\     \cline{1-3}
 
- \multirow{4}{1cm}{04.05.2014} &  \multirow{4}{1cm}{6h} &-	Überprüfung 1. Wort von Client als Command-Argument\\
+ \multirow{4}{1cm}{04.05.2014} &  \multirow{4}{1cm}{6h} &-Überprüfung 1. Wort von Client als Command-Argument\\
  & & \ (Momentan nur Create File)\\ 
 & & -Verfeinern CREATE Command\\
  & & - LOG verbessern\\ \cline{1-3}
@@ -128,25 +129,25 @@ V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
  \multirow{7}{1cm}{05.05.2014} &  \multirow{7}{1cm}{8h} & -beim CREATE vom 2. File wurde der Name des ersten\\
  & & \ Files überschrieben.\\
  & & \  Stundenlange Suche nach Ursache (Problem war ein zuweisen\\
- & & \ eines Pointer zum andren filename = filename.new anstelle\\
- & & \ filename = strdup(filename.new)\\
-& & - Implementierung von LIST shm, was dem Client eine\\
-& & \  komplette Liste des Shared Memory mit Adresse\\
-& & \ und Dateinamen zurückliefert.\\ \cline{1-3}
+ & & \ eines Pointer zum einem zweiten filename = filename.new \\
+ & & \ anstelle filename = strdup(filename.new)\\
+& & -Implementierung von LIST shm, was dem Client eine\\
+& & \  komplette Liste des Shared Memory mit Adresse und\\
+& & \  Dateinamen zurückliefert.\\ \cline{1-3}
 
  \multirow{7}{1cm}{06.05.2014} &  \multirow{7}{1cm}{5.5h} & -Dokumentation letzte 2 Tage\\
-& & - Beheben von Warnings beim Kompilieren\\
-& & -für das TRACE\_LOG können nur mehrere (dynamische\\
+& & -Beheben von Warnings beim Kompilieren\\
+& & -für das TRACE\_LOG können nur mehrere (dynamische)\\
 & & \  Variablen mitgeliefert werden.\\
 & & -Problem, dass Server teils beim Erstellen eines Files abstürzt.\\
 & & \ Recherche im Internet: 1 Fehler war das malloc vor einen\\
 & & \ strdup() -> Weniger Abstürze, aber nicht ganz weg\\
-& & - DELETE und READ fertig implementieren (ohne Lock)\\ \cline{1-3}
+& & -DELETE und READ fertig implementieren (ohne Lock)\\ \cline{1-3}
 
 26.05.2014 & 1.75h & -Erstellen von Pthreads für Clients\\ \cline{1-3}
 
  \multirow{6}{1cm}{27.05.2014} &  \multirow{6}{1cm}{4.25h} & -Erstellen von PThreads für Client\\
- & & - Implementierung ReadWrite Lock mit pthread\_rwlock\_t\\
+ & & -Implementierung ReadWrite Lock mit pthread\_rwlock\_t\\
  & & \ (Momentan nur ReadLock beim Lesen)\\
  & & -Kommentieren von Code\\
  & & -löschen von altem, nicht mehr benutztem Code\\
@@ -158,10 +159,10 @@ V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
 
 
  \multirow{3}{1cm}{31.05.2014} &  \multirow{3}{1cm}{4.5h} & -Fehlerbehebung PThreadList\\
- & & - Senden von EXIT bei Beenden von Client an Server\\
- & & - Joining PThread nach Client-EXIT bei Server\\ \cline{1-3}
+ & & -Senden von EXIT bei Beenden von Client an Server\\
+ & & -Joining PThread nach Client-EXIT bei Server\\ \cline{1-3}
 
- \multirow{5}{1cm}{01.06.2014} &  \multirow{5}{1cm}{7h} &- Joining PThread nach Client-EXIT bei Server fertig\\
+ \multirow{5}{1cm}{01.06.2014} &  \multirow{5}{1cm}{7h} &-Joining PThread nach Client-EXIT bei Server fertig\\
  & & -Probleme Segmentation Fault beim löschen des letzten Files\\
  & & \  (mehrere Stunden Fehlersuche)\\
  & & \  -> Problem war Test.txt (fix in Code als Testfile)\\
@@ -194,6 +195,12 @@ V1.8c & 15.06.2014 &  Output LIST, Fehlerbehandlung Code\\  \cline{1-3}
 \multirow{3}{1cm}{15.06.2014} &  \multirow{3}{1cm}{3.25h} & -Ferhlebehandlung Server: bei DELTET/READ/UPDATE ohne\\
 & & \  weitere Angaben stürzte der Server mit segmentation fault ab\\
 & & -Dokumentation ergänzen \ref{sec:Server-Befehle}, \ref{subsec:Quellenangaben}, \ref{chapter:Fazit} \\ \cline{1-3}
+
+
+\multirow{3}{1cm}{17.06.2014} &  \multirow{3}{1cm}{4.75h} & -Dokumentation auf Inhaltsfehler durchlesen\\
+& & -Probleme bei LOG: immer gleiche Zeitangabe\\
+& & \ -> Problem: \_\_TIME\_\_ ist statisch\\
+& & -Dokumentation: Inhaltfehler beheben \\ \cline{1-3}
 
 \caption{Aufwände Seminararbeit}
 \label{tab:Aufwände}
