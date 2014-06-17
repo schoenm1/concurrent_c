@@ -296,7 +296,6 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 
 		/* if file name and file content is set */
 		else {
-			printf("1 - in else.\n");
 			char *filecontent = getFileContent(recMessage);
 
 			char *filename = strdup(recMessage[2]);
@@ -365,7 +364,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 			else {
 				retcode = deleteFile(shm_ctr, recMessage[2]);
 				/* if deleting was successful, call runClientCommand and */
-			   	if (retcode) {
+				if (retcode) {
 
 					/* combine now the free blocks */
 					retcode = combine(shm_ctr);

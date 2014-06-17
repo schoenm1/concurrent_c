@@ -69,18 +69,29 @@ int getValidServerCommand(char *command) {
 void LOG_TRACE(int lvl, char *msg, ...) {
 	char buf[1024];
 	char *buff = (char *) malloc(sizeof(char) * 1024);
+	char *currenttime = (char *) malloc(sizeof(char) * 64);
+	memset(currenttime, '\0', sizeof(currenttime)); //clear String
 	if (LOGLEVEL >= lvl) {
 		char *L_LEVEL = "NULL";
 		L_LEVEL = getLogLevel(lvl, L_LEVEL);
-		printf("# %s %s:\t", __DATE__, __TIME__);
+
+		time_t current_time = time(NULL);
+		struct tm* local_time = localtime(&current_time);
+		currenttime = asctime(local_time);
+		*(currenttime + strlen(currenttime) - 1) = '\0';
+
+		printf("# %s:\t", currenttime);
 		va_list va;
 		va_start(va, msg);
 		vsprintf(buf, msg, va);
 		sprintf(buff, "%s\t%s\n", L_LEVEL, buf);
 		printf("%s", buff);
 		va_end(va);
+
 	}
 	free(buff);
+	//free(currenttime);
+
 }
 
 /* set the valid arguments for the server */
