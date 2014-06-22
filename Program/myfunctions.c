@@ -72,7 +72,8 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 			"\n======================================================== ALL BLOCKS OF SHARED MEMORY ===================================================================\n";
 	char * all_shm_blocks = (char *) malloc(8192);
 	strcpy(all_shm_blocks, one);
-	strcat(all_shm_blocks, "Block No\t Block Address\t\t Block-Size\t isFree\t Filename\t\t Filesize\t is Last\t first 16 char of Filedata\n");
+	strcat(all_shm_blocks,
+			"Block No\t Block Address\t\t Block-Size\t isFree\t Filename\t\t Filesize\t is Last\t first 16 char of Filedata\n");
 	strcat(all_shm_blocks,
 			"========================================================================================================================================================\n");
 	int i = 1;
@@ -89,30 +90,33 @@ char * get_all_shm_blocks(struct shm_ctr_struct *shm_ctr) {
 
 		/* create a String with the first 16 sign of the filedata */
 		char * part_Of_File_Data = (char*) malloc(64);
+		memset(part_Of_File_Data, '\0', sizeof(part_Of_File_Data));
+
 		if (strlen(myshm_ctr->filedata) > 16) {
-			strncpy(part_Of_File_Data, myshm_ctr->filedata, 16);
+			part_Of_File_Data = strdup(myshm_ctr->filedata);
+			//strncpy(part_Of_File_Data, myshm_ctr->filedata, 16);
+			*(part_Of_File_Data + sizeof(char)*16) = "... ";
+			memset(part_Of_File_Data+sizeof(char)*16, '\0', sizeof(part_Of_File_Data-sizeof(char) *16));
+			//	*(part_Of_File_Data + 20) = '\0';
+
 			strcat(part_Of_File_Data, "... ");
 		} else {
 			strncpy(part_Of_File_Data, myshm_ctr->filedata, 16);
 		}
 
-
-		myblock = getSingleString(
-				"%i\t\t %x  \t\t %i\t\t %i\t %s\t %i\t\t %i\t\t %s\n",
-				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), strlen(myshm_ctr->filedata),
-				myshm_ctr->isLast, part_Of_File_Data);
+		myblock = getSingleString("%i\t\t %x  \t\t %i\t\t %i\t %s\t %i\t\t %i\t\t %s\n", i, myshm_ctr, myshm_ctr->shm_size,
+				myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), strlen(myshm_ctr->filedata), myshm_ctr->isLast,
+				part_Of_File_Data);
 		strcat(all_shm_blocks, myblock);
 
+		free(part_Of_File_Data);
 
-
-
-
-/*		myblock = getSingleString(
-				"Block No %i:\tBlock-Address = %x  \tBlock-Size = %i  \tisFree = %i\tFilename = %s\tFilesize = %i     \tisLast = %i\t%s\n",
-				i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), strlen(myshm_ctr->filedata),
-				myshm_ctr->isLast, part_Of_File_Data);
-		strcat(all_shm_blocks, myblock);
-*/
+		/*		myblock = getSingleString(
+		 "Block No %i:\tBlock-Address = %x  \tBlock-Size = %i  \tisFree = %i\tFilename = %s\tFilesize = %i     \tisLast = %i\t%s\n",
+		 i, myshm_ctr, myshm_ctr->shm_size, myshm_ctr->isfree, getfixCharLen(myshm_ctr->filename, 20), strlen(myshm_ctr->filedata),
+		 myshm_ctr->isLast, part_Of_File_Data);
+		 strcat(all_shm_blocks, myblock);
+		 */
 		free(myblock);
 		//free(part_Of_File_Data);
 		if (myshm_ctr->isLast == TRUE) {

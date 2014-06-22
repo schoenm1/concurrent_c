@@ -53,8 +53,6 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesi
  *  64KB     |       64KB    | 16KB     | ...
  *  not free |      free     |Ênot free | ...
  *
- *  the two 32KB can be combined
- *
  *  result:
  *  64KB     | 32KB | 32 KB  | 16KB     | ...
  *  not free | free | free   |Ênot free | ...
@@ -62,7 +60,7 @@ struct shm_ctr_struct* find_shm_place(struct shm_ctr_struct *shm_ctr, int filesi
 int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 	int retrcode = FALSE;
 	/* check if place can be devided */
-	if (shm_ctr->isfree == TRUE) {
+	if (shm_ctr->isfree && shm_ctr->shm_size >= 2 * untilSize) {
 
 		/* new setting for devided, next place */
 		struct shm_ctr_struct *nextshm;
@@ -84,6 +82,9 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 		nextshm->filename = malloc(sizeof(char) * 128);
 		nextshm->filename = "NULL";
 		nextshm->filedata = (shm_ctr->filedata) + (shm_ctr->shm_size);
+		memset(nextshm->filedata, '\0', sizeof(nextshm->filedata));
+
+
 
 		/* check if this was last one */
 		if (shm_ctr->isLast == TRUE) {
@@ -98,7 +99,7 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 			return retrcode;
 			/* if the size is not good, call recursive the function and split it, until the size is good */
 		} else {
-			if (newsize <= 2)
+			if (newsize <= 4)
 				return FALSE;
 
 			LOG_TRACE(LOG_NOTICE, "PT: Recursive call in deviding because block size is to big (at moment = %i / should be: %i) ...",
@@ -109,7 +110,7 @@ int devide(struct shm_ctr_struct *shm_ctr, int untilSize) {
 
 	/* if block is not free */
 	else {
-		shm_ctr = (shm_ctr->next)->next;
+		shm_ctr = shm_ctr->next;
 		retrcode = devide(shm_ctr, untilSize);
 	}
 	return retrcode;

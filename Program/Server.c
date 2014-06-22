@@ -1,6 +1,6 @@
 /*
  * File: 		Main.c
- * Author: 		Micha Schšnenberger
+ * Author: 		Micha Schönenberger
  * Modul:		Concurrent Programming in C
  *
  * Created:     07.04.2014
@@ -18,9 +18,8 @@
 #include "Logs.h"
 #define TOT_SHM_SIZE 65536
 #define MIM_SHM_BLOCK_SIZE 4
-#define MAX_FILE_LENGTH 1500
+#define MAX_FILE_LENGTH 8192
 #define MAX_WORD_SIZE 256
-#define MUTEXSIZE 10
 #include <arpa/inet.h>  /* for sockaddr_in, inet_addr() and inet_ntoa() */
 #include <errno.h>
 #include <math.h>
@@ -310,11 +309,12 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 
 	/* Reading File */
 	else if (strcmp(command, "READ") == 0) {
-
+		char *returnvalue = malloc(sizeof(char) * MAX_FILE_LENGTH);
 		/* if no filename was given, return this to the client */
 		if (recMessage[2] == NULL) {
-			char * returnvalue = "Cannot read an empty filename";
+			returnvalue = "Cannot read an empty filename";
 			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+			free(returnvalue);
 
 		}
 
@@ -323,6 +323,7 @@ void runClientCommand(char *recMessage[], char *command, int clntSocket, int thr
 			char * returnvalue = readFile(shm_ctr, recMessage[2]);
 			LOG_TRACE(LOG_INFORMATIONAL, "READ Command: Sending message to Client: %s", returnvalue);
 			send(clntSocket, returnvalue, strlen(returnvalue), 0);
+			free(returnvalue);
 		}
 	}
 
@@ -484,40 +485,51 @@ void handle_tcp_client(void* parameters) {
 		LOG_TRACE(LOG_INFORMATIONAL, "Waiting for reveicing message from Client.");
 		recvMsgSize = recv(clntSocket, recBuffer, BUFSIZE - 1, 0);
 
-		/*replace last sign of string with a Space */
-		char* p = strchr(recBuffer, '\n');
-		if (p) {
-			*p = '\0';
+		/* if there was no message send Server received "12" */
+		if (recvMsgSize < 13) {
+			LOG_TRACE(LOG_INFORMATIONAL, "There was no command in the message");
+			char *retchar = getSingleString("There was no command in the message");
+			send(clntSocket, retchar, strlen(retchar), 0);
+
 		}
 
-		handle_error(recvMsgSize, "recv() failed", NO_EXIT);
-		if (recvMsgSize == 0) {
-			break;
-		}
-		LOG_TRACE(LOG_INFORMATIONAL, "Received message from Client %s: %s", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
-		breakCharArrayInWords(recMessage, recBuffer);
-		/* check is effective message is equal to expected message size */
-		int effLength = (int) atoi(recMessage[0]);
-		if (effLength == recvMsgSize) {
-
-			/* check if 1st word of message is a valid command */
-			retcode = getValidServerCommand(recMessage[1]);
-
-			/* if command is valid */
-			if (retcode) {
-				LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s", recMessage[1]);
-				runClientCommand(recMessage, recMessage[1], clntSocket, thread_count);
+		else {
+			/*replace last sign of string with a Space */
+			char* p = strchr(recBuffer, '\n');
+			if (p) {
+				*p = '\0';
 			}
 
-			/* if command is not valid, return it to client */
-			else {
-				LOG_TRACE(LOG_INFORMATIONAL, "no match found for command %s", recMessage[1]);
-				LOG_TRACE(LOG_DEBUG, "No match. Send nothing to commit to client");
-				char *retchar = getSingleString("No match found for entered command \"%s\". There is nothing to commit...", recMessage[1]);
-				send(clntSocket, retchar, strlen(retchar), 0);
+			handle_error(recvMsgSize, "recv() failed", NO_EXIT);
+			if (recvMsgSize == 0) {
+				break;
 			}
+			LOG_TRACE(LOG_INFORMATIONAL, "Received message from Client %s: %s", inet_ntoa(ClientSocketAddress.sin_addr), recBuffer);
+			breakCharArrayInWords(recMessage, recBuffer);
+			/* check is effective message is equal to expected message size */
+			int effLength = (int) atoi(recMessage[0]);
+			if (effLength == recvMsgSize) {
+
+				/* check if 1st word of message is a valid command */
+				retcode = getValidServerCommand(recMessage[1]);
+
+				/* if command is valid */
+				if (retcode) {
+					LOG_TRACE(LOG_INFORMATIONAL, "It is a valid command: %s", recMessage[1]);
+					runClientCommand(recMessage, recMessage[1], clntSocket, thread_count);
+				}
+
+				/* if command is not valid, return it to client */
+				else {
+					LOG_TRACE(LOG_INFORMATIONAL, "no match found for command %s", recMessage[1]);
+					LOG_TRACE(LOG_DEBUG, "No match. Send nothing to commit to client");
+					char *retchar = getSingleString("No match found for entered command \"%s\". There is nothing to commit...",
+							recMessage[1]);
+					send(clntSocket, retchar, strlen(retchar), 0);
+				}
+			}
+			recBuffer[recvMsgSize] = '\000'; // set End Termination at the end of the Buffer
 		}
-		recBuffer[recvMsgSize] = '\000'; // set End Termination at the end of the Buffer
 	}
 	close(clntSocket); /* Close client socket */
 }

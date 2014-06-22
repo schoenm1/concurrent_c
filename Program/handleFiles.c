@@ -133,6 +133,7 @@ int deleteFile(struct shm_ctr_struct *shm_ctr, char *filename) {
 		LOG_TRACE(LOG_DEBUG, "Filedata was until now: %s\n", shm_ctr->filedata);
 		//memset((shm_ctr->filedata), 0, shm_ctr->shm_size);
 		memset((shm_ctr->filedata), '\0', sizeof(shm_ctr->filedata));
+
 		shm_ctr->isfree = TRUE;
 
 		/*unlock the file */

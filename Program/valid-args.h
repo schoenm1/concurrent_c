@@ -67,7 +67,7 @@ int getValidServerCommand(char *command) {
 
 /* will create a log entry */
 void LOG_TRACE(int lvl, char *msg, ...) {
-	char buf[1024];
+	char buf[8192];
 	char *buff = (char *) malloc(sizeof(char) * 1024);
 	char *currenttime = (char *) malloc(sizeof(char) * 64);
 	memset(currenttime, '\0', sizeof(currenttime)); //clear String
