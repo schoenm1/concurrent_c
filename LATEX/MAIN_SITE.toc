@@ -21,7 +21,7 @@
 \contentsline {section}{\numberline {4.3}Benutzen der Clients}{11}{section.4.3}
 \contentsline {section}{\numberline {4.4}Einschr\"ankungen der Applikation}{12}{section.4.4}
 \contentsline {subsection}{\numberline {4.4.1}Einschr\"ankungen gem\"ass Implementationsdefinitionen}{12}{subsection.4.4.1}
-\contentsline {subsection}{\numberline {4.4.2}Einschr\"ankungen gem\"ass bekannter Fehler in der Applikation}{12}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.2}Einschr\"ankungen gem\"ass bekannter Fehler in der Applikation}{13}{subsection.4.4.2}
 \contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{14}{chapter.5}
 \contentsline {section}{\numberline {5.1}Voraussetzungen}{14}{section.5.1}
 \contentsline {section}{\numberline {5.2}Libraries}{14}{section.5.2}
