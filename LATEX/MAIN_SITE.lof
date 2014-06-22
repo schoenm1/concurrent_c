@@ -6,10 +6,12 @@
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Starten des Servers}}{10}{figure.caption.7}
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Starten des Servers mit doppelten Argumenten}}{10}{figure.caption.8}
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Starten des Clients}}{11}{figure.caption.9}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Buffer Overflow bei zu grossen Dateien}}{13}{figure.caption.10}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Duplizierung SHM nach Server Crash}}{13}{figure.caption.11}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Server-Befehl LIST}}{25}{figure.caption.15}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Server-Befehl LIST}}{27}{figure.caption.17}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces SHM vor dem Einf\"ugen eines neuen Files}}{i}{figure.caption.16}
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Aufteilen des SHM in der Funktion devide()}}{ii}{figure.caption.17}
-\contentsline {figure}{\numberline {A.3}{\ignorespaces SHM nach dem Einf\"ugen eines neuen Files}}{iii}{figure.caption.18}
+\contentsline {figure}{\numberline {A.1}{\ignorespaces SHM vor dem Einf\"ugen eines neuen Files}}{i}{figure.caption.18}
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Aufteilen des SHM in der Funktion devide()}}{ii}{figure.caption.19}
+\contentsline {figure}{\numberline {A.3}{\ignorespaces SHM nach dem Einf\"ugen eines neuen Files}}{iii}{figure.caption.20}

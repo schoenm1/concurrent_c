@@ -85,54 +85,63 @@
 \newlabel{fig:Starting_Client}{{4.3}{11}{Starten des Clients}{figure.caption.9}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4.3}Benutzen der Clients}{11}{section.4.3}}
 \newlabel{sec:Using-Clients}{{4.3}{11}{Benutzen der Clients}{section.4.3}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{12}{chapter.5}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Einschr\"ankungen der Applikation}{12}{section.4.4}}
+\newlabel{sec:Einschr\"ankungen}{{4.4}{12}{Einschränkungen der Applikation}{section.4.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.1}Einschr\"ankungen gem\"ass Implementationsdefinitionen}{12}{subsection.4.4.1}}
+\newlabel{Einschr\"ankung_CREATE_UPDATE}{{4.4.1}{12}{Einschränkungen gemäss Implementationsdefinitionen}{subsection.4.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.2}Einschr\"ankungen gem\"ass bekannter Fehler in der Applikation}{12}{subsection.4.4.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Buffer Overflow bei zu grossen Dateien}}{13}{figure.caption.10}}
+\newlabel{fig:buffer_overflow}{{4.4}{13}{Buffer Overflow bei zu grossen Dateien}{figure.caption.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Duplizierung SHM nach Server Crash}}{13}{figure.caption.11}}
+\newlabel{fig:new_shm_after_crash}{{4.5}{13}{Duplizierung SHM nach Server Crash}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{14}{chapter.5}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{lol}{\addvspace {10\p@ }}
-\newlabel{chapter:Umsetzung}{{5}{12}{Umsetzung des Projektes}{chapter.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Voraussetzungen}{12}{section.5.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}Libraries}{12}{section.5.2}}
-\newlabel{itskylib.c}{{5.1}{12}{itskylib.c}{lstlisting.5.1}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.1}itskylib.c}{12}{lstlisting.5.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}Programmierumgebung}{13}{section.5.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.4}LOG/DEBUG}{13}{section.5.4}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.1}{\ignorespaces Loglevels\relax }}{13}{table.caption.10}}
-\newlabel{tab:loglevel}{{5.1}{13}{Loglevels\relax }{table.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.5}Speicherverwaltung -- Buddy System}{14}{section.5.5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.1}Wie wird das komplette System gemanagt?}{14}{subsection.5.5.1}}
-\newlabel{subsec:completeSystem}{{5.5.1}{14}{Wie wird das komplette System gemanagt?}{subsection.5.5.1}{}}
-\newlabel{shmctrstruct}{{5.2}{14}{shm\_ctr\_struct}{lstlisting.5.2}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.2}shm\_ctr\_struct}{14}{lstlisting.5.2}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.2}{\ignorespaces Shared Memory control Struct\relax }}{15}{table.caption.11}}
-\newlabel{tab:shm_ctl_struct}{{5.2}{15}{Shared Memory control Struct\relax }{table.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.2}Wie wird der optimale Block f\"ur ein neues File im Shared Memory gefunden?}{16}{subsection.5.5.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}Gibt es nur zu grosse Bl\"ocke, wie werden die aufgetrennt?}{16}{subsection.5.5.3}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.3}{\ignorespaces Shared Memory - 1\relax }}{18}{table.caption.12}}
-\newlabel{tab:shm-1}{{5.3}{18}{Shared Memory - 1\relax }{table.caption.12}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.4}{\ignorespaces Shared Memory - 2\relax }}{18}{table.caption.13}}
-\newlabel{tab:shm-2}{{5.4}{18}{Shared Memory - 2\relax }{table.caption.13}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.5}{\ignorespaces Shared Memory - 3\relax }}{18}{table.caption.14}}
-\newlabel{tab:shm-3}{{5.5}{18}{Shared Memory - 3\relax }{table.caption.14}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.6}Locks}{19}{section.5.6}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.7}Server-Befehle}{20}{section.5.7}}
-\newlabel{sec:Server-Befehle}{{5.7}{20}{Server-Befehle}{section.5.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.8}CREATE}{21}{section.5.8}}
-\newlabel{subsec:CREATE}{{5.8}{21}{CREATE}{section.5.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.9}READ}{22}{section.5.9}}
-\newlabel{subsec:READ}{{5.9}{22}{READ}{section.5.9}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.10}UPDATE}{23}{section.5.10}}
-\newlabel{subsec:UPDATE}{{5.10}{23}{UPDATE}{section.5.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.11}DELETE}{24}{section.5.11}}
-\newlabel{subsec:DELETE}{{5.11}{24}{DELETE}{section.5.11}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.12}LIST}{25}{section.5.12}}
-\newlabel{subsec:LIST}{{5.12}{25}{LIST}{section.5.12}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Server-Befehl LIST}}{25}{figure.caption.15}}
-\newlabel{fig:LIST}{{5.1}{25}{Server-Befehl LIST}{figure.caption.15}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {6}Fazit}{26}{chapter.6}}
+\newlabel{chapter:Umsetzung}{{5}{14}{Umsetzung des Projektes}{chapter.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Voraussetzungen}{14}{section.5.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}Libraries}{14}{section.5.2}}
+\newlabel{itskylib.c}{{5.1}{14}{itskylib.c}{lstlisting.5.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.1}itskylib.c}{14}{lstlisting.5.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}Programmierumgebung}{15}{section.5.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.4}LOG/DEBUG}{15}{section.5.4}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.1}{\ignorespaces Loglevels\relax }}{15}{table.caption.12}}
+\newlabel{tab:loglevel}{{5.1}{15}{Loglevels\relax }{table.caption.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.5}Speicherverwaltung -- Buddy System}{16}{section.5.5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.1}Wie wird das komplette System gemanagt?}{16}{subsection.5.5.1}}
+\newlabel{subsec:completeSystem}{{5.5.1}{16}{Wie wird das komplette System gemanagt?}{subsection.5.5.1}{}}
+\newlabel{shmctrstruct}{{5.2}{16}{shm\_ctr\_struct}{lstlisting.5.2}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.2}shm\_ctr\_struct}{16}{lstlisting.5.2}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.2}{\ignorespaces Shared Memory control Struct\relax }}{17}{table.caption.13}}
+\newlabel{tab:shm_ctl_struct}{{5.2}{17}{Shared Memory control Struct\relax }{table.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.2}Wie wird der optimale Block f\"ur ein neues File im Shared Memory gefunden?}{18}{subsection.5.5.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}Gibt es nur zu grosse Bl\"ocke, wie werden die aufgetrennt?}{18}{subsection.5.5.3}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.3}{\ignorespaces Shared Memory - 1\relax }}{20}{table.caption.14}}
+\newlabel{tab:shm-1}{{5.3}{20}{Shared Memory - 1\relax }{table.caption.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.4}{\ignorespaces Shared Memory - 2\relax }}{20}{table.caption.15}}
+\newlabel{tab:shm-2}{{5.4}{20}{Shared Memory - 2\relax }{table.caption.15}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5.5}{\ignorespaces Shared Memory - 3\relax }}{20}{table.caption.16}}
+\newlabel{tab:shm-3}{{5.5}{20}{Shared Memory - 3\relax }{table.caption.16}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.6}Locks}{21}{section.5.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.7}Server-Befehle}{22}{section.5.7}}
+\newlabel{sec:Server-Befehle}{{5.7}{22}{Server-Befehle}{section.5.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.8}CREATE}{23}{section.5.8}}
+\newlabel{subsec:CREATE}{{5.8}{23}{CREATE}{section.5.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.9}READ}{24}{section.5.9}}
+\newlabel{subsec:READ}{{5.9}{24}{READ}{section.5.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.10}UPDATE}{25}{section.5.10}}
+\newlabel{subsec:UPDATE}{{5.10}{25}{UPDATE}{section.5.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.11}DELETE}{26}{section.5.11}}
+\newlabel{subsec:DELETE}{{5.11}{26}{DELETE}{section.5.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.12}LIST}{27}{section.5.12}}
+\newlabel{subsec:LIST}{{5.12}{27}{LIST}{section.5.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Server-Befehl LIST}}{27}{figure.caption.17}}
+\newlabel{fig:LIST}{{5.1}{27}{Server-Befehl LIST}{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}Fazit}{28}{chapter.6}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{lol}{\addvspace {10\p@ }}
-\newlabel{chapter:Fazit}{{6}{26}{Fazit}{chapter.6}{}}
+\newlabel{chapter:Fazit}{{6}{28}{Fazit}{chapter.6}{}}
 \@writefile{toc}{\contentsline {chapter}{\numberline {A}Anhang}{i}{appendix.A}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
@@ -141,14 +150,14 @@
 \@writefile{toc}{\contentsline {section}{\numberline {A.1}Screenshots zum Server}{i}{section.A.1}}
 \newlabel{sec:Screenshots}{{A.1}{i}{Screenshots zum Server}{section.A.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.1.1}Shared Memory vor dem Einf\"ugen eines neuen Files}{i}{subsection.A.1.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {A.1}{\ignorespaces SHM vor dem Einf\"ugen eines neuen Files}}{i}{figure.caption.16}}
-\newlabel{fig:shm-1}{{A.1}{i}{SHM vor dem Einfügen eines neuen Files}{figure.caption.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.1}{\ignorespaces SHM vor dem Einf\"ugen eines neuen Files}}{i}{figure.caption.18}}
+\newlabel{fig:shm-1}{{A.1}{i}{SHM vor dem Einfügen eines neuen Files}{figure.caption.18}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.1.2}Aufteilen des Shared Memory in der Funktion devide()}{ii}{subsection.A.1.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {A.2}{\ignorespaces Aufteilen des SHM in der Funktion devide()}}{ii}{figure.caption.17}}
-\newlabel{fig:shm-2}{{A.2}{ii}{Aufteilen des SHM in der Funktion devide()}{figure.caption.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.2}{\ignorespaces Aufteilen des SHM in der Funktion devide()}}{ii}{figure.caption.19}}
+\newlabel{fig:shm-2}{{A.2}{ii}{Aufteilen des SHM in der Funktion devide()}{figure.caption.19}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.1.3}Shared Memory nach dem Einf\"ugen eines neuen Files}{iii}{subsection.A.1.3}}
-\@writefile{lof}{\contentsline {figure}{\numberline {A.3}{\ignorespaces SHM nach dem Einf\"ugen eines neuen Files}}{iii}{figure.caption.18}}
-\newlabel{fig:shm-3}{{A.3}{iii}{SHM nach dem Einfügen eines neuen Files}{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.3}{\ignorespaces SHM nach dem Einf\"ugen eines neuen Files}}{iii}{figure.caption.20}}
+\newlabel{fig:shm-3}{{A.3}{iii}{SHM nach dem Einfügen eines neuen Files}{figure.caption.20}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {A.2}Programm-Code}{iv}{section.A.2}}
 \newlabel{sec:Program-Code}{{A.2}{iv}{Programm-Code}{section.A.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.2.1}Aufteilen des Shared Memory in der Funktion devide()}{v}{subsection.A.2.1}}
@@ -178,5 +187,5 @@
 \bibcite{AdvProgramming}{2}
 \bibcite{CGrundlagen}{3}
 \bibcite{GrundkursC}{4}
-\@writefile{toc}{\contentsline {chapter}{\nonumberline Literaturverzeichnis}{xv}{appendix*.19}}
+\@writefile{toc}{\contentsline {chapter}{\nonumberline Literaturverzeichnis}{xv}{appendix*.21}}
 \global\@altsecnumformattrue

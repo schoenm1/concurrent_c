@@ -19,23 +19,26 @@
 \contentsline {section}{\numberline {4.1}Starten des Server}{9}{section.4.1}
 \contentsline {section}{\numberline {4.2}Starten der Clients}{11}{section.4.2}
 \contentsline {section}{\numberline {4.3}Benutzen der Clients}{11}{section.4.3}
-\contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{12}{chapter.5}
-\contentsline {section}{\numberline {5.1}Voraussetzungen}{12}{section.5.1}
-\contentsline {section}{\numberline {5.2}Libraries}{12}{section.5.2}
-\contentsline {section}{\numberline {5.3}Programmierumgebung}{13}{section.5.3}
-\contentsline {section}{\numberline {5.4}LOG/DEBUG}{13}{section.5.4}
-\contentsline {section}{\numberline {5.5}Speicherverwaltung -- Buddy System}{14}{section.5.5}
-\contentsline {subsection}{\numberline {5.5.1}Wie wird das komplette System gemanagt?}{14}{subsection.5.5.1}
-\contentsline {subsection}{\numberline {5.5.2}Wie wird der optimale Block f\"ur ein neues File im Shared Memory gefunden?}{16}{subsection.5.5.2}
-\contentsline {subsection}{\numberline {5.5.3}Gibt es nur zu grosse Bl\"ocke, wie werden die aufgetrennt?}{16}{subsection.5.5.3}
-\contentsline {section}{\numberline {5.6}Locks}{19}{section.5.6}
-\contentsline {section}{\numberline {5.7}Server-Befehle}{20}{section.5.7}
-\contentsline {section}{\numberline {5.8}CREATE}{21}{section.5.8}
-\contentsline {section}{\numberline {5.9}READ}{22}{section.5.9}
-\contentsline {section}{\numberline {5.10}UPDATE}{23}{section.5.10}
-\contentsline {section}{\numberline {5.11}DELETE}{24}{section.5.11}
-\contentsline {section}{\numberline {5.12}LIST}{25}{section.5.12}
-\contentsline {chapter}{\numberline {6}Fazit}{26}{chapter.6}
+\contentsline {section}{\numberline {4.4}Einschr\"ankungen der Applikation}{12}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Einschr\"ankungen gem\"ass Implementationsdefinitionen}{12}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Einschr\"ankungen gem\"ass bekannter Fehler in der Applikation}{12}{subsection.4.4.2}
+\contentsline {chapter}{\numberline {5}Umsetzung des Projektes}{14}{chapter.5}
+\contentsline {section}{\numberline {5.1}Voraussetzungen}{14}{section.5.1}
+\contentsline {section}{\numberline {5.2}Libraries}{14}{section.5.2}
+\contentsline {section}{\numberline {5.3}Programmierumgebung}{15}{section.5.3}
+\contentsline {section}{\numberline {5.4}LOG/DEBUG}{15}{section.5.4}
+\contentsline {section}{\numberline {5.5}Speicherverwaltung -- Buddy System}{16}{section.5.5}
+\contentsline {subsection}{\numberline {5.5.1}Wie wird das komplette System gemanagt?}{16}{subsection.5.5.1}
+\contentsline {subsection}{\numberline {5.5.2}Wie wird der optimale Block f\"ur ein neues File im Shared Memory gefunden?}{18}{subsection.5.5.2}
+\contentsline {subsection}{\numberline {5.5.3}Gibt es nur zu grosse Bl\"ocke, wie werden die aufgetrennt?}{18}{subsection.5.5.3}
+\contentsline {section}{\numberline {5.6}Locks}{21}{section.5.6}
+\contentsline {section}{\numberline {5.7}Server-Befehle}{22}{section.5.7}
+\contentsline {section}{\numberline {5.8}CREATE}{23}{section.5.8}
+\contentsline {section}{\numberline {5.9}READ}{24}{section.5.9}
+\contentsline {section}{\numberline {5.10}UPDATE}{25}{section.5.10}
+\contentsline {section}{\numberline {5.11}DELETE}{26}{section.5.11}
+\contentsline {section}{\numberline {5.12}LIST}{27}{section.5.12}
+\contentsline {chapter}{\numberline {6}Fazit}{28}{chapter.6}
 \contentsline {chapter}{\numberline {A}Anhang}{i}{appendix.A}
 \contentsline {section}{\numberline {A.1}Screenshots zum Server}{i}{section.A.1}
 \contentsline {subsection}{\numberline {A.1.1}Shared Memory vor dem Einf\"ugen eines neuen Files}{i}{subsection.A.1.1}
@@ -47,4 +50,4 @@
 \contentsline {subsection}{\numberline {A.2.3}READ}{ix}{subsection.A.2.3}
 \contentsline {subsection}{\numberline {A.2.4}UPDATE}{x}{subsection.A.2.4}
 \contentsline {subsection}{\numberline {A.2.5}DELETE}{xiii}{subsection.A.2.5}
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{xv}{appendix*.19}
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{xv}{appendix*.21}

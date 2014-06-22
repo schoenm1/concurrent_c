@@ -87,6 +87,58 @@ Der LIST zeigt das momentan vorhandene Shared-Memory an, wobei zu beachten gilt,
 \end{itemize}
 
 
+%============== N E W  ==== S E C T I O N  ======== 
+\newpage
+\section{Einschränkungen der Applikation}
+\label{sec:Einschränkungen}
+
+Die Benutzung dieser Applikation beinhaltet einigen Einschränkungen. Einige basieren auf der Implementation und deren Definition, andere sind bekannte Fehler, welche jedoch aufgrund von zeitlichen Problemen konnten nicht alle Fehler behoben werden, die erkannt wurden.\\
+Aus diesem Grund sind folgende Einschränkungen vorhanden, welche den Server auch abstürzen lassen können. Es könnte auch sein, dass noch mehr Fehler vorhanden sind, welche jedoch noch nicht erkannt wurden.
+
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Einschränkungen gemäss Implementationsdefinitionen}
+
+\begin{itemize}
+\item Werden bei einem CREATE oder UPDATE beim content zwischen zwei Wörtern zwei oder mehr Leerzeichen platziert, werden diese (da der content in einzelne Array aufgeteilt wird) auf ein Leerzeichen reduziert.\\
+Beispiel:\\
+Bei der Eingabe von \flqq CREATE test.txt Hallo \ Welt, dies ist ein Test\frqq\ und anschliessendem READ der Datei test.txt ist der content:  \flqq Hallo Welt, dies ist ein Test\frqq\
+
+\item Die maximale Wortlänge, sprich aneinander gereihte Zeichen ohne Leerzeichen, darf maximal 256 sein.\\
+Diese Einschränkung in der Funktion void breakCharArrayInWords(\dots) definiert, welche die Eingabe des Clients auftrennt in ein Array, um so Serverbefehle vom Rest (z.B. content) unterscheiden zu können.
+
+\label{Einschränkung_CREATE_UPDATE}
+\item CREATE und UPDATE\\
+Wird bei dem Erstellen oder Updaten eines Files ein content mitgegeben, welcher nicht mindestens 3 Zeichen hat, wird automatisch \flqq NULL\dots\frqq\ als content geschrieben.
+
+Beispiel:\\
+Bei einem \flqq CREATE test.txt 12\frqq\ und anschliessendes \flqq READ test.txt\frqq\ wird ausgegeben: \flqq \# Message from Server: NULL\dots\frqq.
+
+\end{itemize}
+
+%============== N E W  ==== S U B - S E C T I O N  ======== 
+\subsection{Einschränkungen gemäss bekannter Fehler in der Applikation}
+
+
+\begin{itemize}
+\item Wird bei dem Befehlt CREATE oder UPDATE ein Content mitgegeben, welcher > 900 ist, wird der Server mit grosser Wahrscheinlichkeit mit einem bufferoverflow abstürzen\\
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{buffer_overflow.png} 
+\caption[Buffer Overflow bei zu grossen Dateien]{Buffer Overflow bei zu grossen Dateien\\Quelle: eigener Screenshot}
+\label{fig:buffer_overflow}
+\end{figure}
+
+\item Stürzt der Server ab, wird das allozierte Shared Memory nicht gelöscht. Bei einem erneuten Start des Servers wird ein weiteres Shared Memory erzeugt. Bis zu einem Neustart der Linux-Umgebung oder manuelles löschen der nicht mehr benützten Shared-Memory Blöcken bleiben diese vorhanden.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{new_shm_after_crash.png} 
+\caption[Duplizierung SHM nach Server Crash]{Duplizierung SHM nach Server Crash\\Quelle: eigener Screenshot}
+\label{fig:new_shm_after_crash}
+\end{figure}
+
+\end{itemize}
 
 
 

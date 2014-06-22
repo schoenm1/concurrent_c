@@ -18,32 +18,35 @@
 \BOOKMARK [1][]{section.4.1}{Starten des Server}{chapter.4}% 18
 \BOOKMARK [1][]{section.4.2}{Starten der Clients}{chapter.4}% 19
 \BOOKMARK [1][]{section.4.3}{Benutzen der Clients}{chapter.4}% 20
-\BOOKMARK [0][]{chapter.5}{Umsetzung des Projektes}{}% 21
-\BOOKMARK [1][]{section.5.1}{Voraussetzungen}{chapter.5}% 22
-\BOOKMARK [1][]{section.5.2}{Libraries}{chapter.5}% 23
-\BOOKMARK [1][]{section.5.3}{Programmierumgebung}{chapter.5}% 24
-\BOOKMARK [1][]{section.5.4}{LOG/DEBUG}{chapter.5}% 25
-\BOOKMARK [1][]{section.5.5}{Speicherverwaltung \205 Buddy System}{chapter.5}% 26
-\BOOKMARK [2][]{subsection.5.5.1}{Wie wird das komplette System gemanagt?}{section.5.5}% 27
-\BOOKMARK [2][]{subsection.5.5.2}{Wie wird der optimale Block f\374r ein neues File im Shared Memory gefunden?}{section.5.5}% 28
-\BOOKMARK [2][]{subsection.5.5.3}{Gibt es nur zu grosse Bl\366cke, wie werden die aufgetrennt?}{section.5.5}% 29
-\BOOKMARK [1][]{section.5.6}{Locks}{chapter.5}% 30
-\BOOKMARK [1][]{section.5.7}{Server-Befehle}{chapter.5}% 31
-\BOOKMARK [1][]{section.5.8}{CREATE}{chapter.5}% 32
-\BOOKMARK [1][]{section.5.9}{READ}{chapter.5}% 33
-\BOOKMARK [1][]{section.5.10}{UPDATE}{chapter.5}% 34
-\BOOKMARK [1][]{section.5.11}{DELETE}{chapter.5}% 35
-\BOOKMARK [1][]{section.5.12}{LIST}{chapter.5}% 36
-\BOOKMARK [0][]{chapter.6}{Fazit}{}% 37
-\BOOKMARK [0][]{appendix.A}{Anhang}{}% 38
-\BOOKMARK [1][]{section.A.1}{Screenshots zum Server}{appendix.A}% 39
-\BOOKMARK [2][]{subsection.A.1.1}{Shared Memory vor dem Einf\374gen eines neuen Files}{section.A.1}% 40
-\BOOKMARK [2][]{subsection.A.1.2}{Aufteilen des Shared Memory in der Funktion devide\(\)}{section.A.1}% 41
-\BOOKMARK [2][]{subsection.A.1.3}{Shared Memory nach dem Einf\374gen eines neuen Files}{section.A.1}% 42
-\BOOKMARK [1][]{section.A.2}{Programm-Code}{appendix.A}% 43
-\BOOKMARK [2][]{subsection.A.2.1}{Aufteilen des Shared Memory in der Funktion devide\(\)}{section.A.2}% 44
-\BOOKMARK [2][]{subsection.A.2.2}{CREATE}{section.A.2}% 45
-\BOOKMARK [2][]{subsection.A.2.3}{READ}{section.A.2}% 46
-\BOOKMARK [2][]{subsection.A.2.4}{UPDATE}{section.A.2}% 47
-\BOOKMARK [2][]{subsection.A.2.5}{DELETE}{section.A.2}% 48
-\BOOKMARK [0][]{appendix*.19}{Literaturverzeichnis}{}% 49
+\BOOKMARK [1][]{section.4.4}{Einschr\344nkungen der Applikation}{chapter.4}% 21
+\BOOKMARK [2][]{subsection.4.4.1}{Einschr\344nkungen gem\344ss Implementationsdefinitionen}{section.4.4}% 22
+\BOOKMARK [2][]{subsection.4.4.2}{Einschr\344nkungen gem\344ss bekannter Fehler in der Applikation}{section.4.4}% 23
+\BOOKMARK [0][]{chapter.5}{Umsetzung des Projektes}{}% 24
+\BOOKMARK [1][]{section.5.1}{Voraussetzungen}{chapter.5}% 25
+\BOOKMARK [1][]{section.5.2}{Libraries}{chapter.5}% 26
+\BOOKMARK [1][]{section.5.3}{Programmierumgebung}{chapter.5}% 27
+\BOOKMARK [1][]{section.5.4}{LOG/DEBUG}{chapter.5}% 28
+\BOOKMARK [1][]{section.5.5}{Speicherverwaltung \205 Buddy System}{chapter.5}% 29
+\BOOKMARK [2][]{subsection.5.5.1}{Wie wird das komplette System gemanagt?}{section.5.5}% 30
+\BOOKMARK [2][]{subsection.5.5.2}{Wie wird der optimale Block f\374r ein neues File im Shared Memory gefunden?}{section.5.5}% 31
+\BOOKMARK [2][]{subsection.5.5.3}{Gibt es nur zu grosse Bl\366cke, wie werden die aufgetrennt?}{section.5.5}% 32
+\BOOKMARK [1][]{section.5.6}{Locks}{chapter.5}% 33
+\BOOKMARK [1][]{section.5.7}{Server-Befehle}{chapter.5}% 34
+\BOOKMARK [1][]{section.5.8}{CREATE}{chapter.5}% 35
+\BOOKMARK [1][]{section.5.9}{READ}{chapter.5}% 36
+\BOOKMARK [1][]{section.5.10}{UPDATE}{chapter.5}% 37
+\BOOKMARK [1][]{section.5.11}{DELETE}{chapter.5}% 38
+\BOOKMARK [1][]{section.5.12}{LIST}{chapter.5}% 39
+\BOOKMARK [0][]{chapter.6}{Fazit}{}% 40
+\BOOKMARK [0][]{appendix.A}{Anhang}{}% 41
+\BOOKMARK [1][]{section.A.1}{Screenshots zum Server}{appendix.A}% 42
+\BOOKMARK [2][]{subsection.A.1.1}{Shared Memory vor dem Einf\374gen eines neuen Files}{section.A.1}% 43
+\BOOKMARK [2][]{subsection.A.1.2}{Aufteilen des Shared Memory in der Funktion devide\(\)}{section.A.1}% 44
+\BOOKMARK [2][]{subsection.A.1.3}{Shared Memory nach dem Einf\374gen eines neuen Files}{section.A.1}% 45
+\BOOKMARK [1][]{section.A.2}{Programm-Code}{appendix.A}% 46
+\BOOKMARK [2][]{subsection.A.2.1}{Aufteilen des Shared Memory in der Funktion devide\(\)}{section.A.2}% 47
+\BOOKMARK [2][]{subsection.A.2.2}{CREATE}{section.A.2}% 48
+\BOOKMARK [2][]{subsection.A.2.3}{READ}{section.A.2}% 49
+\BOOKMARK [2][]{subsection.A.2.4}{UPDATE}{section.A.2}% 50
+\BOOKMARK [2][]{subsection.A.2.5}{DELETE}{section.A.2}% 51
+\BOOKMARK [0][]{appendix*.21}{Literaturverzeichnis}{}% 52
